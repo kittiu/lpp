@@ -1,0 +1,208 @@
+table td {
+    vertical-align: top !important;
+  }
+  
+  .master-table .border-top {
+    border-top: 1px solid black !important;
+  }
+  
+  .master-table table {
+    width: 100% !important;
+  }
+  
+  .master-table table,
+  .master-table th {
+    border: 1px solid black !important;
+  }
+  
+  .master-table table,
+  .master-table td {
+    border-left: 1px solid black !important;
+  }
+  
+  .master-table th,
+  .master-table td {
+    padding: 5px !important;
+    text-align: left;
+    color: black;
+  }
+  
+  .print-format td,
+  .print-format th {
+    padding: 5px !important;
+  }
+  
+  /* Row */
+  .gj-row {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  /* Columns */
+  [class*="gj-col-"] {
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+  }
+  
+  /* Column sizes */
+  .gj-col-1 {
+    flex: 0 0 8.33%;
+    max-width: 8.33%;
+  }
+  
+  .gj-col-2 {
+    flex: 0 0 16.66%;
+    max-width: 16.66%;
+  }
+  
+  .gj-col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  
+  .gj-col-4 {
+    flex: 0 0 33.33%;
+    max-width: 33.33%;
+  }
+  
+  .gj-col-5 {
+    flex: 0 0 41.66%;
+    max-width: 41.66%;
+  }
+  
+  .gj-col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  
+  .gj-col-7 {
+    flex: 0 0 58.33%;
+    max-width: 58.33%;
+  }
+  
+  .gj-col-8 {
+    flex: 0 0 66.66%;
+    max-width: 66.66%;
+  }
+  
+  .gj-col-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+  }
+  
+  .gj-col-10 {
+    flex: 0 0 83.33%;
+    max-width: 83.33%;
+  }
+  
+  .gj-col-11 {
+    flex: 0 0 91.66%;
+    max-width: 91.66%;
+  }
+  
+  .gj-col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  /* Padding Utilities */
+  .gj-p-0 {
+    padding: 0px !important;
+  }
+  
+  .gj-p-1 {
+    padding: 0.25rem;
+  }
+  
+  .gj-p-2 {
+    padding: 0.5rem;
+  }
+  
+  .gj-p-3 {
+    padding: 1rem;
+  }
+  
+  .gj-p-4 {
+    padding: 1.5rem;
+  }
+  
+  .gj-p-5 {
+    padding: 3rem;
+  }
+  
+  /* Margin Y-axis Utilities */
+  .gj-my-1 {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .gj-my-2 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .gj-my-3 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .gj-my-4 {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .gj-my-5 {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+  
+  .fs-detail {
+    font-size: 11px;
+  }
+  
+  .fs-contact {
+    font-size: 11.5px;
+  }
+  
+  .print-format .w-100 {
+    width: 100%;
+  }
+  
+  .print-format .w-50 {
+    width: 50%;
+  }
+  
+  /* Additional utility classes */
+  .print-format .text-right {
+    text-align: right !important;
+  }
+  
+  .print-format .text-center {
+    text-align: center !important;
+  }
+  
+  .print-format .max-width-logo {
+    max-width: 100px !important;
+  }
+  
+  .print-format .width-logo {
+    width: 200px !important;
+  }
+  
+  .print-format .width-address {
+    width: auto !important;
+  }
+  
+  .print-format .width-tax-id {
+    width: 80%;
+  }
+  
+  .print-format .width-order-sheet {
+    width: auto;
+  }
+  
+  .print-format .border-header {
+    border: solid 1px;
+  }
+  
