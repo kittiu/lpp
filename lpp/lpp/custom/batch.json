@@ -1,7 +1,7 @@
 {
  "custom_fields": [],
  "custom_perms": [],
- "doctype": "Purchase Taxes and Charges",
+ "doctype": "Batch",
  "links": [],
  "property_setters": [
   {
@@ -9,23 +9,23 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-   "creation": "2024-08-05 11:04:32.755773",
+   "creation": "2024-08-14 12:34:48.787629",
    "default_value": null,
-   "doc_type": "Purchase Taxes and Charges",
+   "doc_type": "Batch",
    "docstatus": 0,
    "doctype_or_field": "DocField",
-   "field_name": "rate",
+   "field_name": "batch_id",
    "idx": 0,
    "is_system_generated": 0,
-   "modified": "2024-08-13 17:26:45.109456",
+   "modified": "2024-08-14 12:34:48.787629",
    "modified_by": "Administrator",
    "module": null,
-   "name": "Purchase Taxes and Charges-rate-precision",
+   "name": "Batch-batch_id-label",
    "owner": "Administrator",
-   "property": "precision",
-   "property_type": "Select",
+   "property": "label",
+   "property_type": "Data",
    "row_name": null,
-   "value": "6"
+   "value": "Lot No."
   }
  ],
  "sync_on_migrate": 1
