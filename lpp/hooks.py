@@ -28,7 +28,11 @@ app_include_css = "/assets/lpp/css/ui-framework.css"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Quotation" : "public/js/quotation.js"}
+doctype_js = {
+    "Quotation" : "public/js/quotation.js",
+    "Purchase Order" : "public/js/purchase_order.js",
+    "Material Request" : "public/js/material_request.js"
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -59,10 +63,10 @@ doctype_js = {"Quotation" : "public/js/quotation.js"}
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "lpp.utils.jinja_methods",
-# 	"filters": "lpp.utils.jinja_filters"
-# }
+jinja = {
+	"methods": "lpp.utils.jinja_methods",
+	"filters": "lpp.utils.jinja_filters"
+}
 
 # Installation
 # ------------
