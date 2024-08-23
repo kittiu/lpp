@@ -1,15 +1,16 @@
 import frappe
 from datetime import datetime
+from num2words import num2words
 
 def format_datetime_to_date(date_str):
     try:
-        date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S.%f')
+        date_obj = datetime.strptime(str(date_str), '%Y-%m-%d %H:%M:%S.%f')
         return date_obj.strftime('%d/%m/%Y')
     except Exception as e:
         return date_str
 def format_date(date_str):
     try:
-        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+        date_obj = datetime.strptime(str(date_str), '%Y-%m-%d')
         return date_obj.strftime('%d/%m/%Y')
     except Exception as e:
         return date_str
@@ -42,3 +43,15 @@ def get_user_full_name(owner):
         return f"{first_name.strip()} {last_name.strip()}" if (first_name or last_name) else "Unknown User"
     except frappe.DoesNotExistError:
         return "Unknown User"
+    
+
+def thai_currency_in_en_words(value):
+    integer_part = int(value)
+    decimal_part = int(round((value - integer_part) * 100))
+    words = num2words(integer_part) + " Baht"
+    if decimal_part > 0:
+        words += f" And {num2words(decimal_part)} Satang"
+    else:
+        words += " And Zero Satang"
+    words = ' '.join([word.capitalize() for word in words.split()])
+    return words
