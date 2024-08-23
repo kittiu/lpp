@@ -7,7 +7,7 @@ def format_datetime_to_date(date_str):
         date_obj = datetime.strptime(str(date_str), '%Y-%m-%d %H:%M:%S.%f')
         return date_obj.strftime('%d/%m/%Y')
     except Exception as e:
-        return e.message
+        return date_str
 def format_date(date_str):
     try:
         date_obj = datetime.strptime(str(date_str), '%Y-%m-%d')
