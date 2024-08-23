@@ -4,13 +4,13 @@ from num2words import num2words
 
 def format_datetime_to_date(date_str):
     try:
-        date_obj = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S.%f')
+        date_obj = datetime.strptime(str(date_str), '%Y-%m-%d %H:%M:%S.%f')
         return date_obj.strftime('%d/%m/%Y')
     except Exception as e:
-        return date_str
+        return e.message
 def format_date(date_str):
     try:
-        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+        date_obj = datetime.strptime(str(date_str), '%Y-%m-%d')
         return date_obj.strftime('%d/%m/%Y')
     except Exception as e:
         return date_str
