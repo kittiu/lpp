@@ -1,4 +1,5 @@
 import frappe
+
 def get_company_info():
     try:
         # Get the Company Info data
@@ -11,3 +12,6 @@ def get_company_info():
         # Handle any other unexpected exceptions
         # frappe.log_error(f"Error retrieving Company Info: {e}", "get_company_info")
         return None
+    
+def chunk_list(lst : list, size):
+    return [lst[i:i+size] for i in range(0, len(lst), size)]
