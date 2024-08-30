@@ -32,8 +32,8 @@ def format_currency(value, decimals=2):
     except (ValueError, TypeError):
         # Handle cases where value is not a valid number
         return "Invalid value"
-def sum_amounts(items):
-    return sum(item.get('amount', 0) for item in items)
+def sum_amounts(items, field= 'amount'):
+    return sum(item.get(field, 0) for item in items)
 def get_user_full_name(owner):
     try:
         user = frappe.get_doc('User', owner)
