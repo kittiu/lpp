@@ -269,7 +269,7 @@
    "description": null,
    "docstatus": 0,
    "dt": "Work Order",
-   "fetch_from": "custom_customer_item.customer_name",
+   "fetch_from": "",
    "fetch_if_empty": 0,
    "fieldname": "custom_customer_on_label",
    "fieldtype": "Data",
