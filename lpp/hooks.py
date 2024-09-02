@@ -31,7 +31,8 @@ app_include_css = "/assets/lpp/css/ui-framework.css"
 doctype_js = {
     "Quotation" : "public/js/quotation.js",
     "Purchase Order" : "public/js/purchase_order.js",
-    "Material Request" : "public/js/material_request.js"
+    "Material Request" : "public/js/material_request.js",
+    "Stock Entry" : "public/js/stock_entry.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
