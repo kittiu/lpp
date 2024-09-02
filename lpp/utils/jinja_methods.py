@@ -15,3 +15,12 @@ def get_company_info():
     
 def chunk_list(lst : list, size):
     return [lst[i:i+size] for i in range(0, len(lst), size)]
+
+def split_string(input_str, delimiter='-', index=None):
+    # Split the input string by the specified delimiter and strip any leading/trailing whitespace from the parts
+    parts = [part.strip() for part in input_str.split(delimiter)]
+    
+    # If index is provided, return the specific part, otherwise return the full list
+    if index is not None and 0 <= index < len(parts):
+        return parts[index]
+    return parts
