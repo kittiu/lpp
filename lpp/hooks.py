@@ -67,7 +67,10 @@ doctype_js = {
 
 # add methods and filters to jinja environment
 jinja = {
-	"methods": "lpp.utils.jinja_methods",
+    "methods": [
+		"qr_demo.qr_code.get_qr_code",
+        "lpp.utils.jinja_methods",
+	],
 	"filters": "lpp.utils.jinja_filters"
 }
 
