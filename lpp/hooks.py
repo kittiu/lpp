@@ -34,6 +34,7 @@ doctype_js = {
     "Material Request" : "public/js/material_request.js",
     "Stock Entry" : "public/js/stock_entry.js",
     "BOM" : "public/js/bom.js"
+    # "Delivery Note" : "public/js/delivery_note.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -128,13 +129,16 @@ jinja = {
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "Delivery Note": {
+        "on_submit": "custom.deliveryd_note.on_submit_delivery_note"
+    }
+	# "*": {
+	# 	"on_update": "method",
+	# 	"on_cancel": "method",
+	# 	"on_trash": "method"
+	# }
+}
 
 # Scheduled Tasks
 # ---------------
