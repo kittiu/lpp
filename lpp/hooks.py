@@ -33,6 +33,7 @@ doctype_js = {
     "Purchase Order" : "public/js/purchase_order.js",
     "Material Request" : "public/js/material_request.js",
     "Stock Entry" : "public/js/stock_entry.js",
+    "BOM" : "public/js/bom.js",
     "Work Order" : "public/js/work_order.js",
     # "Delivery Note" : "public/js/delivery_note.js"
 }
