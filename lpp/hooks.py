@@ -33,6 +33,7 @@ doctype_js = {
     "Purchase Order" : "public/js/purchase_order.js",
     "Material Request" : "public/js/material_request.js",
     "Stock Entry" : "public/js/stock_entry.js",
+    "Work Order" : "public/js/work_order.js",
     # "Delivery Note" : "public/js/delivery_note.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -66,7 +67,10 @@ doctype_js = {
 
 # add methods and filters to jinja environment
 jinja = {
-	"methods": "lpp.utils.jinja_methods",
+    "methods": [
+		"qr_demo.qr_code.get_qr_code",
+        "lpp.utils.jinja_methods",
+	],
 	"filters": "lpp.utils.jinja_filters"
 }
 
