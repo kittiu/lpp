@@ -43,3 +43,46 @@ frappe.ui.form.on("Work Order", {
         }
     }
 });
+
+
+frappe.ui.form.on('Work Order Item', {
+    item_code: async function(frm, cdt, cdn) {
+        update_invoice_portion(frm);
+    },
+    required_qty: function(frm, cdt, cdn) {
+        update_invoice_portion(frm);
+    },
+    custom_invoice_portion_ : function(frm, cdt, cdn) {
+        update_invoice_portion(frm);
+    },
+    required_items_remove(frm, cdt, cdn) {
+        update_invoice_portion(frm);
+    },
+});
+
+
+function update_invoice_portion (frm) {
+    
+    let total_qty = 0;
+
+    // คำนวณ total cost ของวัตถุดิบทั้งหมด
+    frm.doc.required_items.forEach(i => {        
+        total_qty += i.required_qty;
+    });
+
+    // คำนวณและอัพเดต Invoice Portion % สำหรับแต่ละวัตถุดิบ
+    frm.doc.required_items.forEach(item => {
+        if (total_qty > 0) {
+            
+            invoice_portion = (item.required_qty/ total_qty) * 100;
+            item.custom_invoice_portion_ = invoice_portion;
+        } else {
+
+            item.custom_invoice_portion_ = 0;
+        }
+    });
+
+    // รีเฟรชฟิลด์ของรายการวัตถุดิบเพื่อแสดงผลลัพธ์
+    frm.refresh_field('required_items');
+}
+
