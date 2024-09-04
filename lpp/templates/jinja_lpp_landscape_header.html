@@ -1,0 +1,24 @@
+{% set value = get_company_info() %}
+<div >
+    <div class="gj-row">
+        <div class="gj-col-2 width-logo">
+            <h4 class="text-left ">
+                <img class="w-100 max-width-logo" src="/assets/lpp/images/lpp-logo.png" alt="Logo">
+            </h4>
+        </div>
+        <div class="gj-col-5">
+            <h4 class="my-0">{{value.company_name_en}}</h4>
+            <h4 class="my-0">{{value.company_name_th}}</h4>
+        </div>
+
+        <div class="gj-col-5">
+            <h1 class="text-right my-0">
+                {{title_th}}
+            </h1>
+            <h1 class="text-right my-0">
+                {{title_en}}
+            </h1>
+        </div>
+    </div>
+
+</div>
