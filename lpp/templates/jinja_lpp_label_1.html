@@ -1,0 +1,55 @@
+<div style="width: 10cm; height: 7cm; border: 1px solid #000; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; font-size: 12px;">
+    <div style="margin: 0;">
+        <strong>Customer</strong> {{ customer_name }}
+    </div>
+    <div style="margin: 0;">
+        <strong>Item Name</strong> {{ item_name }}
+    </div>
+    <div style="margin: 0;">
+        <strong>Customer Part No.</strong> {{ customer_part_no }}
+    </div>
+    <div>{{ get_barcode_svg(data=barcode_data_1, module_width_mm=0.15, module_height_mm=6) | safe }}</div>
+    <div style="margin: 0; display: flex; justify-content: space-between;">
+        <div style="width: 75%;">
+            <div style="margin: 0;">
+                <strong>Quantity</strong> {{ quantity }} Pcs
+            </div>
+            <div style="display: flex;">
+                <div style="width: 50%;">
+                    <strong>Lot No.</strong> {{ lot_no }}
+                </div>
+                <div style="width: 50%;">
+                    <strong>Run Card No.</strong> ________ <!-- {{ run_card_no }} -->
+                </div>
+            </div>
+            <div style="margin: 0;">
+                <div>{{ get_barcode_svg(data=barcode_data_2, module_width_mm=0.15, module_height_mm=6) | safe }}</div>
+            </div>
+            <div style="display: flex;">
+                <div style="width: 50%;">
+                    <strong>MFG</strong> {{ mfg_date }}
+                </div>
+                <div style="width: 50%;">
+                    <strong>EXP</strong> {{ exp_date }}
+                </div>
+            </div>
+        </div>
+        <div style="width: 25%;">
+            <img src="{{ get_qr_code(qr_code_data) }}" width="90px" height="90px"/>
+        </div>
+    </div>
+    <div style="margin: 0; display: flex; justify-content: space-between;">
+        <div style="width: 70%;">
+            <div style="font-size: 14px; font-weight: bold; color: #3a7eb8;">{{ company_name }}</div>
+            <div>{{ country_of_origin }}</div>
+        </div>
+        <div style="width: 30%;">
+            <img style="height: 25px;" src="/assets/lpp/images/label-1.png" alt="Logo">
+            <img style="height: 25px;" src="/assets/lpp/images/label-2.png" alt="Logo">
+            <img style="height: 25px;" src="/assets/lpp/images/label-3.png" alt="Logo">
+        </div>
+    </div>
+    <div style="font-size: 9px;">
+        {{ storage_instructions }}
+    </div>
+</div>
