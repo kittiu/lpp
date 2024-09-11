@@ -1,8 +1,15 @@
 frappe.ui.form.on("Work Order", {
     refresh(frm) {
-        // Code for refresh event (if needed)
+        // Get today's date
+        let today = frappe.datetime.nowdate();
+        
+        // Set 'custom_mfg_date' field to today's date by default
+        frm.set_value("custom_mfg_date", today);
+        
+        // Add 12 months to today's date and set the 'custom_exp_date' field
+        frm.set_value("custom_exp_date", frappe.datetime.add_months(today, 12));
     },
-
+    
     custom_customer(frm) {
         // Check if custom_customer exists, then fetch customer_name
         if (frm.doc.custom_customer) {
