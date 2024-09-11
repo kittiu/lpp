@@ -1,6 +1,7 @@
 import frappe
 from datetime import datetime
 from num2words import num2words
+import math
 
 def format_datetime_to_date(date_str):
     try:
@@ -55,3 +56,10 @@ def thai_currency_in_en_words(value):
         words += " And Zero Satang"
     words = ' '.join([word.capitalize() for word in words.split()])
     return words
+
+def adjust_number(number):
+    # Check if the number has a decimal part
+    if number != math.floor(number):
+        return math.floor(number) + 1
+    else:
+        return number
