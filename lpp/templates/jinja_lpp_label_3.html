@@ -15,7 +15,7 @@
         <div style="width: 50%;">
             <div class="my-1" style="display: flex; justify-content: space-between;">
                 <strong>Quantity</strong>
-                <span style="text-align: left; width: 50%;">{{ quantity }}</span>
+                <span style="text-align: left; width: 50%;">{{ quantity }} {{unit}}</span>
             </div>
             <div class="my-1" style="display: flex; justify-content: space-between;">
                 <strong>Lot No.</strong>
@@ -44,13 +44,13 @@
             <div class="my-1" style="display: flex; justify-content: space-between;">
                 <strong>Quantity</strong>
                 <span style="text-align: left; width: 80%;">
-                    {{ get_barcode_svg(data=barcode_data_1, module_width_mm=0.15, module_height_mm=8) | safe }}
+                    {{ get_barcode_svg(data=barcode_data_2, module_width_mm=0.15, module_height_mm=8) | safe }}
                 </span>
             </div>
             <div class="my-1" style="display: flex; justify-content: space-between;">
                 <strong>Lot No.</strong>
                 <span style="text-align: left; width: 80%;">
-                    {{ get_barcode_svg(data=barcode_data_1, module_width_mm=0.15, module_height_mm=8) | safe }}
+                    {{ get_barcode_svg(data=barcode_data_3, module_width_mm=0.15, module_height_mm=8) | safe }}
                 </span>
             </div>
         </div>
