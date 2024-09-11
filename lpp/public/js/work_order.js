@@ -3,10 +3,10 @@ frappe.ui.form.on("Work Order", {
         // Code for refresh event (if needed)
     },
 
-    custom_customer_item(frm) {
-        // Check if custom_customer_item exists, then fetch customer_name
-        if (frm.doc.custom_customer_item) {
-            frappe.db.get_value("Customer", frm.doc.custom_customer_item, "customer_name")
+    custom_customer(frm) {
+        // Check if custom_customer exists, then fetch customer_name
+        if (frm.doc.custom_customer) {
+            frappe.db.get_value("Customer", frm.doc.custom_customer, "customer_name")
                 .then(({ message }) => {
                     if (message) {
                         frm.set_value("custom_customer_on_label", message.customer_name);
