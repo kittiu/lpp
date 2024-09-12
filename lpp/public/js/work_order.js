@@ -112,9 +112,8 @@ function calculate_total_run_cards(frm) {
     if (custom_quantity_run_card > 0) {
         // Calculate and round to 2 decimal places using toFixed(2)
         let total_run_cards = (qty / custom_quantity_run_card).toFixed(2);
-        console.log('total_run_cards', total_run_cards);
         
-        frm.set_value("custom_total_run_cards", total_run_cards);
+        frm.set_value("custom_total_run_cards", Math.ceil(total_run_cards));
     } else {
         frm.set_value("custom_total_run_cards", 0);  // Set total run cards to 0 if invalid division
     }
