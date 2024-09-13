@@ -1,0 +1,75 @@
+<div style="width: 20cm; height: 9cm; border: 1px solid #000; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; font-size: 16px;">
+    <!-- Header Section -->
+    <div style="display: flex; justify-content: space-between;">
+        <div style="width: 75%;">
+            <div class="my-1"><strong style="margin-right: 20px;">Customer</strong> {{ customer_name }}</div>
+            <div class="my-1"><strong style="margin-right: 20px;">Item Name</strong> {{ item_name }}</div>
+            <div class="my-1"><strong style="margin-right: 20px;">Customer Part No.</strong> {{ customer_part_no }}</div>
+        </div>
+        <div style="width: 25%; text-align: right; font-weight: bold; font-size: 30px;">
+            {{number}}
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+        <div style="width: 50%;">
+            <div class="my-1" style="display: flex; justify-content: space-between;">
+                <strong>Quantity</strong>
+                <span style="text-align: left; width: 50%;">{{ quantity }} {{unit}}</span>
+            </div>
+            <div class="my-1" style="display: flex; justify-content: space-between;">
+                <strong>Lot No.</strong>
+                <span style="text-align: left; width: 50%;">{{ lot_no }}</span>
+            </div>
+            <div class="my-1" style="display: flex; justify-content: space-between;">
+                <strong>Run Card No.</strong>
+                <span style="text-align: left; width: 50%;">________</span>
+            </div>
+            <div class="my-1" style="display: flex; justify-content: space-between;">
+                <strong>MFG</strong>
+                <span style="text-align: left; width: 50%;">{{ mfg_date }}</span>
+            </div>
+            <div class="my-1" style="display: flex; justify-content: space-between;">
+                <strong>EXP</strong>
+                <span style="text-align: left; width: 50%;">{{ exp_date }}</span>
+            </div>
+        </div>
+        <div style="width: 50%;">
+            <div class="my-1" style="display: flex; justify-content: space-between;">
+                <small style="margin:auto">Part No</small>
+                <span style="text-align: left; width: 80%;">
+                    {{ get_barcode_svg(data=barcode_data_1, module_width_mm=0.15, module_height_mm=8) | safe }}
+                </span>
+            </div>
+            <div class="my-1" style="display: flex; justify-content: space-between;">
+                <small style="margin:auto">Quantity</small>
+                <span style="text-align: left; width: 80%;">
+                    {{ get_barcode_svg(data=barcode_data_2, module_width_mm=0.15, module_height_mm=8) | safe }}
+                </span>
+            </div>
+            <div class="my-1" style="display: flex; justify-content: space-between;">
+                <small style="margin:auto">Lot No.</small>
+                <span style="text-align: left; width: 80%;">
+                    {{ get_barcode_svg(data=barcode_data_3, module_width_mm=0.15, module_height_mm=8) | safe }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Info and Logos Section -->
+    <div style="display: flex; justify-content: space-between;">
+        <div style="width: 65%;">
+            <div style="font-size: 18px; font-weight: bold; color: #3a7eb8;">{{ company_name }}</div>
+            <div>{{ country_of_origin }}</div>
+            <!-- Footer Note -->
+            <div class="mt-1" style="font-size: 12px; text-align: left">
+                {{ storage_instructions }}
+            </div>
+        </div>
+        <div style="width: 35%; display: flex; justify-content: space-around;">
+            <img style="height: 60px;" src="/assets/lpp/images/label-1.png" alt="Logo 1">
+            <img style="height: 60px;" src="/assets/lpp/images/label-2.png" alt="Logo 2">
+            <img style="height: 60px;" src="/assets/lpp/images/label-3.png" alt="Logo 3">
+        </div>
+    </div>
+</div>
