@@ -31,6 +31,7 @@ app_include_css = "/assets/lpp/css/ui-framework.css"
 doctype_js = {
     "Quotation" : "public/js/quotation.js",
     "Purchase Order" : "public/js/purchase_order.js",
+    "Purchase Invoice" : "public/js/purchase_invoice.js",
     "Material Request" : "public/js/material_request.js",
     "Stock Entry" : "public/js/stock_entry.js",
     "BOM" : "public/js/bom.js",
@@ -174,7 +175,7 @@ doc_events = {
 # ------------------------------
 #
 # override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "lpp.event.get_events"
+	# "frappe.desk.doctype.event.event.get_events": "lpp.event.get_events"
 # }
 #
 # each overriding function accepts a `data` argument;
