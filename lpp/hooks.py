@@ -36,7 +36,8 @@ doctype_js = {
     "Stock Entry" : "public/js/stock_entry.js",
     "BOM" : "public/js/bom.js",
     "Work Order" : "public/js/work_order.js",
-    "Delivery Note" : "public/js/delivery_note.js"
+    "Delivery Note" : "public/js/delivery_note.js",
+    "Quality Inspection" : "public/js/quality_inspection.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -126,9 +127,9 @@ jinja = {
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+    "Quality Inspection" : "lpp.custom.custom_quality_inspection.CustomQualityInspection"
+}
 
 # Document Events
 # ---------------
