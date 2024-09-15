@@ -11,6 +11,8 @@ frappe.ui.form.on("Work Order", {
 
         // Calculate total run cards
         calculate_total_run_cards(frm);
+        
+        set_custom_item_molds_query(frm)
     },
     
     custom_customer(frm) {
@@ -40,23 +42,7 @@ frappe.ui.form.on("Work Order", {
         calculate_total_run_cards(frm);  // Call the function to calculate when custom_quantity__run_card changes
     },
     production_item(frm) {
-        // Check if production_item exists, then fetch batch details
-        if (frm.doc.production_item) {
-            frappe.db.get_value("Batch", { item: frm.doc.production_item }, "batch_id")
-                .then(({ message }) => {
-                    if (message) {
-                        frm.set_value("custom_lot_no", message.batch_id);
-                    }
-                })
-                .catch(err => {
-                    console.error("Error fetching batch details:", err);
-                    frappe.msgprint({
-                        title: __('Error'),
-                        indicator: 'red',
-                        message: __('Unable to fetch batch details.')
-                    });
-                });
-        }
+        set_custom_item_molds_query(frm)
     }
 });
 
@@ -75,6 +61,57 @@ frappe.ui.form.on('Work Order Item', {
         update_invoice_portion(frm);
     },
 });
+
+function set_custom_item_molds_query(frm) {
+    // Clear 'custom_item_molds' field
+    frm.set_value('custom_item_molds', '');
+
+    // Check if 'production_item' is present
+    if (frm.doc.production_item) {
+        // Fetch the 'Item' document corresponding to the 'production_item' field
+        frappe.db.get_doc('Item', frm.doc.production_item)
+            .then(doc => {
+                // Check if the 'Item' document and its 'custom_molds_items' child table exist
+                if (doc && doc.custom_molds_items) {
+                    // Extract 'name_molds' from each row in the 'custom_molds_items' child table
+                    let molds_items = doc.custom_molds_items.map(row => row.name_molds);
+
+                    // Set a query on the 'custom_item_molds' field to filter options based on 'molds_items'
+                    frm.set_query('custom_item_molds', () => ({
+                        filters: [
+                            ['Molds', 'name_molds', 'in', molds_items]
+                        ]
+                    }));
+                } else {
+                    // Clear the filter if no molds are found
+                    clear_custom_item_molds_filter(frm);
+                }
+            })
+            .catch(err => {
+                // Log any errors to the console and notify the user
+                console.error("Error fetching custom molds items:", err);
+                frappe.msgprint({
+                    title: __('Error'),
+                    indicator: 'red',
+                    message: __('Unable to fetch custom molds items.')
+                });
+                // Clear the filter on error
+                clear_custom_item_molds_filter(frm);
+            });
+    } else {
+        // Clear filter if 'production_item' is empty
+        clear_custom_item_molds_filter(frm);
+    }
+}
+
+// Helper function to clear 'custom_item_molds' filters
+function clear_custom_item_molds_filter(frm) {
+    frm.set_query('custom_item_molds', () => ({
+        filters: [
+            ['Molds', 'name_molds', '=', 'empty']
+        ]
+    }));
+}
 
 
 function update_invoice_portion (frm) {
