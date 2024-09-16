@@ -9,6 +9,8 @@ class CustomSalesBilling(SalesBilling):
         journal_entry = frappe.new_doc("Journal Entry")
         journal_entry.bill_no = sales_billing.name
         journal_entry.bill_date = sales_billing.date
+        journal_entry.custom_party_type = "Customer"
+        journal_entry.custom_party = sales_billing.customer
         
         if sales_billing.threshold_type == "Due Date":
             journal_entry.due_date = sales_billing.threshold_date
