@@ -2,9 +2,9 @@
     <!-- Header Section -->
     <div style="display: flex; justify-content: space-between;">
         <div style="width: 75%;">
-            <div class="my-1"><strong>Customer</strong> {{ customer_name }}</div>
-            <div class="my-1"><strong>Item Name</strong> {{ item_name }}</div>
-            <div class="my-1"><strong>Customer Part No.</strong> {{ customer_part_no }}</div>
+            <div class="my-1"><strong style="margin-right: 20px;">Customer</strong> {{ customer_name }}</div>
+            <div class="my-1"><strong style="margin-right: 20px;">Item Name</strong> {{ item_name }}</div>
+            <div class="my-1"><strong style="margin-right: 20px;">Customer Part No.</strong> {{ customer_part_no }}</div>
         </div>
         <div style="width: 25%; text-align: right; font-weight: bold; font-size: 30px;">
             {{number}}
@@ -36,19 +36,19 @@
         </div>
         <div style="width: 50%;">
             <div class="my-1" style="display: flex; justify-content: space-between;">
-                <strong>Part No</strong>
+                <small style="margin:auto">Part No</small>
                 <span style="text-align: left; width: 80%;">
                     {{ get_barcode_svg(data=barcode_data_1, module_width_mm=0.15, module_height_mm=8) | safe }}
                 </span>
             </div>
             <div class="my-1" style="display: flex; justify-content: space-between;">
-                <strong>Quantity</strong>
+                <small style="margin:auto">Quantity</small>
                 <span style="text-align: left; width: 80%;">
                     {{ get_barcode_svg(data=barcode_data_2, module_width_mm=0.15, module_height_mm=8) | safe }}
                 </span>
             </div>
             <div class="my-1" style="display: flex; justify-content: space-between;">
-                <strong>Lot No.</strong>
+                <small style="margin:auto">Lot No.</small>
                 <span style="text-align: left; width: 80%;">
                     {{ get_barcode_svg(data=barcode_data_3, module_width_mm=0.15, module_height_mm=8) | safe }}
                 </span>
