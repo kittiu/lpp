@@ -1,0 +1,42 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-09-13 16:52:46.985109",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "role_code",
+  "role_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "role_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Role Code",
+   "options": "Role",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "role_code.role_name",
+   "fieldname": "role_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Role Name",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-09-13 16:55:34.497164",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "Item Journal Type",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
