@@ -127,9 +127,9 @@ jinja = {
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+    "Quality Inspection" : "lpp.custom.custom_quality_inspection.CustomQualityInspection"
+}
 
 # Document Events
 # ---------------
