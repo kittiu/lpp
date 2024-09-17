@@ -2,17 +2,19 @@ frappe.ui.form.on("Work Order", {
     refresh(frm) {
         // Get today's date
         let today = frappe.datetime.nowdate();
-        
+
         // Set 'custom_mfg_date' field to today's date by default
         frm.set_value("custom_mfg_date", today);
-        
+
         // Add 12 months to today's date and set the 'custom_exp_date' field
         frm.set_value("custom_exp_date", frappe.datetime.add_months(today, 12));
 
         // Calculate total run cards
         calculate_total_run_cards(frm);
-        
+
         set_custom_item_molds_query(frm)
+
+        update_custom_jobcard_remaining(frm)
     },
     
     custom_customer(frm) {
@@ -34,7 +36,7 @@ frappe.ui.form.on("Work Order", {
                 });
         }
     },
-    custom_ordered_quantity(frm){
+    custom_ordered_quantity(frm) {
         calculate_total_run_cards(frm);
         frm.set_value("qty", frm.doc.custom_ordered_quantity);
     },
@@ -48,13 +50,13 @@ frappe.ui.form.on("Work Order", {
 
 
 frappe.ui.form.on('Work Order Item', {
-    item_code: async function(frm, cdt, cdn) {
+    item_code: async function (frm, cdt, cdn) {
         update_invoice_portion(frm);
     },
-    required_qty: function(frm, cdt, cdn) {
+    required_qty: function (frm, cdt, cdn) {
         update_invoice_portion(frm);
     },
-    custom_invoice_portion_ : function(frm, cdt, cdn) {
+    custom_invoice_portion_: function (frm, cdt, cdn) {
         update_invoice_portion(frm);
     },
     required_items_remove(frm, cdt, cdn) {
@@ -112,20 +114,20 @@ function clear_custom_item_molds_filter(frm) {
 }
 
 
-function update_invoice_portion (frm) {
-    
+function update_invoice_portion(frm) {
+
     let total_qty = 0;
 
     // คำนวณ total cost ของวัตถุดิบทั้งหมด
-    frm.doc.required_items.forEach(i => {        
+    frm.doc.required_items.forEach(i => {
         total_qty += i.required_qty;
     });
 
     // คำนวณและอัพเดต Invoice Portion % สำหรับแต่ละวัตถุดิบ
     frm.doc.required_items.forEach(item => {
         if (total_qty > 0) {
-            
-            invoice_portion = (item.required_qty/ total_qty) * 100;
+
+            invoice_portion = (item.required_qty / total_qty) * 100;
             item.custom_invoice_portion_ = invoice_portion;
         } else {
 
@@ -142,15 +144,32 @@ function calculate_total_run_cards(frm) {
     let qty = frm.doc.custom_ordered_quantity || 0;
     let custom_quantity_run_card = frm.doc.custom_quantity__run_card || 0;
     console.log(qty, custom_quantity_run_card);
-    
+
     // Handle division safely: Check if custom_quantity_run_card is greater than 0 to avoid division by zero
     if (custom_quantity_run_card > 0) {
         // Calculate and round to 2 decimal places using toFixed(2)
         let total_run_cards = (qty / custom_quantity_run_card).toFixed(2);
-        
+
         frm.set_value("custom_total_run_cards", Math.ceil(total_run_cards));
     } else {
         frm.set_value("custom_total_run_cards", 0);  // Set total run cards to 0 if invalid division
     }
 }
 
+function update_custom_jobcard_remaining(frm) {    
+    if(frm.doc.custom_total_run_cards && frm.doc.name && frm.doc.operations.length) {
+        frm.call({
+            method: 'lpp.custom.work_order.get_jobcard_remaining',
+            args: {
+                data: frm.doc
+            },
+            callback: function (response) {
+                if (response.message) {
+                    frm.set_value("custom_jobcard_remaining", response.message);
+                }
+            }
+        });
+    } else {
+        frm.set_value("custom_jobcard_remaining", 0);
+    }
+}
