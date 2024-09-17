@@ -38,6 +38,9 @@ doctype_js = {
     "Work Order" : "public/js/work_order.js",
     "Delivery Note" : "public/js/delivery_note.js",
     "Quality Inspection" : "public/js/quality_inspection.js",
+    "Sales Billing" : "public/js/sales_billing.js",
+    "Purchase Billing" : "public/js/purchase_billing.js",
+    "Journal Entry" : "public/js/journal_entry.js",
     "Withholding Tax Cert": "public/js/withholding_tax_cert.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -129,7 +132,9 @@ jinja = {
 # Override standard doctype classes
 
 override_doctype_class = {
-    "Quality Inspection" : "lpp.custom.custom_quality_inspection.CustomQualityInspection"
+    "Quality Inspection" : "lpp.custom.custom_quality_inspection.CustomQualityInspection",
+    "Sales Billing" : "lpp.custom.custom_sales_billing.CustomSalesBilling",
+    "Purchase Billing" : "lpp.custom.custom_purchase_billing.CustomSalesBilling",
 }
 
 # Document Events
