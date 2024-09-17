@@ -1,0 +1,49 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "condition": "((doc.for_quantity - doc.total_completed_qty) >= doc.custom_scrap_item_per_runcard)",
+ "creation": "2024-09-16 12:57:16.323823",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Job Card",
+ "enabled": 1,
+ "event": "Save",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>\u0e1c\u0e25\u0e34\u0e15\u0e20\u0e31\u0e13\u0e11\u0e4c\u0e17\u0e35\u0e48\u0e1c\u0e25\u0e34\u0e15\u0e08\u0e32\u0e01 Jobcard {{doc.name}} \u0e21\u0e35 NG \u0e40\u0e01\u0e34\u0e19\u0e01\u0e27\u0e48\u0e32\u0e17\u0e35\u0e48\u0e01\u0e33\u0e2b\u0e19\u0e14</p>\n",
+ "message_type": "Markdown",
+ "modified": "2024-09-17 07:28:59.925794",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "Excessive Defect Quantity Notification",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "cc": "daris@goingjesse.com",
+   "condition": "doc.custom_item_group_2 == 'Thermoformed Tray'",
+   "receiver_by_role": ""
+  },
+  {
+   "cc": "daris@goingjesse.com",
+   "condition": "doc.custom_item_group_2 == 'Carrier Tape'"
+  },
+  {
+   "cc": "daris@goingjesse.com",
+   "condition": "doc.custom_item_group_2 == ' Plastic Reel'"
+  },
+  {
+   "cc": "daris@goingjesse.com",
+   "condition": "doc.custom_item_group_2 == 'Protective Band'"
+  },
+  {
+   "cc": "daris@goingjesse.com",
+   "condition": "doc.custom_item_group_2 == 'Slitted Sheet'"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "sender": "Support LPP",
+ "sender_email": "support.seekpi@goingjesse.com",
+ "subject": "Jobcard NG Notification"
+}
