@@ -16,5 +16,6 @@ frappe.ui.form.on("Delivery Note", {
         // set payment schedule to delivery note
         frm.set_value("custom_payment_schedule", payment_schedule);
 
+        
     }
 });
