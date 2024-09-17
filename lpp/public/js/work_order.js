@@ -63,8 +63,6 @@ frappe.ui.form.on('Work Order Item', {
 });
 
 function set_custom_item_molds_query(frm) {
-    // Clear 'custom_item_molds' field
-    frm.set_value('custom_item_molds', '');
 
     // Check if 'production_item' is present
     if (frm.doc.production_item) {
