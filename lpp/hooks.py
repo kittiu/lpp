@@ -42,7 +42,8 @@ doctype_js = {
     "Purchase Billing" : "public/js/purchase_billing.js",
     "Journal Entry" : "public/js/journal_entry.js",
     "Withholding Tax Cert": "public/js/withholding_tax_cert.js",
-    "Payment Entry": "public/js/payment_entry.js"
+    "Payment Entry": "public/js/payment_entry.js" ,
+    "Asset": "public/js/asset.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
