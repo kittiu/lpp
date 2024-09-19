@@ -1,0 +1,33 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "creation": "2024-09-18 12:39:29.773684",
+ "date_changed": "valid_till",
+ "days_in_advance": 30,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Quotation",
+ "enabled": 1,
+ "event": "Days Before",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>Hi!</p>\n\n<p>We would like to remind you that your Quotation [{{ doc.name }}] is set to expire on {{ doc.valid_till }}. Please take any necessary actions to renew or proceed with this quotation before the expiration date.</p>\n\n<p>Quotation Details:</p>\n\n<pre><code>Quotation ID: {{ doc.name }}\nCustomer Name: {{ doc.customer_name }}\nTotal Amount: {{ doc.grand_total }}\nValid Till: {{ doc.valid_till }}\n</code></pre>\n\n<p>If you have any questions or need further assistance, please feel free to contact us.</p>\n\n<p>Thank you for your attention to this matter</p>\n",
+ "message_type": "Markdown",
+ "modified": "2024-09-18 13:36:04.212806",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "Quotation Expiry Reminder",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "cc": "cs@lplastpack.com",
+   "condition": "1==1"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "sender": "Support LPP",
+ "sender_email": "support.seekpi@goingjesse.com",
+ "set_property_after_alert": "",
+ "subject": "Reminder: Quotation [{{ doc.name }}] Expiring in 30 Days"
+}
