@@ -18,6 +18,7 @@ frappe.query_reports["Customer Balance Report"] = {
 			],
 			default: "Customer",
 			reqd: 1,
+			read_only: 1
 		},
 		{
 			fieldname: "doc_type",
@@ -117,4 +118,5 @@ frappe.query_reports["Customer Balance Report"] = {
 			},
 		});
 	},
+
 };
