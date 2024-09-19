@@ -18,7 +18,6 @@ frappe.ui.form.on('Purchase Billing', {
                     threshold_date: frm.doc.threshold_date
                 },
                 callback: function (r) {
-                    console.log("get_purchase_invoices_in_month", r);
                     let invoices = []
                     for (let i of r.message) {
                         invoices.push({ purchase_invoice: i })
