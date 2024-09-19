@@ -96,3 +96,51 @@ frappe.ui.form.on("Quality Inspection", {
         }
     }
 });
+
+frappe.ui.form.on('Quality Inspection Reading', {
+    reading_value: function(frm, cdt, cdn) {
+        // Get the current row
+        let row = locals[cdt][cdn];
+    
+        frappe.db.get_doc('Item', frm.doc.item_code)?.then((doc) => {
+            const specs = [
+                { name: 'A (reel diameter)', valueField: 'custom_a_reel_diameter', toleranceField: 'custom_a_reel_diameter_plus_or_minus' },
+                { name: 'B (width)', valueField: 'custom_b_width', toleranceField: 'custom_b_width_plus_or_minus' },
+                { name: 'C (diameter)', valueField: 'custom_c_diameter', toleranceField: 'custom_c_diameter_plus_or_minus' },
+                { name: 'D (diameter)', valueField: 'custom_d_diameter', toleranceField: 'custom_d_diameter_plus_or_minus' },
+                { name: 'E', valueField: 'custom_e', toleranceField: 'custom_e_plus_or_minus' },
+                { name: 'F', valueField: 'custom_f', toleranceField: 'custom_f_plus_or_minus' },
+                { name: 'N (hub diameter)', valueField: 'custom_n_hub_diameter', toleranceField: 'custom_n_hub_diameter_plus_or_minus' },
+                { name: 'W1', valueField: 'custom_w1', toleranceField: 'custom_w1_plus_or_minus' },
+                { name: 'W2', valueField: 'custom_w2', toleranceField: 'custom_w2_plus_or_minus' },
+                { name: 'T (Flange thickness)', valueField: 'custom_t_flange_thickness', toleranceField: 'custom_t_flange_thickness_plus_or_minus' }
+            ];
+    
+            const spec = specs.find(s => s.name === row.specification);
+    
+            if (spec) {
+                let value = parseFloat(doc[spec.valueField]) || 0;
+                let tolerance = parseFloat(doc[spec.toleranceField]) || 0;
+    
+                let min = value - tolerance;
+                let max = value + tolerance;
+    
+                if (!(row.reading_value >= min && row.reading_value <= max)) {
+                    frappe.msgprint({
+                        title: __('Warning'),
+                        message: `${row.specification} = <span style="font-weight: bold;">${row.reading_value}</span> is out of the acceptable range.<br><br>(Acceptable range is between <span style="font-weight: bold;">${min}</span> and <span style="font-weight: bold;">${max}</span>)`,
+                        indicator: 'orange',
+                        primary_action: {
+                            label: __('Close'),
+                            action: function() {
+                                // This will close the modal
+                                frappe.msg_dialog.hide();
+                            }
+                        }
+                    });    
+                }
+            }
+        });
+    }
+});
+

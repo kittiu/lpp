@@ -45,7 +45,106 @@ frappe.ui.form.on("Work Order", {
     },
     production_item(frm) {
         set_custom_item_molds_query(frm)
-    }
+    },
+    make_job_card: function (frm) {
+		let qty = 0;
+		let operations_data = [];
+
+		const dialog = frappe.prompt(
+			{
+				fieldname: "operations",
+				fieldtype: "Table",
+				label: __("Operations"),
+				fields: [
+					{
+						fieldtype: "Link",
+						fieldname: "operation",
+						label: __("Operation"),
+						read_only: 1,
+						in_list_view: 1,
+					},
+					{
+						fieldtype: "Link",
+						fieldname: "workstation",
+						label: __("Workstation"),
+						read_only: 1,
+						in_list_view: 1,
+					},
+					{
+						fieldtype: "Data",
+						fieldname: "name",
+						label: __("Operation Id"),
+					},
+					{
+						fieldtype: "Float",
+						fieldname: "pending_qty",
+						label: __("Pending Qty"),
+					},
+					{
+						fieldtype: "Float",
+						fieldname: "qty",
+						label: __("Quantity to Manufacture"),
+						read_only: 0,
+						in_list_view: 1,
+					},
+					{
+						fieldtype: "Float",
+						fieldname: "batch_size",
+						label: __("Batch Size"),
+						read_only: 1,
+					},
+					{
+						fieldtype: "Int",
+						fieldname: "sequence_id",
+						label: __("Sequence Id"),
+						read_only: 1,
+					},
+				],
+				data: operations_data,
+				in_place_edit: true,
+				get_data: function () {
+					return operations_data;
+				},
+			},            
+			function (data) {
+				frappe.call({
+					method: "lpp.custom.work_order.make_job_card",
+					freeze: true,
+					args: {
+						work_order: frm.doc,
+						operations: data.operations,
+					},
+					callback: function () {
+						frm.reload_doc();
+					},
+				});
+			},
+			__("Job Card"),
+			__("Create")
+		);
+
+		dialog.fields_dict["operations"].grid.wrapper.find(".grid-add-row").hide();
+
+		var pending_qty = 0;
+		frm.doc.operations.forEach((data) => {
+			if (data.completed_qty + data.process_loss_qty != frm.doc.qty) {
+				pending_qty = frm.doc.qty - flt(data.completed_qty) - flt(data.process_loss_qty);
+
+				if (pending_qty) {
+					dialog.fields_dict.operations.df.data.push({
+						name: data.name,
+						operation: data.operation,
+						workstation: data.workstation,
+						batch_size: data.batch_size,
+						qty: pending_qty,
+						pending_qty: pending_qty,
+						sequence_id: data.sequence_id,
+					});
+				}
+			}
+		});
+		dialog.fields_dict.operations.grid.refresh();
+	},
 });
 
 
