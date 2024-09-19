@@ -45,7 +45,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-19 12:35:15.470908",
+ "modified": "2024-09-19 13:59:24.648666",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Journal Type",
@@ -65,7 +65,9 @@
    "write": 1
   }
  ],
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "name1"
 }
