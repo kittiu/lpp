@@ -51,9 +51,10 @@ def get_columns():
 def get_data(filters):
     # try:
     sales_analytics_data = sales_analytics_execute(filters)
+    report_data = []
+    target_data = []
 
     if sales_analytics_data:
-        report_data = []
 
         for dt in sales_analytics_data[1]:
 
@@ -78,53 +79,52 @@ def get_data(filters):
                 }
                 report_data.append(json_data)
 
-    grouped_data = defaultdict(list)
-    for item in report_data:
-        grouped_data[item['group']].append(item)
+        grouped_data = defaultdict(list)
+        for item in report_data:
+            grouped_data[item['group']].append(item)
 
-    # Prepare the target JSON with summary rows for each group
-    target_data = []
-    grand_total_balance = 0
-    for group, items in sorted(grouped_data.items()):
-        group_total_balance = 0
-        # Add the summary row for the group
-        target_data.append({
-            "group": group,
-            "entity": "",
-            "entity_name": "",
-            "remark": "",
-            "balance": None
-        })
-
-        # Add numbered items for each group
-        for idx, item in enumerate(items, start=1):
-            group_total_balance += item['balance']
+        # Prepare the target JSON with summary rows for each group
+        grand_total_balance = 0
+        for group, items in sorted(grouped_data.items()):
+            group_total_balance = 0
+            # Add the summary row for the group
             target_data.append({
-                "group": str(idx),  # Sequential numbering as string
-                "entity": item['entity'],
-                "entity_name": item['entity_name'],
-                "remark": item['remark'],
-                "balance": item['balance']
+                "group": group,
+                "entity": "",
+                "entity_name": "",
+                "remark": "",
+                "balance": None
             })
 
-        # Add total row for the group
+            # Add numbered items for each group
+            for idx, item in enumerate(items, start=1):
+                group_total_balance += item['balance']
+                target_data.append({
+                    "group": str(idx),  # Sequential numbering as string
+                    "entity": item['entity'],
+                    "entity_name": item['entity_name'],
+                    "remark": item['remark'],
+                    "balance": item['balance']
+                })
+
+            # Add total row for the group
+            target_data.append({
+                "group": "",
+                "entity": "",
+                "entity_name": "Total",
+                "remark": "",
+                "balance": group_total_balance
+            })
+
+            grand_total_balance += group_total_balance
+
         target_data.append({
             "group": "",
             "entity": "",
-            "entity_name": "Total",
+            "entity_name": "Grand Total",
             "remark": "",
-            "balance": group_total_balance
+            "balance": grand_total_balance
         })
-
-        grand_total_balance += group_total_balance
-
-    target_data.append({
-        "group": "",
-        "entity": "",
-        "entity_name": "Grand Total",
-        "remark": "",
-        "balance": grand_total_balance
-    })
 	# except KeyError as e:
         # print(f"KeyError encountered: {e}")
 
