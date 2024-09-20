@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "name1",
+  "naming_series",
   "item_role",
   "remark"
  ],
@@ -29,11 +30,22 @@
    "label": "Item Role",
    "options": "Item Journal Type",
    "reqd": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_filter": 1,
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Series",
+   "no_copy": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-13 16:59:30.843413",
+ "modified": "2024-09-19 13:59:24.648666",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Journal Type",
@@ -53,7 +65,9 @@
    "write": 1
   }
  ],
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "name1"
 }
