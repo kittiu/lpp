@@ -1,5 +1,19 @@
 frappe.ui.form.on("Payment Entry", {
-    validate(frm) {
+    refresh(frm) {
+        frm.set_query("reference_doctype", "references", function () {
+            let doctypes = ["Journal Entry"];
+            if (frm.doc.party_type == "Customer") {
+                doctypes = ["Sales Billing","Sales Order", "Sales Invoice", "Journal Entry", "Dunning"];
+            } else if (frm.doc.party_type == "Supplier") {
+                doctypes = ["Purchase Billing","Purchase Order", "Purchase Invoice", "Journal Entry"];
+            }
+    
+            return {
+                filters: { name: ["in", doctypes] },
+            };
+        });
+    },
+    validate(frm) {        
         // วนลูปตรวจสอบแต่ละรายการใน frm.doc.references
         frm.doc.references.forEach(reference => {
             // ตรวจสอบว่า reference_doctype เป็น Purchase Invoice, Purchase Order, หรือ Journal Entry
@@ -11,7 +25,7 @@ frappe.ui.form.on("Payment Entry", {
     }
 });
 
-frappe.ui.form.on("Payment Entry","onload", function(frm) {
+frappe.ui.form.on("Payment Entry","setup", function(frm) {
     frm.set_query("paid_from", function () {
         frm.events.validate_company(frm);
 
@@ -189,7 +203,7 @@ frappe.ui.form.on("Payment Entry","validate_reference_document",function (frm, r
             frappe.model.set_value(row.doctype, row.name, "reference_doctype", null);
             frappe.msgprint(
                 __(
-                    "Row #{0}: Reference Document Type must be one of Sales Order, Sales Invoice, Journal Entry or Dunning",
+                    "Row #{0}: Reference Document Type must be one of Sales Billing, Sales Order, Sales Invoice, Journal Entry or Dunning",
                     [row.idx]
                 )
             );
@@ -203,7 +217,7 @@ frappe.ui.form.on("Payment Entry","validate_reference_document",function (frm, r
             frappe.model.set_value(row.doctype, row.name, "against_voucher_type", null);
             frappe.msgprint(
                 __(
-                    "Row #{0}: Reference Document Type must be one of Purchase Order, Purchase Invoice or Journal Entry",
+                    "Row #{0}: Reference Document Type must be one of Purchase Billing, Purchase Order, Purchase Invoice or Journal Entry",
                     [row.idx]
                 )
             );
