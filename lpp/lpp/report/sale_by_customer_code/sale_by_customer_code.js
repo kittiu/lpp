@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Ecosoft and contributors
 // For license information, please see license.txt
 
-frappe.query_reports["Division Product Report"] = {
+frappe.query_reports["Sale by Customer Code"] = {
 	filters: [
 		{
 			fieldname: "tree_type",
@@ -25,8 +25,9 @@ frappe.query_reports["Division Product Report"] = {
 			label: __("based_on"),
 			fieldtype: "Select",
 			options: ["Sales Order", "Delivery Note", "Sales Invoice"],
-			default: "Sales Invoice",
+			default: "Sales Order",
 			reqd: 1,
+			read_only: 1
 		},
 		{
 			fieldname: "value_quantity",
