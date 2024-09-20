@@ -1,0 +1,73 @@
+{
+ "add_total_row": 0,
+ "columns": [
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name",
+   "width": 0
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "E-mail",
+   "width": 0
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "label": "Username",
+   "width": 0
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name",
+   "width": 0
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name",
+   "width": 0
+  }
+ ],
+ "creation": "2024-09-16 12:49:40.543948",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "label": "Name",
+   "mandatory": 0,
+   "wildcard_filter": 0
+  }
+ ],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letterhead": null,
+ "modified": "2024-09-17 11:02:03.855806",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "User Test",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT \n    full_name, \n    email, \n    username, \n    first_name, \n    last_name\nFROM \n    `tabUser`",
+ "ref_doctype": "User",
+ "report_name": "User Test",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Desk User"
+  },
+  {
+   "role": "Employee Self Service"
+  }
+ ],
+ "timeout": 0
+}
