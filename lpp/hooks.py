@@ -47,7 +47,8 @@ doctype_js = {
     "Journal Type": "public/js/journal_type.js"
 }
 doctype_list_js = {
-    "Journal Entry": "public/js/journal_entry_list.js"
+    "Journal Entry": "public/js/journal_entry_list.js",
+    "Payment Entry": "public/js/payment_entry_list.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}

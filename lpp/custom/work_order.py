@@ -36,21 +36,23 @@ def make_job_card(work_order, operations):
         remaining = work_order['custom_jobcard_remaining']
 
         work_order = frappe.get_doc("Work Order", work_order['name'])
-    
+
+        sequence = 0
         for row in operations:
             row = frappe._dict(row)
             runcard_no = f"{(amount - remaining) + 1}/{amount}"
+            sequence = sequence + 1
             validate_operation_data(row)
             qty = row.get("qty")
             while qty > 0:
                 qty = split_qty_based_on_batch_size(work_order, row, qty)
                 if row.job_card_qty > 0:
-                    create_job_card(work_order, row, runcard_no, auto_create=True)
+                    create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
     else:
         msgprint(_('จำนวน Runcard เกินกว่าที่กำหนด'))
         
 
-def create_job_card(work_order, row, runcard_no, enable_capacity_planning=False, auto_create=False):
+def create_job_card(work_order, row, runcard_no, sequence, enable_capacity_planning=False, auto_create=False):
     doc = frappe.new_doc("Job Card")
     print('runcard_no', runcard_no)
     doc.update(
@@ -69,7 +71,8 @@ def create_job_card(work_order, row, runcard_no, enable_capacity_planning=False,
             "wip_warehouse": work_order.wip_warehouse,
             "hour_rate": row.get("hour_rate"),
             "serial_no": row.get("serial_no"),
-            "custom_runcard_no": runcard_no
+            "custom_runcard_no": runcard_no,
+            "custom_sequence": sequence
         }
     )
 
