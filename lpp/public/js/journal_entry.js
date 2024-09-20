@@ -1,14 +1,48 @@
 frappe.ui.form.on('Journal Entry', {
+    // On load event of Journal Entry form
     onload: function(frm) {
+        // If custom_journal_type is not set, clear the naming_series field
+        if (!frm.doc.custom_journal_type) {
+            frm.set_value('naming_series', '');  // Set naming_series to an empty string
+        }
+
+        // Setting a query filter for the custom_party_type field
         frm.set_query('custom_party_type', function() {
             return {
                 filters: [
-                    ['DocType', 'name', 'in', ['Customer', 'Supplier']]
+                    ['DocType', 'name', 'in', ['Customer', 'Supplier']]  // Only allow Customer and Supplier
                 ]
             };
         });
+    },
+
+    // Event triggered when the custom_journal_type field is updated
+    custom_journal_type: function(frm) {
+        if (frm.doc.custom_journal_type) {
+            // Fetching the selected Journal Type document from the database
+            frappe.db.get_doc('Journal Type', frm.doc.custom_journal_type)
+            .then(doc => {
+                // If naming_series exists in the Journal Type, set it in the Journal Entry
+                if (doc.naming_series) {
+                    frm.set_value('naming_series', doc.naming_series);
+                } else {
+                    frappe.msgprint(__('Naming series not found for this Journal Type'));  // Show message if no naming series
+                }
+            })
+            .catch(error => {
+                // Error handling for issues with fetching the Journal Type document
+                frappe.msgprint(__('Error fetching Journal Type. Please check the selected Journal Type.'));
+                console.error('Error fetching Journal Type:', error);
+            });
+        } else {
+            // Clear naming_series if no Journal Type is selected
+            frm.set_value('naming_series', '');  // Clear naming_series
+            frappe.msgprint(__('Please select a valid Journal Type.'));  // Show message if Journal Type is not selected
+        }
     }
 });
+
+
 
 frappe.ui.form.on('Journal Entry Tax Invoice Detail', {
     custom_party_code(frm, cdt, cdn) {
