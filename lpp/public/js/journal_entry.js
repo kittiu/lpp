@@ -69,11 +69,11 @@ frappe.ui.form.on('Journal Entry Account', {
     account(frm, cdt, cdn) {
         let row = locals[cdt][cdn];
 
-        if (frm.doc.custom_type) {
-            if (frm.doc.custom_type.includes('ภาษีซื้อ') && row.account.includes('ภาษีซื้อ')) {
+        if (row.account) {
+            if (row.account.includes('ภาษีซื้อ')) {
                 frappe.model.set_value(cdt, cdn, 'debit_in_account_currency', frm.doc.custom_total);
                 frappe.model.set_value(cdt, cdn, 'credit_in_account_currency', 0); 
-            } else if (frm.doc.custom_type.includes('ภาษีขาย') && row.account.includes('ภาษีขาย')) {
+            } else if (row.account.includes('ภาษีขาย')) {
                 frappe.model.set_value(cdt, cdn, 'credit_in_account_currency', frm.doc.custom_total);
                 frappe.model.set_value(cdt, cdn, 'debit_in_account_currency', 0);
             } else {
