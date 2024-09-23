@@ -25,43 +25,51 @@ def batch_uses_naming_series():
 	use_naming_series = cint(frappe.db.get_single_value("Stock Settings", "use_naming_series"))
 	return bool(use_naming_series)
 
-def get_next_sequence(last_number, date_part):
+def get_next_sequence(last_name):
     """
-    Helper function to calculate the next sequence number.
+    Helper function to calculate the next sequence number from the last batch name.
     """
-    if last_number and last_number[0][0]:
-        last_seq_num = int(re.search(r'\d{3}', last_number[0][0]).group())
+    if last_name:
+        last_seq_num = int(re.search(r'\d{3}', last_name).group())
         return last_seq_num + 1
-    else:
-        return 1
+    return 1
 
 
 class CustomBatch(Batch):
     def autoname(self):
-        """Generate random ID for batch if not specified"""
+        """Generate the batch name based on custom logic for Buying or Selling."""
         # Get current year and month in YY.MM format
         date_part = datetime.datetime.now().strftime("%y.%m")
-        # Check if custom_rescreen is True or False
-        rescreen_suffix = ".-R" if self.custom_rescreen else ""
-        # Handle naming for "Buying"
+        # Set rescreen suffix if applicable
+        rescreen_suffix = "-R" if self.custom_rescreen else ""
+        
+        # Prepare the filter for sequence query
+        filters = {
+            "name": ["like", f"{date_part}%"],
+            "custom_lot_type": self.custom_lot_type
+        }
+
+        # Determine the batch type and set the name
         if self.custom_lot_type == "Buying":
             # Separate sequence for Buying
-            params_name = f"""name like "{date_part}%" """
-            last_number = frappe.db.sql("""SELECT MAX(name) FROM `tabBatch` WHERE custom_lot_type="Buying" and """+params_name)
-            
-            next_number = get_next_sequence(last_number, date_part)
+            last_name = self.get_last_batch_name(filters)
+            next_number = get_next_sequence(last_name)
             # Set name as YY.MM.### or YY.MM.###-R
             self.name = f"{date_part}.{next_number:03d}{rescreen_suffix}"
-        
-        # Handle naming for "Selling"
+
         elif self.custom_lot_type == "Selling":
-            # Get the 'custom_in_short' field from the linked item group (item.custom_in_short)
+            # Get the 'custom_in_short' field from the linked item group
             custom_item_group_2 = frappe.db.get_value("Item", self.item, "custom_item_group_2")
             item2_group_in_short = frappe.db.get_value("Item Group", custom_item_group_2, "custom_in_short")
-            # Separate sequence for 
-            params_name = f"""name like "{date_part}%" """
-            last_number = frappe.db.sql("""SELECT MAX(name) FROM `tabBatch` WHERE custom_lot_type="Selling" and """+params_name)
-            next_number = get_next_sequence(last_number, date_part)
+            
+            # Separate sequence for Selling
+            last_name = self.get_last_batch_name(filters)
+            next_number = get_next_sequence(last_name)
             # Set name as YY.MM.[item_in_short].### or YY.MM.[item_in_short].###-R
             self.name = f"{date_part}.{item2_group_in_short}.{next_number:03d}{rescreen_suffix}"
+
+    def get_last_batch_name(self, filters):
+        """Retrieve the last batch name based on filters."""
+        last_batch = frappe.get_list("Batch", filters=filters, fields=["name"], order_by="name desc", limit=1)
+        return last_batch[0].name if last_batch else None
 
