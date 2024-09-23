@@ -56,6 +56,9 @@ class CustomBatch(Batch):
             next_number = get_next_sequence(last_name)
             # Set name as YY.MM.### or YY.MM.###-R
             self.name = f"{date_part}.{next_number:03d}{rescreen_suffix}"
+            self.batch_id = self.name
+            if not self.batch_id:
+                self.batch_id = self.name
 
         elif self.custom_lot_type == "Selling":
             # Get the 'custom_in_short' field from the linked item group
@@ -67,6 +70,9 @@ class CustomBatch(Batch):
             next_number = get_next_sequence(last_name)
             # Set name as YY.MM.[item_in_short].### or YY.MM.[item_in_short].###-R
             self.name = f"{date_part}.{item2_group_in_short}.{next_number:03d}{rescreen_suffix}"
+            if not self.batch_id:
+                self.batch_id = self.name
+
 
     def get_last_batch_name(self, filters):
         """Retrieve the last batch name based on filters."""
