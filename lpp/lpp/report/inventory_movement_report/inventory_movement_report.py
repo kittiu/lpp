@@ -12,12 +12,12 @@ def execute(filters=None):
 def get_columns():
     return [
         {"label": "Posting Date", "fieldname": "posting_date", "fieldtype": "Data", "width": 230},
-        {"label": "ID", "fieldname": "name", "fieldtype": "Link", "options": "Stock Entry", "width": 250},
+        {"label": "ID", "fieldname": "name", "fieldtype": "Link", "options": "Stock Entry", "width": 280},
         {"label": "In Qty", "fieldname": "in_qty", "fieldtype": "Float", "width": 120},
         {"label": "Out Qty", "fieldname": "out_qty", "fieldtype": "Float", "width": 120},
         {"label": "UOM", "fieldname": "uom", "fieldtype": "Data", "width": 90},
         {"label": "Actual Qty", "fieldname": "actual_qty", "fieldtype": "Float", "width": 100},
-        {"label": "Remarks", "fieldname": "remarks", "fieldtype": "Data", "width": 120},
+        {"label": "Remarks", "fieldname": "remarks", "fieldtype": "Data", "width": 150},
         {"label": "Warehouse", "fieldname": "warehouse", "fieldtype": "Link", "options": "Warehouse", "width": 180}
     ]
 
@@ -43,7 +43,10 @@ def get_data(filters):
         SELECT 
             se.name, se.posting_date, se.remarks, se.work_order,
             sed.qty, sed.uom, sed.actual_qty, sed.s_warehouse, sed.t_warehouse, 
-            COALESCE(wo.production_item, 'Null') as item_name
+            COALESCE(wo.production_item, '-') as production_item,
+            COALESCE(wo.item_name, '-') as item_name,
+            CASE WHEN wo.item_name is null THEN '-'
+            ELSE CONCAT(wo.item_name, " (", wo.production_item, ") ") END as item_full_name
         FROM 
             `tabStock Entry` se
         INNER JOIN 
@@ -66,6 +69,7 @@ def get_data(filters):
 
     for entry in stock_entries:
         item_name = entry.item_name
+        item_full_name = entry.item_full_name
         group_key = entry.s_warehouse or entry.t_warehouse
         in_qty = 0
         out_qty = 0
@@ -95,7 +99,7 @@ def get_data(filters):
             group_actual_qty = 0
             
             # Add row to display the item name
-            data.append(get_item_name_row(item_name))
+            data.append(get_item_name_row(item_full_name))
 
         # Check if we are in a new warehouse group within the current item
         if current_group is None or group_key != current_group:
