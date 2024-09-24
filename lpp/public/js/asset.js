@@ -11,7 +11,7 @@ frappe.ui.form.on("Asset", {
             case 'Vehicle':
                 frm.set_value('naming_series', 'FVEH.YY.MM.####.');
                 break;
-            case 'Machine':
+            case 'Machine & Mold':
                 frm.set_value('naming_series', 'FMAC.YY.MM.####.');
                 break;
             case 'Tools & Equipment':
@@ -25,6 +25,12 @@ frappe.ui.form.on("Asset", {
                 break;
             case 'Computer Equipment':
                 frm.set_value('naming_series', 'FCOM.YY.MM.####.');
+                break;
+            case 'Build Insurance':
+                frm.set_value('naming_series', 'FBIN.YY.MM.####.');
+                break;
+            case 'Vehicle Insurance':
+                frm.set_value('naming_series', 'FVIN.YY.MM.####.');
                 break;
             default:
                 frm.set_value('naming_series', '');
