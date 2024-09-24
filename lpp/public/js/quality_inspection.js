@@ -141,6 +141,48 @@ frappe.ui.form.on('Quality Inspection Reading', {
                 }
             }
         });
+    },
+    reading_1: function(frm, cdt, cdn) {
+        // Get the specific child row using cdt and cdn
+        let child = locals[cdt][cdn];
+        let reading_value = child.reading_1;
+        
+        // Initialize the parsed value to 0
+        let parsed_value = 0;
+        let is_valid = false;
+        
+        // Ensure reading_value is a string before calling startsWith
+        if (reading_value && typeof reading_value === 'string' && reading_value.startsWith('=')) {
+            let number_after_equal = reading_value.substring(1).trim();
+            parsed_value = parseInt(number_after_equal, 10);
+            if (!isNaN(parsed_value)) {
+                is_valid = true;
+            }
+        } else {
+            return;
+        }
+        
+        if (!is_valid && reading_value) {
+            // Show an error message if input is invalid
+            frappe.msgprint({
+                title: __('Invalid Input'),
+                message: __('Please enter the value in the format "=number", e.g., "=12".'),
+                indicator: 'red'
+            });
+            // Optionally, clear the invalid input
+            frappe.model.set_value(cdt, cdn, 'reading_1', '');
+            parsed_value = 0;
+        }
+        
+        // Update all readings in the child row
+        for (let i = 1; i <= 32; i++) {
+            let field_name = `reading_${i}`;
+            if (i >= 11) {
+                frappe.model.set_value(cdt, cdn, `custom_${field_name}`, parsed_value);
+            } else {
+                frappe.model.set_value(cdt, cdn, field_name, parsed_value);
+            }
+        }
     }
 });
 
