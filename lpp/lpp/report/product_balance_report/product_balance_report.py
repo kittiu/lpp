@@ -90,11 +90,11 @@ def get_data(filters):
             # Add a row for the cost per item group
             data.append({
                 'item_code': f"Cost Per Group: {item_group}",
-                'item_name': group_data['total_bal_val'],
+                'item_name': '',
                 'stock_uom': '',
                 'bal_qty': None,
                 'val_rate': None,
-                'bal_val': None
+                'bal_val': group_data['total_bal_val']
             })
 
             # Accumulate the total balance value for the warehouse
@@ -103,11 +103,11 @@ def get_data(filters):
         # After all item groups, add a row for the total cost per warehouse
         data.append({
             'item_code': f"Cost Per Warehouse: {warehouse}",
-            'item_name': warehouse_total_bal_val,
+            'item_name': '',
             'stock_uom': '',
             'bal_qty': None,
             'val_rate': None,
-            'bal_val': None
+            'bal_val': warehouse_total_bal_val
         })
 
     return data
