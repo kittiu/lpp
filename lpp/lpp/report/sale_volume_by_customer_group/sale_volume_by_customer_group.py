@@ -28,6 +28,7 @@ def get_columns():
 			"fieldname": "entity_name",
 			"fieldtype": "Data",
 			"width": 400,
+			"align": "left"
 		},
         {
 			"label": _("DISC."),
@@ -73,7 +74,7 @@ def get_data(filters):
 	from_date = None
 	to_date = None
 
-	if sales_analytics_data: 
+	if sales_analytics_data and len(sales_analytics_data) > 1:
 
 		if filters:
 			from_date = filters['from_date']
