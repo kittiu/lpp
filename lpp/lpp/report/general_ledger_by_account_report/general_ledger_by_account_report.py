@@ -27,12 +27,14 @@ def get_columns():
 			"fieldname": "voucher_code",
 			"fieldtype": "Data",
 			"width": 200,
+            "align": "left"
 		},
         {
 			"label": _("Description"),
 			"fieldname": "description",
 			"fieldtype": "Data",
 			"width": 500,
+            "align": "left"
 		},
         {
 			"label": _("Debit"),
@@ -55,15 +57,13 @@ def get_columns():
 	]
     return columns 
 
-from collections import defaultdict
-
 def get_data(filters):
     general_ledger_data = general_ledger_execute(filters)
     report_data = []
     target_data = []
     record_total = {"debit": 0.0, "credit": 0.0, "balance": 0.0}  # Initialize totals
 
-    if general_ledger_data:
+    if general_ledger_data and len(general_ledger_data) > 1:
         for dt in general_ledger_data[1]:
             # Check if 'posting_date' exists
             if dt.get('posting_date'):
@@ -101,7 +101,7 @@ def get_data(filters):
             # Add the group header (summary row for the group)
             target_data.append({
                 "account_code": None,
-                "date": group,  # Display the group name in the 'date' field
+                "date": "Account Code : " + group,  # Display the group name in the 'date' field
                 "voucher_code": "",
                 "description": "",
                 "debit": None,

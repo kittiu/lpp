@@ -25,18 +25,21 @@ def get_columns():
 			"fieldname": "entity_name",
 			"fieldtype": "Data",
 			"width": 400,
+			"align": "left"
 		},
 		{
 			"label": _("Account"),
 			"fieldname": "account",
 			"fieldtype": "Data",
 			"width": 200,
+			"align": "left"
 		},
 		{
 			"label": _("Customer Remark"),
 			"fieldname": "remark",
 			"fieldtype": "Data",
 			"width": 160,
+			"align": "left"
 		},
 		{
 			"label": _(""),
@@ -64,7 +67,7 @@ def get_data(filters):
 	report_data = []
 	target_data = []
 
-	if accounts_receivable_data: 
+	if accounts_receivable_data and len(accounts_receivable_data) > 1:
 
 		for dt in accounts_receivable_data[1]:
 
