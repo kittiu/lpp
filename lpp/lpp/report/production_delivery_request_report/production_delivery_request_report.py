@@ -1,17 +1,11 @@
 import frappe
 from collections import defaultdict
 
-def execute(filters=None):
-    if not filters:
-        filters = {}
-
-    # Define columns
-    columns = [
+def get_columns():
+    return [
         {"label": "ID", "fieldname": "id", "fieldtype": "Link", "options": "Stock Entry", "width": 120},
-        {"label": "Employee", "fieldname": "custom_employee_name", "fieldtype": "Data", "width": 150},
         {"label": "Status", "fieldname": "status", "fieldtype": "Data", "width": 120},
         {"label": "Stock Entry Type", "fieldname": "stock_entry_type", "fieldtype": "Data", "width": 150},
-        {"label": "Posting Date", "fieldname": "posting_date", "fieldtype": "Date", "width": 120},
         {"label": "Default Source Warehouse", "fieldname": "source_warehouse", "fieldtype": "Data", "width": 150},
         {"label": "Default Target Warehouse", "fieldname": "target_warehouse", "fieldtype": "Data", "width": 150},
         {"label": "Item Code", "fieldname": "item_code", "fieldtype": "Link", "options": "Item", "width": 150},
@@ -22,158 +16,191 @@ def execute(filters=None):
         {"label": "Created By", "fieldname": "full_name", "fieldtype": "Data", "width": 150},
     ]
 
-    # Initialize filters for Stock Entry
-    stock_entry_filters = {
-        "docstatus": filters.get("docstatus"),
-        "stock_entry_type": filters.get("stock_entry_type")
-    }
-
-    # Handle Posting Date filters
-    from_posting_date = filters.get("from_posting_date")
-    to_posting_date = filters.get("to_posting_date")
-
-    # Apply 'posting_date' filter only if 'from_posting_date' is provided
-    if from_posting_date:
-        if to_posting_date:
-            stock_entry_filters["posting_date"] = ["between", [from_posting_date, to_posting_date]]
-        else:
-            stock_entry_filters["posting_date"] = [">=", from_posting_date]
-    # Do not apply 'posting_date' filter if 'from_posting_date' is not provided
-
-    # Handle custom_employee_name filter
-    custom_employee_name = filters.get("custom_employee_name")
-    if custom_employee_name:
-        # Search Employee by employee_name using a case-insensitive partial match
-        matching_employees = frappe.get_all(
-            "Employee",
-            filters={
-                "employee_name": ["like", f"%{custom_employee_name}%"]
-            },
-            fields=["name"]
-        )
-        if matching_employees:
-            employee_ids = [emp["name"] for emp in matching_employees]
-            stock_entry_filters["custom_employee"] = ["in", employee_ids]
-        else:
-            # If no employees match the filter, return empty data
-            return columns, []
-
-    # Remove filters with None or empty values
-    stock_entry_filters = {k: v for k, v in stock_entry_filters.items() if v}
-
-    # Fetch Stock Entries with required fields
-    stock_entries = frappe.get_all(
-        "Stock Entry",
-        filters=stock_entry_filters,
-        fields=[
-            "name as id",
-            "docstatus",
-            "stock_entry_type",
-            "posting_date",
-            "from_warehouse as source_warehouse",
-            "to_warehouse as target_warehouse",
-            "owner as created_by",
-            "custom_employee"
-        ]
-    )
-
-    if not stock_entries:
-        return columns, []
-
-    # Extract unique Stock Entry IDs
-    stock_entry_ids = [entry["id"] for entry in stock_entries]
-
-    # Fetch all Stock Entry Details in bulk
-    stock_entry_details = frappe.get_all(
-        "Stock Entry Detail",
-        filters={"parent": ["in", stock_entry_ids]},
-        fields=["parent", "item_code", "item_name", "qty", "uom", "batch_no"]
-    )
-
-    # Group details by parent Stock Entry ID
-    details_map = defaultdict(list)
-    for detail in stock_entry_details:
-        details_map[detail["parent"]].append(detail)
-
-    # Fetch unique User full names
-    created_by_users = list({entry["created_by"] for entry in stock_entries})
-    user_map = {
-        user["name"]: user["full_name"]
-        for user in frappe.get_all(
-            "User",
-            filters={"name": ["in", created_by_users]},
-            fields=["name", "full_name"]
-        )
-    }
-
-    # Fetch unique Employee full names
-    custom_employee_ids = list({entry["custom_employee"] for entry in stock_entries if entry.get("custom_employee")})
-    if custom_employee_ids:
-        employee_map = {
-            emp["name"]: emp["employee_name"]
-            for emp in frappe.get_all(
-                "Employee",
-                filters={"name": ["in", custom_employee_ids]},
-                fields=["name", "employee_name"]
+def build_sql_query():
+    return """
+        SELECT
+            se.name AS id,
+            CASE se.docstatus
+                WHEN 0 THEN 'Draft'
+                WHEN 1 THEN 'Submitted'
+                WHEN 2 THEN 'Cancelled'
+                ELSE 'Unknown'
+            END AS status,
+            se.stock_entry_type,
+            se.from_warehouse AS source_warehouse,
+            se.to_warehouse AS target_warehouse,
+            sed.item_code,
+            sed.item_name,
+            sed.qty,
+            sed.uom,
+            sed.batch_no,
+            COALESCE(u.full_name, u.first_name, u.name) AS full_name,
+            COALESCE(e.employee_name, '-') AS employee_name,
+            se.posting_date
+        FROM
+            `tabStock Entry` se
+        LEFT JOIN
+            `tabStock Entry Detail` sed ON sed.parent = se.name
+        LEFT JOIN
+            `tabUser` u ON u.name = se.owner
+        LEFT JOIN
+            `tabEmployee` e ON e.name = se.custom_employee
+        WHERE
+            1=1
+            /* Apply docstatus filter if provided */
+            AND (%(docstatus)s IS NULL OR se.docstatus = %(docstatus)s)
+            /* Apply stock_entry_type filter if provided */
+            AND (%(stock_entry_type)s IS NULL OR se.stock_entry_type = %(stock_entry_type)s)
+            /* Apply posting_date filters */
+            AND (
+                %(from_posting_date)s IS NULL
+                OR (
+                    %(to_posting_date)s IS NOT NULL
+                    AND se.posting_date BETWEEN %(from_posting_date)s AND %(to_posting_date)s
+                )
+                OR (se.posting_date >= %(from_posting_date)s)
             )
-        }
-    else:
-        employee_map = {}
+            /* Apply custom_employee_name filter if provided */
+            AND (
+                %(custom_employee_name)s IS NULL
+                OR e.name IN (
+                    SELECT name FROM `tabEmployee` WHERE name LIKE CONCAT('%%', %(custom_employee_name)s, '%%')
+                )
+            )
+        ORDER BY
+            employee_name, se.posting_date
+    """
 
-    # Map numeric docstatus to label
-    docstatus_map = {
-        "0": "Draft",
-        "1": "Submitted",
-        "2": "Cancelled"
-    }
+def fetch_data(sql_query, query_params):
+    return frappe.db.sql(sql_query, query_params, as_dict=True)
 
-    # Initialize data list and total quantity
-    data = []
-    total_qty = 0
+def group_data(data):
+    grouped = defaultdict(lambda: defaultdict(list))
+    for record in data:
+        employee_name = record.get("employee_name", "-")
+        posting_date = record.get("posting_date").strftime('%Y-%m-%d') if record.get("posting_date") else "-"
+        grouped[employee_name][posting_date].append(record)
+    return grouped
 
-    # Iterate over Stock Entries and their details to build the report data
-    for entry in stock_entries:
-        employee_name = employee_map.get(entry.get("custom_employee"), "") if entry.get("custom_employee") else ""
-        status = docstatus_map.get(str(entry["docstatus"]), "Unknown")
-        created_by = user_map.get(entry["created_by"], "")
+def calculate_summaries(grouped_data):
+    final_data = []
+    grand_total = 0
 
-        for detail in details_map.get(entry["id"], []):
-            qty = detail.get("qty") or 0
-            total_qty += qty
+    for employee_name, posting_dates in grouped_data.items():
+        employee_total = 0
+        # Employee Header
+        final_data.append({
+            "id": f"EMPLOYEE : {employee_name}",
+            "status": "",
+            "stock_entry_type": "",
+            "source_warehouse": "",
+            "target_warehouse": "",
+            "item_code": "",
+            "item_name": "",
+            "qty": None,
+            "uom": "",
+            "batch_no": "",
+            "full_name": ""
+        })
+        for posting_date, records in sorted(posting_dates.items()):
+            date_total = 0
+            # Posting Date Header
+            final_data.append({
+                "id": posting_date,
+                "status": "",
+                "stock_entry_type": "",
+                "source_warehouse": "",
+                "target_warehouse": "",
+                "item_code": "",
+                "item_name": "",
+                "qty": None,
+                "uom": "",
+                "batch_no": "",
+                "full_name": ""
+            })
+            for record in records:
+                qty = record["qty"] or 0
+                date_total += qty
+                employee_total += qty
+                final_data.append(record)
+            # Posting Date Summary
+            final_data.append({
+                "id": "Summary",
+                "status": "",
+                "stock_entry_type": "",
+                "source_warehouse": "",
+                "target_warehouse": "",
+                "item_code": "",
+                "item_name": "Total Quantity",
+                "qty": date_total,
+                "uom": "",
+                "batch_no": "",
+                "full_name": ""
+            })
+        # Employee Summary
+        final_data.append({
+            "id": "Summary",
+            "status": "",
+            "stock_entry_type": "",
+            "source_warehouse": "",
+            "target_warehouse": "",
+            "item_code": "",
+            "item_name": "Total Quantity",
+            "qty": employee_total,
+            "uom": "",
+            "batch_no": "",
+            "full_name": ""
+        })
+        grand_total += employee_total
 
-            record = {
-                "id": entry["id"],
-                "custom_employee_name": employee_name,
-                "status": status,
-                "stock_entry_type": entry["stock_entry_type"],
-                "posting_date": entry["posting_date"],
-                "source_warehouse": entry["source_warehouse"],
-                "target_warehouse": entry["target_warehouse"],
-                "item_code": detail["item_code"],
-                "item_name": detail["item_name"],
-                "qty": qty,
-                "uom": detail["uom"],
-                "batch_no": detail["batch_no"],
-                "full_name": created_by
-            }
-            data.append(record)
-
-    # Append the total quantity as the last row in the report
-    total_row = {
-        "id": "Total",
-        "custom_employee_name": "",
+    # Grand Total
+    final_data.append({
+        "id": "Grand Total",
         "status": "",
         "stock_entry_type": "",
-        "posting_date": "",
         "source_warehouse": "",
         "target_warehouse": "",
         "item_code": "",
-        "item_name": "Total Quantity",
-        "qty": total_qty,
+        "item_name": "Overall Total Quantity",
+        "qty": grand_total,
         "uom": "",
         "batch_no": "",
         "full_name": ""
-    }
-    data.append(total_row)
+    })
 
-    return columns, data
+    return final_data
+
+def assemble_final_data(grouped_data):
+    return calculate_summaries(grouped_data)
+
+def execute(filters=None):
+    filters = filters or {}
+    
+    # Step 1: Define Columns
+    columns = get_columns()
+    
+    # Step 2: Build SQL Query
+    sql_query = build_sql_query()
+    
+    # Step 3: Prepare Query Parameters
+    query_params = {
+        "docstatus": filters.get("docstatus"),
+        "stock_entry_type": filters.get("stock_entry_type"),
+        "from_posting_date": filters.get("from_posting_date"),
+        "to_posting_date": filters.get("to_posting_date"),
+        "custom_employee_name": filters.get("custom_employee_name"),
+    }
+    
+    # Step 4: Execute SQL Query
+    data = fetch_data(sql_query, query_params)
+    
+    if not data:
+        return columns, []
+    
+    # Step 5: Group Data
+    grouped_data = group_data(data)
+    
+    # Step 6: Assemble Final Data with Summaries
+    final_data = assemble_final_data(grouped_data)
+    
+    return columns, final_data
