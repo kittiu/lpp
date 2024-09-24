@@ -27,18 +27,21 @@ def get_columns():
 			"fieldname": "entity",
 			"fieldtype": "Data",
 			"width": 140,
+            "align": "left"
 		},
         {
 			"label": _("Customer Name"),
 			"fieldname": "entity_name",
 			"fieldtype": "Data",
 			"width": 400,
+            "align": "left"
 		},
         {
 			"label": _("Customer Remark"),
 			"fieldname": "remark",
 			"fieldtype": "Data",
 			"width": 160,
+            "align": "left"
 		},{
 			"label": _("Balance"),
 			"fieldname": "balance",
@@ -54,7 +57,7 @@ def get_data(filters):
     report_data = []
     target_data = []
 
-    if sales_analytics_data:
+    if sales_analytics_data and len(sales_analytics_data) > 1:
 
         for dt in sales_analytics_data[1]:
 

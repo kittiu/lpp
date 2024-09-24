@@ -27,6 +27,7 @@ def get_column():
 			"fieldname": "entity_name",
 			"fieldtype": "Data",
 			"width": 400,
+			"align": "left"
 		},
         {
 			"label": _("มค."),
@@ -116,7 +117,7 @@ def get_data(filters=None):
 	target_data = []
 	grand_total_balance = 0
 
-	if sales_analytics_data:
+	if sales_analytics_data and len(sales_analytics_data) > 1:
 
 		for dt in sales_analytics_data[1]:
 			value_sum = get_value_summary_by_month(dt)
