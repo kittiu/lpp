@@ -7,36 +7,36 @@ def execute(filters=None):
     # Define the columns for the report
     columns = get_columns()
     
-    # Get the data and apply necessary grouping and calculations
+    # Get the data and apply necessary grouping and sorting
     data = get_data(filters)
 
-    # Return the columns and data for rendering the report
+    # Return the columns and sorted data for rendering the report
     return columns, data
 
 # Define the columns to be displayed in the report
 def get_columns():
     return [
         {"label": _("รหัสสินค้า (Product Code)"), "fieldname": "item_code", "fieldtype": "Data", "width": 250},
-        {"label": _("ชื่อสินค้า (Product Name)"), "fieldname": "item_name", "fieldtype": "Data", "width": 200},
-        {"label": _("หน่วยนับ (Unit)"), "fieldname": "stock_uom", "fieldtype": "Data", "width": 150},
+        {"label": _("ชื่อสินค้า (Product Name)"), "fieldname": "item_name", "fieldtype": "Data", "width": 250},
+        {"label": _("หน่วยนับ (Unit)"), "fieldname": "stock_uom", "fieldtype": "Data", "width": 100},
         {"label": _("ยอดคงเหลือ (Balance)"), "fieldname": "bal_qty", "fieldtype": "Float", "width": 150},
         {"label": _("มูลค่าต่อหน่วย (Unit Price)"), "fieldname": "val_rate", "fieldtype": "Currency", "width": 150},
         {"label": _("รวมมูลค่า (Total)"), "fieldname": "bal_val", "fieldtype": "Currency", "width": 150},
     ]
 
-# Process and group the data, then return it for the report
+# Process, group, and sort the data, then return it for the report
 def get_data(filters):
-    data = []
-
     # Execute the stock balance function and get the stock data
     stock_balance = stock_balance_execute(filters)
 
+    # If there's no data, return an empty list
     if not stock_balance:
-        return data
+        return []
 
-    stock_balance_data = stock_balance[1]  # Get the actual data part of the result
+    # Get the actual stock balance data
+    stock_balance_data = stock_balance[1]
 
-    # A dictionary to accumulate data per warehouse and item group
+    # Dictionary to store data grouped by warehouse and item group
     warehouse_grouped_data = {}
 
     # Process each row in the stock data
@@ -44,26 +44,24 @@ def get_data(filters):
         warehouse = row.get('warehouse')
         item_group = row.get('item_group')
 
-        # Initialize the warehouse group if not already done
-        if warehouse not in warehouse_grouped_data:
-            warehouse_grouped_data[warehouse] = {}
+        # Use setdefault to initialize nested dictionaries in one line
+        group = warehouse_grouped_data.setdefault(warehouse, {}).setdefault(item_group, {
+            'items': [],
+            'total_bal_val': 0
+        })
 
-        # Initialize the item group inside the warehouse group if not already done
-        if item_group not in warehouse_grouped_data[warehouse]:
-            warehouse_grouped_data[warehouse][item_group] = {
-                'items': [],
-                'total_bal_val': 0
-            }
+        # Append the item to the group and accumulate the bal_val
+        group['items'].append(row)
+        group['total_bal_val'] += row.get('bal_val', 0)
 
-        # Add the item to the respective item group and accumulate the bal_val
-        warehouse_grouped_data[warehouse][item_group]['items'].append(row)
-        warehouse_grouped_data[warehouse][item_group]['total_bal_val'] += row.get('bal_val', 0)
+    # Final data to return
+    data = []
 
-    # Process the grouped data to generate the final output
+    # Process the grouped data for output and sorting
     for warehouse, item_groups in warehouse_grouped_data.items():
-        # Add a row to indicate the start of a warehouse group
+        # Add warehouse group row
         data.append({
-            'item_code': "คลังสินค้า",
+            'item_code': "คลังสินค้า",  # "Warehouse"
             'item_name': warehouse,
             'stock_uom': '',
             'bal_qty': None,
@@ -71,10 +69,14 @@ def get_data(filters):
             'bal_val': None
         })
 
-        warehouse_total_bal_val = 0  # Accumulate total balance value per warehouse
+        # Variable to store total value for the warehouse
+        warehouse_total_bal_val = 0
 
-        for item_group, group_data in item_groups.items():
-            # Add a row to indicate the start of an item group within the warehouse
+        # Sort item groups by item_group name
+        sorted_item_groups = sorted(item_groups.items(), key=lambda x: x[0])
+
+        for item_group, group_data in sorted_item_groups:
+            # Add item group row
             data.append({
                 'item_code': f"Product Group: {item_group}",
                 'item_name': '',
@@ -84,10 +86,13 @@ def get_data(filters):
                 'bal_val': None
             })
 
-            # Add all the items in this item group
-            data.extend(group_data['items'])
+            # Sort items within the group by item_code
+            sorted_items = sorted(group_data['items'], key=lambda x: x['item_code'])
+            
+            # Add all sorted items in the current item group
+            data.extend(sorted_items)
 
-            # Add a row for the cost per item group
+            # Add cost per item group
             data.append({
                 'item_code': f"Cost Per Group: {item_group}",
                 'item_name': '',
@@ -97,7 +102,7 @@ def get_data(filters):
                 'bal_val': group_data['total_bal_val']
             })
 
-            # Accumulate the total balance value for the warehouse
+            # Accumulate total balance value for the warehouse
             warehouse_total_bal_val += group_data['total_bal_val']
 
         # After all item groups, add a row for the total cost per warehouse
