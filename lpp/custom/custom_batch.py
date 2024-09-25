@@ -39,7 +39,7 @@ class CustomBatch(Batch):
     def autoname(self):
         """Generate the batch name based on custom logic for Buying or Selling."""
         # Get current year and month in YY.MM format
-        date_part = datetime.datetime.now().strftime("%y.%m")
+        date_part = datetime.datetime.now().strftime("%y%m")
         # Set rescreen suffix if applicable
         rescreen_suffix = "-R" if self.custom_rescreen else ""
         
