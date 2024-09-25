@@ -9,6 +9,13 @@ def execute(filters=None):
 def get_columns():
 	return [
 		{
+			"label": "Supplyer Code",
+			"fieldname": "customer",
+			"fieldtype": "Data",
+			"width": 130,
+			"align": "left"
+		},
+		{
 			"label": "Supplyer Name",
 			"fieldname": "customer_name",
 			"fieldtype": "Data",
@@ -109,11 +116,20 @@ def get_columns():
 	]
 
 def get_data(filters):
-	conditions = get_conditions(filters)
+	conditions = "1=1"
+
+	if filters.get("customer_name"):
+		conditions += " AND si.customer = %(customer_name)s"
+	# Filter by date range
+	if filters.get("from_date"):
+		conditions += " AND si.due_date >= %(from_date)s"
+	if filters.get("to_date"):
+		conditions += " AND si.due_date <= %(to_date)s"	
 
 	# ดึงข้อมูลจาก Sales Invoice
 	invoices = frappe.db.sql("""
 		SELECT
+			si.customer,
 			si.customer_name,
 			si.due_date,
 			si.custom_supplier_purchase_order,
@@ -134,7 +150,7 @@ def get_data(filters):
 			`tabItem` it ON sii.item_code = it.name
 		WHERE
 			{conditions}
-	""".format(conditions=conditions), filters, as_dict=1)
+	""".format(conditions=conditions), filters, as_dict=True)
 
 	data = []
 
@@ -143,6 +159,7 @@ def get_data(filters):
 		local_cur_amount = flt(inv.qty) * flt(inv.rate)
 
 		row = {
+			"customer": inv.customer,
 			"customer_name": inv.customer_name,
 			"due_date": inv.due_date,
 			"custom_supplier_purchase_order": inv.custom_supplier_purchase_order,
@@ -162,13 +179,3 @@ def get_data(filters):
 		data.append(row)
 
 	return data
-
-def get_conditions(filters):
-	conditions = "1=1"
-
-	if filters.get("supplier_name"):
-		conditions += " AND si.supplier_name = %(supplier_name)s"
-	if filters.get("due_date"):
-		conditions += " AND si.due_date = %(due_date)s"
-
-	return conditions
