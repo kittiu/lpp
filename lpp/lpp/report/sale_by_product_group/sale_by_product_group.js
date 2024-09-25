@@ -27,6 +27,7 @@ frappe.query_reports["Sale by Product Group"] = {
 			options: ["Sales Order", "Delivery Note", "Sales Invoice"],
 			default: "Sales Order",
 			reqd: 1,
+			read_only: 1
 		},
 		{
 			fieldname: "value_quantity",
