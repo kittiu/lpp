@@ -83,6 +83,10 @@ def quarter(filters=None):
 
     sales_orders = get_aggregated_data(sales_order_query, params)
 
+    # ตรวจสอบว่ามี Sale Orders หรือไม่
+    if not sales_orders:
+        return columns, []  # คืนค่า columns และ data ว่างเปล่า
+
     # Extract distinct sales order names
     sales_order_names = [row.sales_order_name for row in sales_orders]
 
@@ -336,10 +340,10 @@ def quarter(filters=None):
     # Calculate Net Sale Orders (Sale Orders - Credit Notes)
     net_totals = {}
     for key in grand_totals['sale_order']:
-        net_totals[key] = grand_totals['sale_order'][key] - grand_totals['credit_note'][key]
+        net_totals[key] = grand_totals['sale_order'][key] + grand_totals['credit_note'][key]
 
     data.append({
-        "code": "Net Sale Orders",
+        "code": "Net Sales",
         "customer": "",
         "product": "",
         "uom": "",
