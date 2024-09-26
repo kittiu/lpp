@@ -3,6 +3,17 @@
 frappe.query_reports["Annual Sale Report"] = {
 	"filters": [
 		{
+			"fieldname": "type",
+			"label": __("Type"),
+			"fieldtype": "Select",
+			"options": [
+				"Quarter",
+				"Monthly"
+			],
+			"default": "Quarter",
+			"reqd": 1
+		},
+		{
 			"fieldname": "year",
 			"label": __("Year"),
 			"fieldtype": "Int",
