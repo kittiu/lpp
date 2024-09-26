@@ -71,6 +71,17 @@ def monthly(filters=None):
     current_customer = None
     total_items = 0
 
+    # Append "Sales Order" 
+    data.append({
+        "code": "Sales Order",
+        "customer": "",
+        "product": "",
+        "uom": "",
+        **{f"{month.lower()}_unit": None for month in months},
+        **{f"{month.lower()}_baht": None for month in months},
+        "ytd_unit": None, "ytd_baht": None
+    })
+
     # Process results
     for row in results:
         if row.get('customer') != current_customer:
@@ -120,17 +131,6 @@ def monthly(filters=None):
             **customer_totals
         })
 
-    # Append "Credit Note Report" placeholder after appending final customer totals
-    data.append({
-        "code": "Credit Note Report",
-        "customer": "",
-        "product": "",
-        "uom": "",
-        **{f"{month.lower()}_unit": None for month in months},
-        **{f"{month.lower()}_baht": None for month in months},
-        "ytd_unit": None, "ytd_baht": None
-    })
-
     # Query for Sales Invoice Item (Credit Notes)
     result_string = ", ".join([f"'{row.get('customer')}'" for row in results])
 
@@ -144,6 +144,7 @@ def monthly(filters=None):
 
         return_query = """
             SELECT si.customer, si.customer_name,
+            sii.item_code, sii.item_name, sii.uom,
             {return_queries},
             SUM(sii.qty) AS ytd_unit, SUM(sii.qty * sii.rate) AS ytd_baht
             FROM `tabSales Invoice` si
@@ -164,11 +165,48 @@ def monthly(filters=None):
     return_totals.update({f"{month.lower()}_baht": 0 for month in months})
     return_totals.update({"ytd_unit": 0, "ytd_baht": 0})
 
+    current_return_customer = None
+    return_customer_totals = {key: 0 for key in return_totals}
+    return_total_items = 0
+
+    # Append "Credit Notes" header
+    data.append({
+        "code": "Credit Notes",
+        "customer": "",
+        "product": "",
+        "uom": "",
+        **{f"{month.lower()}_unit": None for month in months},
+        **{f"{month.lower()}_baht": None for month in months},
+        "ytd_unit": None, "ytd_baht": None
+    })
+
     for return_row in returns:
+        if return_row.get('customer') != current_return_customer:
+            if current_return_customer:
+                data.append({
+                    "code": "",
+                    "customer": "",
+                    "product": f"รวม {return_total_items} รายการ",
+                    "uom": "",
+                    **return_customer_totals
+                })
+            current_return_customer = return_row.get('customer')
+            return_customer_totals = {key: 0 for key in return_totals}
+            return_total_items = 0
+            data.append({
+                "code": return_row.get('customer'),
+                "customer": return_row.get('customer_name'),
+                "product": "",
+                "uom": return_row.get('uom'),
+                **{f"{month.lower()}_unit": None for month in months},
+                **{f"{month.lower()}_baht": None for month in months},
+                "ytd_unit": None, "ytd_baht": None
+            })
+
         data.append({
-            "code": return_row.get('customer'),
-            "customer": return_row.get('customer_name'),
-            "product": "Return",
+            "code": "",
+            "customer": return_row.get('item_code'),
+            "product": return_row.get('item_name'),
             "uom": "",
             **{f"{month.lower()}_unit": return_row.get(f"{month.lower()}_unit", 0) for month in months},
             **{f"{month.lower()}_baht": return_row.get(f"{month.lower()}_baht", 0) for month in months},
@@ -176,11 +214,22 @@ def monthly(filters=None):
             "ytd_baht": return_row.get("ytd_baht", 0)
         })
 
+        update_totals(return_row, return_customer_totals)
         update_totals(return_row, return_totals)
+        return_total_items += 1
+
+    if current_return_customer:
+        data.append({
+            "code": "",
+            "customer": "",
+            "product": f"รวม {return_total_items} รายการ",
+            "uom": "",
+            **return_customer_totals
+        })
 
     # Append "Grand Total" after processing returns
     data.append({
-        "code": "Grand Total Sale Orders",
+        "code": "Grand Total Sales Orders",
         "customer": "",
         "product": "",
         "uom": "",
@@ -201,7 +250,7 @@ def monthly(filters=None):
 
     # Append "Net Sale Orders"
     data.append({
-        "code": "ยอดขายหักใบลดหนี้",
+        "code": "Net Sales",
         "customer": "",
         "product": "",
         "uom": "",
