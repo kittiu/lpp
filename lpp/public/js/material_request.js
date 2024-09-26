@@ -26,4 +26,16 @@ frappe.ui.form.on("Material Request", {
             });
         }
     },
+    validate: function (frm) {
+        // sum grand total from item amount
+        
+        let items = frm.doc.items
+        let total = 0
+        for (let i = 0; i < items.length; i++) {
+            total += items[i].amount
+        }
+        frm.set_value("custom_grand_total", total)        
+    }
+
+    
 });
