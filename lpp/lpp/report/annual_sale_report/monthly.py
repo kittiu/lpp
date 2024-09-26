@@ -201,7 +201,7 @@ def monthly(filters=None):
 
     # Append "Net Sale Orders"
     data.append({
-        "code": "Net Sale Orders",
+        "code": "ยอดขายหักใบลดหนี้",
         "customer": "",
         "product": "",
         "uom": "",
