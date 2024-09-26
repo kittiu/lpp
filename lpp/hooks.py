@@ -151,9 +151,6 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
-    "Delivery Note": {
-        "on_submit": "custom.deliveryd_note.on_submit_delivery_note"
-    }
 	# "*": {
 	# 	"on_update": "method",
 	# 	"on_cancel": "method",
