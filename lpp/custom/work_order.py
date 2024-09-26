@@ -13,7 +13,7 @@ def get_jobcard_remaining(data):
     if isinstance(data, str):
         # Parse the string as JSON
         data = json.loads(data)
-        
+
     count_amount = data['custom_total_run_cards']
     count_jobcard = frappe.db.count('Job Card', {'work_order': data['name']})
     count_operation = frappe.db.count('Work Order Operation', {'parent': data['name']})
@@ -33,28 +33,65 @@ def make_job_card(work_order, operations):
     if work_order['custom_jobcard_remaining']:
 
         amount = work_order['custom_total_run_cards']
-        remaining = work_order['custom_jobcard_remaining']
 
         work_order = frappe.get_doc("Work Order", work_order['name'])
 
-        sequence = 0
+        custom_quantity__run_card = int(work_order.custom_quantity__run_card)
+
         for row in operations:
             row = frappe._dict(row)
-            runcard_no = f"{(amount - remaining) + 1}/{amount}"
-            sequence = sequence + 1
             validate_operation_data(row)
             qty = row.get("qty")
-            while qty > 0:
-                qty = split_qty_based_on_batch_size(work_order, row, qty)
-                if row.job_card_qty > 0:
-                    create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
+
+            if not qty:  # Skip if qty is not valid
+                continue
+
+            custom_runcard_no = frappe.db.get_all('Job Card', 
+                filters={
+                    'work_order': work_order.name, 
+                    'operation': row.operation,
+                },
+                fields=['custom_runcard_no',],
+                group_by='custom_runcard_no'
+            )
+            max_runcard_no = count_distinct_runcard_no(custom_runcard_no)
+            runcard_no = f"{(max_runcard_no)}/{amount}"
+
+            job_cards = frappe.get_all(
+                "Job Card",
+                filters={
+                    'work_order': work_order.name, 
+                    'operation': row.operation,
+                    'custom_runcard_no': runcard_no
+                },
+                fields=["for_quantity"],
+            )
+            total = sum(item['for_quantity'] for item in job_cards)
+
+            if custom_quantity__run_card == total and custom_quantity__run_card >= qty:
+                # Proceed to next run card
+                runcard_no = f"{(max_runcard_no) + 1}/{amount}"
+                sequence = 1
+                while qty > 0:
+                    qty = split_qty_based_on_batch_size(work_order, row, qty)
+                    if row.job_card_qty > 0:
+                        create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
+
+            elif custom_quantity__run_card >= (total + qty):
+                sequence = len(job_cards) + 1
+                while qty > 0:
+                    qty = split_qty_based_on_batch_size(work_order, row, qty)
+                    if row.job_card_qty > 0:
+                        create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
+            else:
+                msgprint(_('จำนวน Quantity to Manufacture มากกว่า Quantity / Run card'))
+
     else:
         msgprint(_('จำนวน Runcard เกินกว่าที่กำหนด'))
-        
+
 
 def create_job_card(work_order, row, runcard_no, sequence, enable_capacity_planning=False, auto_create=False):
     doc = frappe.new_doc("Job Card")
-    print('runcard_no', runcard_no)
     doc.update(
         {
             "work_order": work_order.name,
@@ -92,3 +129,8 @@ def create_job_card(work_order, row, runcard_no, sequence, enable_capacity_plann
         doc.db_set("status", "Open")
 
     return doc
+
+def count_distinct_runcard_no(data):
+    # Use a set to store distinct custom_runcard_no values, ignoring None
+    distinct_runcard_no = {item['custom_runcard_no'] for item in data if item['custom_runcard_no'] is not None}
+    return len(distinct_runcard_no)
