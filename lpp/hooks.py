@@ -44,7 +44,8 @@ doctype_js = {
     "Withholding Tax Cert": "public/js/withholding_tax_cert.js",
     "Payment Entry": "public/js/payment_entry.js" ,
     "Asset": "public/js/asset.js",
-    "Journal Type": "public/js/journal_type.js"
+    "Journal Type": "public/js/journal_type.js",
+    "Batch" : "public/js/batch.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
