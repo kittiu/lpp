@@ -9,10 +9,7 @@ from erpnext.manufacturing.doctype.work_order.work_order import validate_operati
 
 @frappe.whitelist()
 def get_jobcard_remaining(data): 
-    # Check if data is a string (which it seems to be based on the error)
-    if isinstance(data, str):
-        # Parse the string as JSON
-        data = json.loads(data)
+    data = ensure_json(data)  # Ensure data is parsed once
 
     job_cards = frappe.db.get_all('Job Card', 
         filters={'work_order': data['name']}, 
@@ -29,13 +26,10 @@ def get_jobcard_remaining(data):
 
 @frappe.whitelist()
 def make_job_card(work_order, operations):
-    if isinstance(operations, str):
-        operations = json.loads(operations)
-
-    if isinstance(work_order, str):
-        work_order = json.loads(work_order)
+    work_order = ensure_json(work_order)
+    operations = ensure_json(operations)
     
-    if work_order['custom_jobcard_remaining']:
+    if work_order['custom_jobcard_remaining'] and work_order['custom_total_run_cards']:
 
         amount = work_order['custom_total_run_cards']
 
@@ -51,48 +45,41 @@ def make_job_card(work_order, operations):
             if not qty:  # Skip if qty is not valid
                 continue
 
-            custom_runcard_no = frappe.db.get_all('Job Card', 
+            job_cards = frappe.db.get_all('Job Card', 
                 filters={
                     'work_order': work_order.name, 
                     'operation': row.operation,
                 },
-                fields=['custom_runcard_no',],
+                fields=['custom_runcard_no', 'SUM(for_quantity) as for_quantity'],
                 group_by='custom_runcard_no'
             )
-            max_runcard_no = count_distinct_runcard_no(custom_runcard_no)
+
+            max_runcard_no = count_distinct_runcard_no(job_cards)
             runcard_no = f"{(max_runcard_no)}/{amount}"
 
-            job_cards = frappe.get_all(
-                "Job Card",
-                filters={
-                    'work_order': work_order.name, 
-                    'operation': row.operation,
-                    'custom_runcard_no': runcard_no
-                },
-                fields=["for_quantity"],
-            )
-            total = sum(item['for_quantity'] for item in job_cards)
+            job_card_dict = {item['custom_runcard_no']: item['for_quantity'] for item in job_cards}
+            total = job_card_dict.get(runcard_no, 0)  # Defaults to 0 if runcard_no not found
 
             if custom_quantity__run_card == total and custom_quantity__run_card >= qty:
                 # Proceed to next run card
                 runcard_no = f"{(max_runcard_no) + 1}/{amount}"
                 sequence = 1
-                while qty > 0:
-                    qty = split_qty_based_on_batch_size(work_order, row, qty)
-                    if row.job_card_qty > 0:
-                        create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
+                process_job_card_creation(work_order, row, qty, runcard_no, sequence)
 
             elif custom_quantity__run_card >= (total + qty):
                 sequence = len(job_cards) + 1
-                while qty > 0:
-                    qty = split_qty_based_on_batch_size(work_order, row, qty)
-                    if row.job_card_qty > 0:
-                        create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
+                process_job_card_creation(work_order, row, qty, runcard_no, sequence)
             else:
                 msgprint(_('จำนวน Quantity to Manufacture มากกว่า Quantity / Run card'))
 
     else:
         msgprint(_('จำนวน Runcard เกินกว่าที่กำหนด'))
+
+def process_job_card_creation(work_order, row, qty, runcard_no, sequence=1):
+    while qty > 0:
+        qty = split_qty_based_on_batch_size(work_order, row, qty)
+        if row.job_card_qty > 0:
+            create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
 
 
 def create_job_card(work_order, row, runcard_no, sequence, enable_capacity_planning=False, auto_create=False):
@@ -139,3 +126,8 @@ def count_distinct_runcard_no(data):
     # Use a set to store distinct custom_runcard_no values, ignoring None
     distinct_runcard_no = {item['custom_runcard_no'] for item in data if item['custom_runcard_no'] is not None}
     return len(distinct_runcard_no)
+
+def ensure_json(data):
+    if isinstance(data, str):
+        return json.loads(data)
+    return data
