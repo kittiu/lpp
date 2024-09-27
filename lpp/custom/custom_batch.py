@@ -76,7 +76,8 @@ class CustomBatch(Batch):
             # Get the 'custom_in_short' field from the linked item group
             custom_item_group_2 = frappe.db.get_value("Item", self.item, "custom_item_group_2")
             item2_group_in_short = frappe.db.get_value("Item Group", custom_item_group_2, "custom_in_short")
-            
+            if item2_group_in_short is  None:
+                item2_group_in_short = ""
             # Separate sequence for Selling
             last_lot_no = self.get_last_lot_no(filters)
             
