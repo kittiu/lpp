@@ -13,16 +13,16 @@ def execute(filters=None):
 
 def get_columns():
     return [
-        {"label": _("Quotation No."), "fieldname": "name", "fieldtype": "Data", "width": 150},
-        {"label": _("Date"), "fieldname": "date", "fieldtype": "Date", "width": 100},
-        {"label": _("CS"), "fieldname": "custom_proposer", "fieldtype": "Data", "width": 100},
-        {"label": _("Customer"), "fieldname": "customer_name", "fieldtype": "Data", "width": 150},
+        {"label": _("Quotation No."), "fieldname": "name", "fieldtype": "Data", "width": 200},
+        {"label": _("Date"), "fieldname": "date", "fieldtype": "Date", "width": 150},
+        {"label": _("Proposer Name"), "fieldname": "custom_proposer", "fieldtype": "Data", "width": 200},
+        {"label": _("Customer"), "fieldname": "customer_name", "fieldtype": "Data", "width": 200},
         {"label": _("Drawing"), "fieldname": "custom_drawing_buildsheet_no", "fieldtype": "Data", "width": 150},
-        {"label": _("Product Name"), "fieldname": "item_name", "fieldtype": "Data", "width": 150},
-        {"label": _("Material"), "fieldname": "custom_material", "fieldtype": "Data", "width": 150},
+        {"label": _("Product Name"), "fieldname": "item_name", "fieldtype": "Data", "width": 250},
+        {"label": _("Material"), "fieldname": "custom_material", "fieldtype": "Data", "width": 200},
         {"label": _("Unit Price"), "fieldname": "rate", "fieldtype": "Currency", "width": 150},
         {"label": _("Tooling Price"), "fieldname": "amount", "fieldtype": "Currency", "width": 150},
-        {"label": _("Go Sample"), "fieldname": "custom_quotation_type", "fieldtype": "Data", "width": 150},
+        {"label": _("Marketing Status"), "fieldname": "custom_marketing_status", "fieldtype": "Data", "width": 150},
     ]
 
 def get_data(filters):
@@ -51,7 +51,7 @@ def get_data(filters):
             item.custom_material AS custom_material,
             quotation_item.rate AS rate,
             quotation_item.amount AS amount,
-            quotation.custom_quotation_type AS custom_quotation_type
+            quotation.custom_marketing_status AS custom_marketing_status
         FROM 
             `tabQuotation` quotation
         JOIN
