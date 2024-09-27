@@ -25,6 +25,10 @@ def get_columns():
 
 def get_data(filters):
     year = filters.get("year")
+    customer = filters.get("customer")
+    product = filters.get("product")
+    marketing_status = filters.get("marketing_status")
+    
     if year:
         start_date = f"{year}-01-01"
         end_date = f"{year}-12-31"
@@ -37,13 +41,19 @@ def get_data(filters):
     conditions = []
     if start_date and end_date:
         conditions.append(f"quotation.transaction_date BETWEEN %(start_date)s AND %(end_date)s")
+    if customer:
+        conditions.append(f"customer.name LIKE %(customer)s")
+    if product:
+        conditions.append(f"item.item_code LIKE %(product)s")
+    if marketing_status:
+        conditions.append(f"quotation.custom_marketing_status = %(marketing_status)s")
 
     query = """
         SELECT 
             quotation.name AS name,
             quotation.transaction_date AS date,
             quotation.custom_proposer AS custom_proposer,
-            quotation.customer_name AS customer_name,
+            customer.customer_name AS customer_name,
             item.custom_drawing__buildsheet_no AS custom_drawing_buildsheet_no,
             item.item_name AS item_name,
             item.custom_material AS custom_material,
@@ -56,6 +66,8 @@ def get_data(filters):
             `tabQuotation Item` quotation_item ON quotation.name = quotation_item.parent
         JOIN
             `tabItem` item ON quotation_item.item_code = item.name
+        JOIN
+            `tabCustomer` customer ON quotation.party_name = customer.name
         WHERE 
             quotation.docstatus = 1
     """
@@ -68,7 +80,10 @@ def get_data(filters):
         query,
         {
             "start_date": start_date,
-            "end_date": end_date
+            "end_date": end_date,
+            "customer": f"%{customer}%" if customer else None,
+            "product": f"%{product}%" if product else None,
+            "marketing_status": marketing_status
         },
         as_dict=True
     )
