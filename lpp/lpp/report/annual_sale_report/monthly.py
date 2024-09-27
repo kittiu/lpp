@@ -5,8 +5,9 @@ def monthly(filters=None):
     # Define the columns for the report (January to December)
     months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     columns = [
-        {"label": "Code", "fieldname": "code", "fieldtype": "Data", "width": 180},
-        {"label": "Customer", "fieldname": "customer", "fieldtype": "Data", "width": 200},
+        {"label": "Customer Group", "fieldname": "customer_group", "fieldtype": "Data", "width": 180, "align": "left"},
+        {"label": "Code", "fieldname": "code", "fieldtype": "Data", "width": 180, "align": "left"},
+        {"label": "Customer", "fieldname": "customer", "fieldtype": "Data", "width": 200, "align": "left"},
         {"label": "Product", "fieldname": "product", "fieldtype": "Data", "width": 220, "align": "left"},
         {"label": "UOM", "fieldname": "uom", "fieldtype": "Data", "width": 100}
     ]
@@ -24,6 +25,8 @@ def monthly(filters=None):
     conditions = []
     if 'year' in filters:
         conditions.append(f"YEAR(so.transaction_date) = {filters['year']}")
+    if 'customer_group' in filters:
+        conditions.append(f"cu.customer_group = '{filters['customer_group']}'")
     if 'customer' in filters:
         conditions.append(f"so.customer = '{filters['customer']}'")
     if 'item' in filters:
@@ -39,13 +42,15 @@ def monthly(filters=None):
         month_queries.append(baht_query)
     
     query = """
-        SELECT so.customer, so.customer_name, soi.item_code, soi.item_name, soi.uom,
+        SELECT cu.customer_group, so.customer, so.customer_name, soi.item_code, soi.item_name, soi.uom,
         {month_queries},
         SUM(soi.qty) AS ytd_unit, SUM(soi.qty * soi.rate) AS ytd_baht
         FROM `tabSales Order` so
         JOIN `tabSales Order Item` soi ON soi.parent = so.name
+        JOIN `tabCustomer` cu ON so.customer = cu.name
         WHERE {where_clause}
-        GROUP BY so.customer, so.customer_name, soi.item_code, soi.item_name, soi.uom
+        GROUP BY cu.customer_group, so.customer, so.customer_name, soi.item_code, soi.item_name, soi.uom
+        ORDER BY cu.customer_group, so.customer, soi.item_code
     """.format(
         month_queries=", ".join(month_queries),
         where_clause=where_clause
@@ -63,39 +68,81 @@ def monthly(filters=None):
 
     # Initialize data structure
     data = []
+    group_totals = {}
     customer_totals = {f"{month.lower()}_unit": 0 for month in months}
     customer_totals.update({f"{month.lower()}_baht": 0 for month in months})
     customer_totals.update({"ytd_unit": 0, "ytd_baht": 0})
 
     grand_totals = customer_totals.copy()
     current_customer = None
+    current_group = None
     total_items = 0
+    group_total_items = 0
 
-    # Append "Sales Order" 
-    data.append({
-        "code": "Sales Order",
-        "customer": "",
-        "product": "",
-        "uom": "",
-        **{f"{month.lower()}_unit": None for month in months},
-        **{f"{month.lower()}_baht": None for month in months},
-        "ytd_unit": None, "ytd_baht": None
-    })
+    if results:
+        # Append "Sales Order" 
+        data.append({
+            "customer_group": "Type : Sales Order",
+            "code": "",
+            "customer": "",
+            "product": "",
+            "uom": "",
+            **{f"{month.lower()}_unit": None for month in months},
+            **{f"{month.lower()}_baht": None for month in months},
+            "ytd_unit": None, "ytd_baht": None
+        })
 
     # Process results
     for row in results:
-        if row.get('customer') != current_customer:
-            if current_customer:
+        # Check if we are switching customer groups
+        if row.get('customer_group') != current_group:
+            if current_group is not None:
+                if current_customer:
+                    data.append({
+                        "code": "",
+                        "customer": "",
+                        "product": f"Total {total_items} items for Customer",
+                        "uom": "",
+                        **customer_totals
+                    })
+                    customer_totals = {key: 0 for key in customer_totals}
+                    total_items = 0
+                    current_customer = None
                 data.append({
                     "code": "",
                     "customer": "",
-                    "product": f"รวม {total_items} รายการ",
+                    "product": f"Total for Customer Group {current_group} ({group_total_items} items)",
+                    "uom": "",
+                    **group_totals
+                })
+                group_totals = {key: 0 for key in customer_totals}
+                group_total_items = 0
+
+            current_group = row.get('customer_group')
+            # Append customer group header
+            data.append({
+                "customer_group": current_group,
+                "code": "",
+                "customer": "",
+                "product": "",
+                "uom": "",
+                **{f"{month.lower()}_unit": None for month in months},
+                **{f"{month.lower()}_baht": None for month in months},
+                "ytd_unit": None, "ytd_baht": None
+            })
+
+        if row.get('customer') != current_customer:
+            if current_customer: 
+                data.append({
+                    "code": "",
+                    "customer": "",
+                    "product": f"Total {total_items} items for Customer",
                     "uom": "",
                     **customer_totals
                 })
+                customer_totals = {key: 0 for key in customer_totals}
+                total_items = 0
             current_customer = row.get('customer')
-            customer_totals = {key: 0 for key in customer_totals}
-            total_items = 0
             data.append({
                 "code": row.get('customer'),
                 "customer": row.get('customer_name'),
@@ -120,15 +167,25 @@ def monthly(filters=None):
         update_totals(row, customer_totals)
         update_totals(row, grand_totals)
         total_items += 1
+        group_total_items += 1
 
     # Append the final customer totals
     if current_customer:
         data.append({
             "code": "",
             "customer": "",
-            "product": f"รวม {total_items} รายการ",
+            "product": f"Total {total_items} items for Customer",
             "uom": "",
             **customer_totals
+        })
+
+    if current_group:
+        data.append({
+            "code": "",
+            "customer": "",
+            "product": f"Total for Customer Group {current_group} ({group_total_items} items)",
+            "uom": "",
+            **group_totals
         })
 
     # Query for Sales Invoice Item (Credit Notes)
@@ -169,16 +226,18 @@ def monthly(filters=None):
     return_customer_totals = {key: 0 for key in return_totals}
     return_total_items = 0
 
-    # Append "Credit Notes" header
-    data.append({
-        "code": "Credit Notes",
-        "customer": "",
-        "product": "",
-        "uom": "",
-        **{f"{month.lower()}_unit": None for month in months},
-        **{f"{month.lower()}_baht": None for month in months},
-        "ytd_unit": None, "ytd_baht": None
-    })
+    if returns:
+        # Append "Credit Notes" header
+        data.append({
+            "customer_group": "Type : Credit Notes",
+            "code": "",
+            "customer": "",
+            "product": "",
+            "uom": "",
+            **{f"{month.lower()}_unit": None for month in months},
+            **{f"{month.lower()}_baht": None for month in months},
+            "ytd_unit": None, "ytd_baht": None
+        })
 
     for return_row in returns:
         if return_row.get('customer') != current_return_customer:
@@ -197,7 +256,7 @@ def monthly(filters=None):
                 "code": return_row.get('customer'),
                 "customer": return_row.get('customer_name'),
                 "product": "",
-                "uom": return_row.get('uom'),
+                "uom": "",
                 **{f"{month.lower()}_unit": None for month in months},
                 **{f"{month.lower()}_baht": None for month in months},
                 "ytd_unit": None, "ytd_baht": None
@@ -207,7 +266,7 @@ def monthly(filters=None):
             "code": "",
             "customer": return_row.get('item_code'),
             "product": return_row.get('item_name'),
-            "uom": "",
+            "uom": return_row.get('uom'),
             **{f"{month.lower()}_unit": return_row.get(f"{month.lower()}_unit", 0) for month in months},
             **{f"{month.lower()}_baht": return_row.get(f"{month.lower()}_baht", 0) for month in months},
             "ytd_unit": return_row.get("ytd_unit", 0),
@@ -227,34 +286,40 @@ def monthly(filters=None):
             **return_customer_totals
         })
 
-    # Append "Grand Total" after processing returns
-    data.append({
-        "code": "Grand Total Sales Orders",
-        "customer": "",
-        "product": "",
-        "uom": "",
-        **grand_totals
-    })
+    if results:
+        # Append "Grand Total" after processing returns
+        data.append({
+            "customer_group": "Grand Total Sales Orders",
+            "code": "",
+            "customer": "",
+            "product": "",
+            "uom": "",
+            **grand_totals
+        })
 
-    # Append return totals to data
-    data.append({
-        "code": "Grand Total Credit Notes",
-        "customer": "",
-        "product": "",
-        "uom": "",
-        **return_totals
-    })
+    if returns:
+        # Append return totals to data
+        data.append({
+            "customer_group": "Grand Total Credit Notes",
+            "code": "",
+            "customer": "",
+            "product": "",
+            "uom": "",
+            **return_totals
+        })
 
     # Calculate net totals after returns
     net_totals = {key: grand_totals[key] + return_totals[key] for key in grand_totals}
 
-    # Append "Net Sale Orders"
-    data.append({
-        "code": "Net Sales",
-        "customer": "",
-        "product": "",
-        "uom": "",
-        **net_totals
-    })
+    if results or returns:
+        # Append "Net Sale Orders"
+        data.append({
+            "customer_group": "Net Sales",
+            "code": "",
+            "customer": "",
+            "product": "",
+            "uom": "",
+            **net_totals
+        })
 
     return columns, data
