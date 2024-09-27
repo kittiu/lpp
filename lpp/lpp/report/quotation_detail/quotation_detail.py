@@ -1,8 +1,6 @@
-# your_app/reports/quotation_report/quotation_report.py
-
 import frappe
 from frappe import _
-from frappe.utils import getdate
+from frappe.utils import getdate, formatdate
 
 def execute(filters=None):
     if not filters:
@@ -75,4 +73,37 @@ def get_data(filters):
         as_dict=True
     )
 
-    return data
+    # Process the data by month
+    monthly_data = {}
+    for row in data:
+        # Extract the month and year from the date
+        month = getdate(row["date"]).month
+        year = getdate(row["date"]).year
+        month_year = f"{month:02d}-{year}"  # Format as MM-yyyy for sorting
+        
+        if month_year not in monthly_data:
+            monthly_data[month_year] = []
+        monthly_data[month_year].append(row)
+
+    # Sort by month-year in ascending order (1-12)
+    final_data = []
+    for month_year, rows in sorted(monthly_data.items(), key=lambda x: (int(x[0].split("-")[1]), int(x[0].split("-")[0]))):
+        # Convert MM-yyyy to the format 'MMM yyyy'
+        formatted_month_year = formatdate(f"2024-{month_year[:2]}-01", "MMM yyyy")
+        # Add the month-year header row
+        final_data.append({
+            "name": formatted_month_year,  # Use name field to hold the month-year header
+            "date": None,
+            "custom_proposer": None,
+            "customer_name": None,
+            "custom_drawing_buildsheet_no": None,
+            "item_name": None,
+            "custom_material": None,
+            "rate": None,
+            "amount": None,
+            "custom_marketing_status": None
+        })
+        # Add the rows for that month
+        final_data.extend(rows)
+
+    return final_data
