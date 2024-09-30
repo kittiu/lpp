@@ -318,7 +318,7 @@ def quarter(filters=None):
 
     # Initialize report data with Sale Orders header
     data = [{
-        "customer_group": "Sale Orders",
+        "customer_group": "Type : Sale Orders",
         "code": "",
         "customer": "",
         "product": "",
@@ -341,7 +341,7 @@ def quarter(filters=None):
     # Append Credit Notes Header
     if credit_notes:
         data.append({
-            "customer_group": "Credit Notes",
+            "customer_group": "Type : Credit Notes",
             "code": "",
             "customer": "",
             "product": "",
