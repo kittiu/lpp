@@ -9,7 +9,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2024-09-26 16:02:52.766201",
+ "modified": "2024-09-26 15:44:03.296143",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Annual Sale Report",
@@ -25,6 +25,5 @@
   {
    "role": "Accounts User"
   }
- ],
- "timeout": 0
+ ]
 }
