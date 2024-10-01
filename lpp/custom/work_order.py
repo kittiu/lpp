@@ -37,6 +37,9 @@ def make_job_card(work_order, operations):
 
         custom_quantity__run_card = int(work_order.custom_quantity__run_card)
 
+        job_card_creation_list = []  # ลิสต์เก็บข้อมูลที่จะใช้สร้าง job card
+        validation_failed = False    # Flag เพื่อบอกว่ามี validation ล้มเหลวหรือไม่
+
         for row in operations:
             row = frappe._dict(row)
             validate_operation_data(row)
@@ -55,22 +58,37 @@ def make_job_card(work_order, operations):
             )
 
             max_runcard_no = count_distinct_runcard_no(job_cards)
-            runcard_no = f"{(max_runcard_no)}/{amount}"
+            if max_runcard_no == 0:
+                max_runcard_no = 1
+            runcard_no = f"{max_runcard_no}/{amount}"
 
             job_card_dict = {item['custom_runcard_no']: item['for_quantity'] for item in job_cards}
             total = job_card_dict.get(runcard_no, 0)  # Defaults to 0 if runcard_no not found
 
+            # Validate conditions for run card
             if custom_quantity__run_card == total and custom_quantity__run_card >= qty:
-                # Proceed to next run card
+                # Prepare the next run card for creation
                 runcard_no = f"{(max_runcard_no) + 1}/{amount}"
                 sequence = 1
-                process_job_card_creation(work_order, row, qty, runcard_no, sequence)
+                # Append the data to the creation list
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence))
 
             elif custom_quantity__run_card >= (total + qty):
                 sequence = len(job_cards) + 1
-                process_job_card_creation(work_order, row, qty, runcard_no, sequence)
+                # Append the data to the creation list
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence))
+
             else:
-                msgprint(_('จำนวน Quantity to Manufacture มากกว่า Quantity / Run card'))
+                # Validation failed, stop the process and show a message
+                msgprint(_(f"จำนวนสั่งผลิตมากเกินกว่าจำนวนต่อ Runcard ({row.operation})"))
+                validation_failed = True  # Mark validation as failed
+                break  # Exit the loop if validation fails
+
+        # Check if validation passed for all rows
+        if not validation_failed and job_card_creation_list:
+            # Process job card creation after all validation is complete
+            for job_card_data in job_card_creation_list:
+                process_job_card_creation(*job_card_data)
 
     else:
         msgprint(_('จำนวน Runcard เกินกว่าที่กำหนด'))
