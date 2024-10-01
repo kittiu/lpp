@@ -2,28 +2,28 @@
     <div style="margin: 0; display: flex; justify-content: space-between;">
         <div style="width: 75%">
             <div class="my-2">
-                <strong style="margin-right: 10px;">Customer</strong> {{ customer_name }}
+                <strong style="margin-right: 10px;">Customer</strong> {{ customer_name | replace_none}}
             </div>
             <div class="my-2">
-                <strong style="margin-right: 10px;">Item Name</strong> {{ item_name }}
+                <strong style="margin-right: 10px;">Item Name</strong> {{ item_name | replace_none }}
             </div>
             <div class="my-2">
-                <strong style="margin-right: 10px;">Customer Part No.</strong> {{ customer_part_no }}
+                <strong style="margin-right: 10px;">Customer Part No.</strong> {{ customer_part_no | replace_none }}
             </div>
         </div>
         <div style="width: 25%; text-align: right; font-weight: bold; font-size: 30px;">
-            {{number}}
+            {{number | replace_none("") }}
         </div>
     </div>
     <div>{{ get_barcode_svg(data=barcode_data_1, module_width_mm=0.2, module_height_mm=6) | safe }}</div>
     <div style="margin: 0; display: flex; justify-content: space-between;">
         <div style="width: 75%;">
             <div class="my-1">
-                <strong style="margin-right: 10px;">Quantity</strong> {{ quantity }}
+                <strong style="margin-right: 10px;">Quantity</strong> {{ quantity | replace_none }}
             </div>
             <div style="display: flex;">
                 <div style="width: 52%;">
-                    <strong style="margin-right: 5px;">Lot No.</strong> {{ lot_no }}
+                    <strong style="margin-right: 5px;">Lot No.</strong> {{ lot_no | replace_none }}
                 </div>
                 <div style="width: 48%;">
                     <strong style="margin-right: 5px;">Run Card No.</strong> __________
@@ -34,11 +34,11 @@
             </div>
             <div style="display: flex;">
                 <div style="width: 50%;">
-                    <strong style="margin-right: 10px;">MFG</strong> {{ mfg_date }}
+                    <strong style="margin-right: 10px;">MFG</strong> {{ mfg_date | replace_none }}
                 </div>
                 <div style="width: 50%;">
                     {% if exp_date %}
-                    <strong style="margin-right: 10px;">EXP</strong> {{ exp_date }}
+                    <strong style="margin-right: 10px;">EXP</strong> {{ exp_date | replace_none }}
                     {% endif %}
                 </div>
             </div>
@@ -49,8 +49,8 @@
     </div>
     <div style="margin: 0; display: flex; justify-content: space-between;">
         <div style="width: 70%;">
-            <div style="font-size: 14px; font-weight: bold; height: 10px;">{{ company_name }}</div>
-            <div>{{ country_of_origin }}</div>
+            <div style="font-size: 14px; font-weight: bold; height: 10px;">{{ company_name | replace_none }}</div>
+            <div>{{ country_of_origin | replace_none }}</div>
         </div>
         <div style="width: 30%; text-align: right;">
             <img style="height: 25px;" src="/assets/lpp/images/label-1.png" alt="Logo">
