@@ -63,3 +63,5 @@ def adjust_number(number):
         return math.floor(number) + 1
     else:
         return number
+def replace_none(value):
+    return '-' if value is None else value
