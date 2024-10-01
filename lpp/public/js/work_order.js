@@ -1,4 +1,10 @@
 frappe.ui.form.on("Work Order", {
+    onload_post_render: function(frm) {
+        if (frappe.router.doctype === 'Work Order' && frappe.router.page === 'print') {
+            // Hide the PDF button in the print format
+            $('button[data-label="PDF"]').hide();
+        }
+    },
     refresh(frm) {
         // Get today's date
         let today = frappe.datetime.nowdate();
@@ -15,6 +21,16 @@ frappe.ui.form.on("Work Order", {
         set_custom_item_molds_query(frm)
 
         update_custom_jobcard_remaining(frm)
+
+        setTimeout(() => {
+            if (frm.custom_buttons && frm.custom_buttons[('Create Job Card')]) {
+                // Remove Original Button
+                frm.remove_custom_button(__('Create Job Card'))
+                frm.add_custom_button(__("Create Job Card"), () => {
+                    frm.trigger("make_job_card_custom");
+                }).addClass("btn-primary");
+            }
+        }, 10);
     },
     
     custom_customer(frm) {
@@ -46,10 +62,10 @@ frappe.ui.form.on("Work Order", {
     production_item(frm) {
         set_custom_item_molds_query(frm)
     },
-    make_job_card: function (frm) {
+
+    make_job_card_custom: function (frm) {
 		let qty = 0;
 		let operations_data = [];
-
 		const dialog = frappe.prompt(
 			{
 				fieldname: "operations",
