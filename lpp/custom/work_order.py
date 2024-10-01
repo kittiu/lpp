@@ -12,14 +12,17 @@ def get_jobcard_remaining(data):
     data = ensure_json(data)  # Ensure data is parsed once
 
     job_cards = frappe.db.get_all('Job Card', 
-        filters={'work_order': data['name']}, 
-        fields=['custom_runcard_no',],
-        group_by='custom_runcard_no'
+        filters={
+            'work_order': data['name'],
+            'custom_runcard_no': ['!=', None],  # เพิ่มเงื่อนไข where เพื่อกรองค่า None
+        }, 
+        fields=['custom_runcard_no', 'operation'],
     )
-
     count_amount = data['custom_total_run_cards']
-    count_jobcard = count_distinct_runcard_no(job_cards)
-    result = count_amount - count_jobcard
+    count_jobcard = len(job_cards)
+    count_operations = len(data['operations'])
+    result = count_amount - (count_jobcard / count_operations)
+    result = round(result, 2)
 
     return result
 
