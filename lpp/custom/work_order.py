@@ -12,14 +12,17 @@ def get_jobcard_remaining(data):
     data = ensure_json(data)  # Ensure data is parsed once
 
     job_cards = frappe.db.get_all('Job Card', 
-        filters={'work_order': data['name']}, 
-        fields=['custom_runcard_no',],
-        group_by='custom_runcard_no'
+        filters={
+            'work_order': data['name'],
+            'custom_runcard_no': ['!=', None],  # เพิ่มเงื่อนไข where เพื่อกรองค่า None
+        }, 
+        fields=['custom_runcard_no', 'operation'],
     )
-
     count_amount = data['custom_total_run_cards']
-    count_jobcard = count_distinct_runcard_no(job_cards)
-    result = count_amount - count_jobcard
+    count_jobcard = len(job_cards)
+    count_operations = len(data['operations'])
+    result = count_amount - (count_jobcard / count_operations)
+    result = round(result, 2)
 
     return result
 
@@ -37,40 +40,64 @@ def make_job_card(work_order, operations):
 
         custom_quantity__run_card = int(work_order.custom_quantity__run_card)
 
+        # Initialize list and validation flag
+        job_card_creation_list = []  
+        validation_failed = False
+
         for row in operations:
             row = frappe._dict(row)
+            
+            # Validate operation data and skip if qty is not valid
             validate_operation_data(row)
             qty = row.get("qty")
-
-            if not qty:  # Skip if qty is not valid
+            if not qty:
                 continue
 
-            job_cards = frappe.db.get_all('Job Card', 
+            # Fetch job cards related to the operation
+            job_cards = frappe.db.get_all(
+                'Job Card', 
                 filters={
                     'work_order': work_order.name, 
                     'operation': row.operation,
+                    'custom_runcard_no': ['!=', None],  # เพิ่มเงื่อนไข where เพื่อกรองค่า None
                 },
                 fields=['custom_runcard_no', 'SUM(for_quantity) as for_quantity'],
                 group_by='custom_runcard_no'
             )
 
+            # Determine max run card number and initialize runcard_no
             max_runcard_no = count_distinct_runcard_no(job_cards)
-            runcard_no = f"{(max_runcard_no)}/{amount}"
+            runcard_no = f"{max_runcard_no or 1}/{amount}"
 
+            # Create a dictionary for job cards and calculate total for current runcard_no
             job_card_dict = {item['custom_runcard_no']: item['for_quantity'] for item in job_cards}
             total = job_card_dict.get(runcard_no, 0)  # Defaults to 0 if runcard_no not found
 
-            if custom_quantity__run_card == total and custom_quantity__run_card >= qty:
-                # Proceed to next run card
-                runcard_no = f"{(max_runcard_no) + 1}/{amount}"
-                sequence = 1
-                process_job_card_creation(work_order, row, qty, runcard_no, sequence)
+            # กรอง job_cards ให้เหลือเฉพาะที่ custom_runcard_no ตรงกับ runcard_no
+            filtered_job_cards = [job_card for job_card in job_cards if job_card['custom_runcard_no'] == runcard_no]
 
+            # Validate and prepare data for job card creation
+            if custom_quantity__run_card == total and custom_quantity__run_card >= qty:
+                # Prepare for the next run card
+                runcard_no = f"{max_runcard_no + 1}/{amount}"
+                sequence = 1
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence))
+                
             elif custom_quantity__run_card >= (total + qty):
-                sequence = len(job_cards) + 1
-                process_job_card_creation(work_order, row, qty, runcard_no, sequence)
+                # Add data for the current run card
+                sequence = len(filtered_job_cards) + 1
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence))
+                
             else:
-                msgprint(_('จำนวน Quantity to Manufacture มากกว่า Quantity / Run card'))
+                # Validation failed
+                msgprint(_(f"จำนวนสั่งผลิตมากเกินกว่าจำนวนต่อ Runcard ({row.operation})"))
+                validation_failed = True
+                break  # Exit loop on validation failure
+
+        # Process job cards only if all rows passed validation
+        if not validation_failed and job_card_creation_list:
+            for job_card_data in job_card_creation_list:
+                process_job_card_creation(*job_card_data)
 
     else:
         msgprint(_('จำนวน Runcard เกินกว่าที่กำหนด'))
