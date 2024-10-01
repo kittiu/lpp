@@ -44,7 +44,8 @@ doctype_js = {
     "Withholding Tax Cert": "public/js/withholding_tax_cert.js",
     "Payment Entry": "public/js/payment_entry.js" ,
     "Asset": "public/js/asset.js",
-    "Journal Type": "public/js/journal_type.js"
+    "Journal Type": "public/js/journal_type.js",
+    "Batch" : "public/js/batch.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
@@ -142,7 +143,8 @@ override_doctype_class = {
     "Quality Inspection" : "lpp.custom.custom_quality_inspection.CustomQualityInspection",
     "Sales Billing" : "lpp.custom.custom_sales_billing.CustomSalesBilling",
     "Purchase Billing" : "lpp.custom.custom_purchase_billing.CustomPurchaseBilling",
-    "Batch": "lpp.custom.custom_batch.CustomBatch"
+    "Batch": "lpp.custom.custom_batch.CustomBatch",
+    "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry"
 }
 
 # Document Events
@@ -150,9 +152,6 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
-    "Delivery Note": {
-        "on_submit": "custom.deliveryd_note.on_submit_delivery_note"
-    }
 	# "*": {
 	# 	"on_update": "method",
 	# 	"on_cancel": "method",

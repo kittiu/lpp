@@ -9,52 +9,108 @@ from erpnext.manufacturing.doctype.work_order.work_order import validate_operati
 
 @frappe.whitelist()
 def get_jobcard_remaining(data): 
-    # Check if data is a string (which it seems to be based on the error)
-    if isinstance(data, str):
-        # Parse the string as JSON
-        data = json.loads(data)
-        
+    data = ensure_json(data)  # Ensure data is parsed once
+
+    job_cards = frappe.db.get_all('Job Card', 
+        filters={
+            'work_order': data['name'],
+            'custom_runcard_no': ['!=', None],  # เพิ่มเงื่อนไข where เพื่อกรองค่า None
+        }, 
+        fields=['custom_runcard_no', 'operation'],
+    )
     count_amount = data['custom_total_run_cards']
-    count_jobcard = frappe.db.count('Job Card', {'work_order': data['name']})
-    count_operation = frappe.db.count('Work Order Operation', {'parent': data['name']})
-    result = count_amount - (count_jobcard / count_operation)
+    count_jobcard = len(job_cards)
+    count_operations = len(data['operations'])
+    result = count_amount - (count_jobcard / count_operations)
+    result = round(result, 2)
 
     return result
 
 
 @frappe.whitelist()
 def make_job_card(work_order, operations):
-    if isinstance(operations, str):
-        operations = json.loads(operations)
-
-    if isinstance(work_order, str):
-        work_order = json.loads(work_order)
+    work_order = ensure_json(work_order)
+    operations = ensure_json(operations)
     
-    if work_order['custom_jobcard_remaining']:
+    if work_order['custom_jobcard_remaining'] and work_order['custom_total_run_cards']:
 
         amount = work_order['custom_total_run_cards']
-        remaining = work_order['custom_jobcard_remaining']
 
         work_order = frappe.get_doc("Work Order", work_order['name'])
 
-        sequence = 0
+        custom_quantity__run_card = int(work_order.custom_quantity__run_card)
+
+        # Initialize list and validation flag
+        job_card_creation_list = []  
+        validation_failed = False
+
         for row in operations:
             row = frappe._dict(row)
-            runcard_no = f"{(amount - remaining) + 1}/{amount}"
-            sequence = sequence + 1
+            
+            # Validate operation data and skip if qty is not valid
             validate_operation_data(row)
             qty = row.get("qty")
-            while qty > 0:
-                qty = split_qty_based_on_batch_size(work_order, row, qty)
-                if row.job_card_qty > 0:
-                    create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
+            if not qty:
+                continue
+
+            # Fetch job cards related to the operation
+            job_cards = frappe.db.get_all(
+                'Job Card', 
+                filters={
+                    'work_order': work_order.name, 
+                    'operation': row.operation,
+                    'custom_runcard_no': ['!=', None],  # เพิ่มเงื่อนไข where เพื่อกรองค่า None
+                },
+                fields=['custom_runcard_no', 'SUM(for_quantity) as for_quantity'],
+                group_by='custom_runcard_no'
+            )
+
+            # Determine max run card number and initialize runcard_no
+            max_runcard_no = count_distinct_runcard_no(job_cards)
+            runcard_no = f"{max_runcard_no or 1}/{amount}"
+
+            # Create a dictionary for job cards and calculate total for current runcard_no
+            job_card_dict = {item['custom_runcard_no']: item['for_quantity'] for item in job_cards}
+            total = job_card_dict.get(runcard_no, 0)  # Defaults to 0 if runcard_no not found
+
+            # กรอง job_cards ให้เหลือเฉพาะที่ custom_runcard_no ตรงกับ runcard_no
+            filtered_job_cards = [job_card for job_card in job_cards if job_card['custom_runcard_no'] == runcard_no]
+
+            # Validate and prepare data for job card creation
+            if custom_quantity__run_card == total and custom_quantity__run_card >= qty:
+                # Prepare for the next run card
+                runcard_no = f"{max_runcard_no + 1}/{amount}"
+                sequence = 1
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence))
+                
+            elif custom_quantity__run_card >= (total + qty):
+                # Add data for the current run card
+                sequence = len(filtered_job_cards) + 1
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence))
+                
+            else:
+                # Validation failed
+                msgprint(_(f"จำนวนสั่งผลิตมากเกินกว่าจำนวนต่อ Runcard ({row.operation})"))
+                validation_failed = True
+                break  # Exit loop on validation failure
+
+        # Process job cards only if all rows passed validation
+        if not validation_failed and job_card_creation_list:
+            for job_card_data in job_card_creation_list:
+                process_job_card_creation(*job_card_data)
+
     else:
         msgprint(_('จำนวน Runcard เกินกว่าที่กำหนด'))
-        
+
+def process_job_card_creation(work_order, row, qty, runcard_no, sequence=1):
+    while qty > 0:
+        qty = split_qty_based_on_batch_size(work_order, row, qty)
+        if row.job_card_qty > 0:
+            create_job_card(work_order, row, runcard_no, sequence, auto_create=True)
+
 
 def create_job_card(work_order, row, runcard_no, sequence, enable_capacity_planning=False, auto_create=False):
     doc = frappe.new_doc("Job Card")
-    print('runcard_no', runcard_no)
     doc.update(
         {
             "work_order": work_order.name,
@@ -92,3 +148,13 @@ def create_job_card(work_order, row, runcard_no, sequence, enable_capacity_plann
         doc.db_set("status", "Open")
 
     return doc
+
+def count_distinct_runcard_no(data):
+    # Use a set to store distinct custom_runcard_no values, ignoring None
+    distinct_runcard_no = {item['custom_runcard_no'] for item in data if item['custom_runcard_no'] is not None}
+    return len(distinct_runcard_no)
+
+def ensure_json(data):
+    if isinstance(data, str):
+        return json.loads(data)
+    return data

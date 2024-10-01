@@ -7,14 +7,14 @@
         {% for label in labels %}
         <div style="padding-top: 2.5mm; padding-left: 1mm; padding-right: 1mm;">
             <div style="border: 1px solid black; padding: 10px; width: 10cm; height: 2.7cm; font-size: 10px;">
-                <div ><span style="font-weight: bold; padding-right: 10px;">Item Name </span> {{item_name}}
+                <div ><span style="font-weight: bold; padding-right: 10px;">Item Name </span> {{item_name | replace_none}}
                     Kgs.</div>
                 <div style="margin-top: 7px;">
-                    <span style="font-weight: bold; padding-right: 10px;">Lot No.</span> {{lot_no}}
+                    <span style="font-weight: bold; padding-right: 10px;">Lot No.</span> {{lot_no | replace_none}}
                 </div>
                 <div style="margin-top: 7px; display: flex; flex-direction: row;">
                     <div style="display: inline-block; width: 30%;">
-                        <span style="font-weight: bold; padding-right: 10px;">MFG</span> {{mfg}}
+                        <span style="font-weight: bold; padding-right: 10px;">MFG</span> {{mfg | replace_none}}
                     </div>
                     <div style="display: inline-block; width: 70%;">
                         <span style="font-weight: bold; padding-right: 10px;">Weight</span> ____________________________ Kilograms
@@ -22,7 +22,7 @@
                 </div>
                 <div style="margin-top: 7px; display: flex; flex-direction: row;">
                     <div style="width: 30%;">
-                        <span style="font-weight: bold; padding-right: 15px;">EXP</span>{{exp}}
+                        <span style="font-weight: bold; padding-right: 15px;">EXP</span>{{exp | replace_none}}
                     </div>
                     <div style="width: 70%;">
                         <span style="font-weight: bold; padding-right: 10px;">Supplier Lot No.</span> ____________________________
