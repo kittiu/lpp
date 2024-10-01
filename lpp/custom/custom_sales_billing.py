@@ -20,7 +20,6 @@ class CustomSalesBilling(SalesBilling):
     
     @frappe.whitelist()
     def make_payment_entry(self):
-        print('make_payment_entry', self)
         # สร้าง Payment Entry
         purchase_billing = self
         payment_entry = frappe.new_doc("Payment Entry")
