@@ -63,3 +63,15 @@ def adjust_number(number):
         return math.floor(number) + 1
     else:
         return number
+    
+def convert_none_or_zero(value):
+    # Check if value is None or zero, then return 1; otherwise, return the original value
+    if value is None or value == 0:
+        return 1
+    return value
+
+def replace_none(value,to_value = "-"):
+    if value is None:
+        return to_value
+    else:
+        return value
