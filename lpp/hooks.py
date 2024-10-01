@@ -143,7 +143,8 @@ override_doctype_class = {
     "Quality Inspection" : "lpp.custom.custom_quality_inspection.CustomQualityInspection",
     "Sales Billing" : "lpp.custom.custom_sales_billing.CustomSalesBilling",
     "Purchase Billing" : "lpp.custom.custom_purchase_billing.CustomPurchaseBilling",
-    "Batch": "lpp.custom.custom_batch.CustomBatch"
+    "Batch": "lpp.custom.custom_batch.CustomBatch",
+    "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry"
 }
 
 # Document Events

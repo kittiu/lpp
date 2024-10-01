@@ -13,7 +13,8 @@ frappe.ui.form.on("Payment Entry", {
             };
         });
     },
-    validate(frm) {        
+    validate(frm) {  
+        if (frm.doc.references){              
         // วนลูปตรวจสอบแต่ละรายการใน frm.doc.references
         frm.doc.references.forEach(reference => {
             // ตรวจสอบว่า reference_doctype เป็น Purchase Invoice, Purchase Order, หรือ Journal Entry
@@ -22,6 +23,7 @@ frappe.ui.form.on("Payment Entry", {
                 get_total_no_vat(reference);
             }
         });
+        }
     }
 });
 
