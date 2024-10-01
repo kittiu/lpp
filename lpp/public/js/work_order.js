@@ -1,4 +1,10 @@
 frappe.ui.form.on("Work Order", {
+    onload_post_render: function(frm) {
+        if (frappe.router.doctype === 'Work Order' && frappe.router.page === 'print') {
+            // Hide the PDF button in the print format
+            $('button[data-label="PDF"]').hide();
+        }
+    },
     refresh(frm) {
         // Get today's date
         let today = frappe.datetime.nowdate();
