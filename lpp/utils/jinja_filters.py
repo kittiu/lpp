@@ -9,10 +9,10 @@ def format_datetime_to_date(date_str):
         return date_obj.strftime('%d/%m/%Y')
     except Exception as e:
         return date_str
-def format_date(date_str):
+def format_date(date_str,pattern='%d/%m/%Y'):
     try:
         date_obj = datetime.strptime(str(date_str), '%Y-%m-%d')
-        return date_obj.strftime('%d/%m/%Y')
+        return date_obj.strftime(pattern)
     except Exception as e:
         return date_str
 def substring_if_longer(value, length):

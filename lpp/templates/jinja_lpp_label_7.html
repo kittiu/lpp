@@ -1,0 +1,64 @@
+<div style="width: 10cm; height: 7cm; border: 1px solid #000; padding: 10px; display: flex; flex-direction: column; font-size: 10px;">
+    <div style="margin: 0; display: flex; justify-content: space-between;">
+        <div style="width: 100%">
+            <div class="my-2">
+                <strong style="margin-right: 10px;">Customer</strong> {{ customer_name | replace_none }}
+            </div>
+            <div class="my-2 display: flex; justify-content: space-between;">
+                <strong style="margin-right: 10px;">UTL Vendor Code</strong> 
+                <span style="margin-right: 20px;"> 100456</span>  
+                <strong style="margin-right: 10px;">Manufacturer Code</strong> 01
+            </div>
+            <div class="my-2">
+                <strong style="margin-right: 10px;">UTL PO No.</strong> 42XXXXXX
+            </div>
+            <div class="my-2">
+                <strong style="margin-right: 10px;">Item Name</strong> {{ item_name | replace_none }}
+            </div>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="width: 75%;">
+            <div class="my-2">
+                <strong style="margin-right: 10px;">UTL Part No.</strong> {{ customer_part_no | replace_none }}
+            </div>
+            <div class="my-1">
+                <strong style="margin-right: 10px;">Quantity</strong> {{ quantity | replace_none }}
+            </div>
+            <div class="my-1" style="display: flex;">
+                <div style="width: 52%;">
+                    <strong style="margin-right: 5px;">Lot No.</strong> {{ lot_no | replace_none }}
+                </div>
+                <div style="width: 48%;">
+                    <strong style="margin-right: 5px;">Run Card No.</strong> __________
+                </div>
+            </div>
+
+            <div class="my-1" style="display: flex;">
+                <div style="width: 50%;">
+                    <strong style="margin-right: 10px;">MFG</strong> {{ mfg_date | replace_none }}
+                </div>
+                <div style="width: 50%;">
+                    <strong style="margin-right: 10px;">EXP</strong> {{ exp_date | replace_none }}
+                </div>
+            </div>
+        </div>
+        <div style="width: 25%; position: relative;" >
+            <img   style="position: absolute; right: -6px; top: -5;"   src="{{ get_qr_code(qr_code_data) }}" width="90px" height="90px"/>
+        </div>
+    </div>
+    <div style="margin: 0; margin-top: 15px; display: flex; justify-content: space-between;">
+        <div style="width: 70%;">
+            <div style="font-size: 14px; font-weight: bold; color: #3a7eb8;">{{ company_name | replace_none }}</div>
+            <div>{{ country_of_origin }}</div>
+        </div>
+        <div style="width: 30%; text-align: right;">
+            <img style="height: 25px;" src="/assets/lpp/images/label-1.png" alt="Logo">
+            <img style="height: 25px;" src="/assets/lpp/images/label-2.png" alt="Logo">
+            <img style="height: 25px;" src="/assets/lpp/images/label-3.png" alt="Logo">
+        </div>
+    </div>
+    <div style="font-size: 9px;">
+        {{ storage_instructions | replace_none }}
+    </div>
+</div>
