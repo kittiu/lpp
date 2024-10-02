@@ -258,12 +258,17 @@ function calculate_total_run_cards(frm) {
     // Get values of qty and custom_quantity__run_card safely with default to 0
     let qty = frm.doc.custom_ordered_quantity || 0;
     let custom_quantity_run_card = frm.doc.custom_quantity__run_card || 0;
-    console.log(qty, custom_quantity_run_card);
 
     // Handle division safely: Check if custom_quantity_run_card is greater than 0 to avoid division by zero
     if (custom_quantity_run_card > 0) {
-        // Calculate and round to 2 decimal places using toFixed(2)
-        let total_run_cards = (qty / custom_quantity_run_card).toFixed(2);
+        // Perform the division
+        let total_run_cards = qty / custom_quantity_run_card;
+
+        // Check if the result has a remainder (not an integer)
+        if (total_run_cards % 1 !== 0) {
+            // If not an integer, round up
+            total_run_cards = Math.ceil(total_run_cards);
+        }
 
         frm.set_value("custom_total_run_cards", Math.ceil(total_run_cards));
     } else {
