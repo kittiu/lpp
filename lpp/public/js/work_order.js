@@ -13,7 +13,9 @@ frappe.ui.form.on("Work Order", {
         frm.set_value("custom_mfg_date", today);
 
         // Add 12 months to today's date and set the 'custom_exp_date' field
-        frm.set_value("custom_exp_date", frappe.datetime.add_months(today, 12));
+        if(!frm.doc.custom_exp_date){
+            frm.set_value("custom_exp_date", frappe.datetime.add_months(today, 12));
+        }
 
         // Calculate total run cards
         calculate_total_run_cards(frm);
