@@ -224,7 +224,7 @@
    "insert_after": "work_order",
    "is_system_generated": 0,
    "is_virtual": 0,
-   "label": "Batch",
+   "label": "Batch No.",
    "length": 0,
    "link_filters": null,
    "mandatory_depends_on": null,
