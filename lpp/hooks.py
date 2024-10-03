@@ -46,7 +46,8 @@ doctype_js = {
     "Asset": "public/js/asset.js",
     "Journal Type": "public/js/journal_type.js",
     "Batch" : "public/js/batch.js",
-    "Pricing Rule" : "public/js/pricing_rule.js"
+    "Pricing Rule" : "public/js/pricing_rule.js",
+    "Item" : "public/js/item.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
