@@ -854,7 +854,7 @@
    "insert_after": "custom_quantity__run_card",
    "is_system_generated": 0,
    "is_virtual": 0,
-   "label": "Batch",
+   "label": "Batch No.",
    "length": 0,
    "link_filters": "[[\"Batch\",\"item\",\"=\",\"eval: doc.production_item\"]]",
    "mandatory_depends_on": null,
