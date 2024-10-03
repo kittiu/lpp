@@ -1,0 +1,64 @@
+
+/* NotoSansThai-Regular */
+@font-face {
+    font-family: 'NotoSansThai';
+    src: url('/assets/lpp/fonts/NotoSansThai-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* NotoSansThai-Bold */
+@font-face {
+    font-family: 'NotoSansThai';
+    src: url('/assets/lpp/fonts/NotoSansThai-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* NotoSansThai-Light */
+@font-face {
+    font-family: 'NotoSansThai';
+    src: url('/assets/lpp/fonts/NotoSansThai-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+/* NotoSansThai-Medium */
+@font-face {
+    font-family: 'NotoSansThai';
+    src: url('/assets/lpp/fonts/NotoSansThai-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+/* NotoSansThai-SemiBold */
+@font-face {
+    font-family: 'NotoSansThai';
+    src: url('/assets/lpp/fonts/NotoSansThai-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+/* NotoSansThai-ExtraBold */
+@font-face {
+    font-family: 'NotoSansThai';
+    src: url('/assets/lpp/fonts/NotoSansThai-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+}
+
+/* NotoSansThai-Black */
+@font-face {
+    font-family: 'NotoSansThai';
+    src: url('/assets/lpp/fonts/NotoSansThai-Black.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+/* NotoSansThai-Thin */
+@font-face {
+    font-family: 'NotoSansThai';
+    src: url('/assets/lpp/fonts/NotoSansThai-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
