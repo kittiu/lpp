@@ -102,6 +102,21 @@ frappe.ui.form.on("Quality Inspection", {
                 },
             });
         }
+    },
+    custom_quality_inspection_template_1 : function (frm) {
+        if (frm.doc.custom_quality_inspection_template_1) {
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key : "custom_quality_inspection_template_1",
+                    table_key : "custom_quality_inspection_template_table_1"
+                },
+                callback: function () {
+                    refresh_field("custom_quality_inspection_template_table_1");
+                },
+            });
+        }
     }
 });
 
