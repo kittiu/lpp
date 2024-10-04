@@ -70,8 +70,14 @@ def convert_none_or_zero(value):
         return 1
     return value
 
-def replace_none(value,to_value = "-"):
-    if value is None:
+def replace_none(value, to_value="-"):
+    try:
+        if value is None:
+            return to_value
+        else:
+            # Ensure the value is a string before attempting to replace newlines
+            return str(value).replace("\n", "<br>")
+    except Exception as e:
+        # In case of any unexpected error, return the default value
         return to_value
-    else:
-        return value
+
