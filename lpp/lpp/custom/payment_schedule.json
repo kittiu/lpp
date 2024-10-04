@@ -17,7 +17,7 @@
    "field_name": "invoice_portion",
    "idx": 0,
    "is_system_generated": 0,
-   "modified": "2024-10-03 09:53:52.343928",
+   "modified": "2024-10-04 09:58:40.711774",
    "modified_by": "Administrator",
    "module": null,
    "name": "Payment Schedule-invoice_portion-default",
