@@ -35,7 +35,16 @@ frappe.ui.form.on("Material Request", {
             total += items[i].amount
         }
         frm.set_value("custom_grand_total", total)        
+    },
+    schedule_date: function(frm) {
+        // ตรวจสอบว่ามีการแก้ไขฟิลด์ schedule_date หรือไม่
+        if (frm.doc.schedule_date) {
+            // วนลูปผ่านรายการใน items เพื่อแก้ไขฟิลด์ schedule_date ของแต่ละรายการ
+            frm.doc.items.forEach(function(item) {
+                item.schedule_date = frm.doc.schedule_date;
+            });
+            // บันทึกข้อมูลการเปลี่ยนแปลงกลับไปที่ฟอร์ม
+            frm.refresh_field('items');
+        }
     }
-
-    
 });
