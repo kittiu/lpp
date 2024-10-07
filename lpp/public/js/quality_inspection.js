@@ -8,6 +8,14 @@ frappe.ui.form.on("Quality Inspection", {
 
         // Set 'custom_date_approved_by' field to today's date by default
         frm.set_value("custom_date_approved_by", today);
+
+        // Set ค่า default ของ inspection_type เป็น In Process
+        if (!frm.doc.inspection_type) {
+            frm.set_value('inspection_type', 'In Process');
+        }
+
+        // ซ่อนฟิลด์ inspection_type
+        frm.set_df_property('inspection_type', 'hidden', true);
     },
 	quality_inspection_template: function (frm) {        
 		if (frm.doc.quality_inspection_template) {
@@ -91,6 +99,21 @@ frappe.ui.form.on("Quality Inspection", {
                 },
                 callback: function () {
                     refresh_field("custom_quality_inspection_checkbox_2_table");
+                },
+            });
+        }
+    },
+    custom_quality_inspection_template_1 : function (frm) {
+        if (frm.doc.custom_quality_inspection_template_1) {
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key : "custom_quality_inspection_template_1",
+                    table_key : "custom_quality_inspection_template_table_1"
+                },
+                callback: function () {
+                    refresh_field("custom_quality_inspection_template_table_1");
                 },
             });
         }

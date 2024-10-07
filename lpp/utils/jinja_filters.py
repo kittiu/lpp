@@ -9,10 +9,10 @@ def format_datetime_to_date(date_str):
         return date_obj.strftime('%d/%m/%Y')
     except Exception as e:
         return date_str
-def format_date(date_str):
+def format_date(date_str,pattern='%d/%m/%Y'):
     try:
         date_obj = datetime.strptime(str(date_str), '%Y-%m-%d')
-        return date_obj.strftime('%d/%m/%Y')
+        return date_obj.strftime(pattern)
     except Exception as e:
         return date_str
 def substring_if_longer(value, length):
@@ -70,8 +70,14 @@ def convert_none_or_zero(value):
         return 1
     return value
 
-def replace_none(value,to_value = "-"):
-    if value is None:
+def replace_none(value, to_value="-"):
+    try:
+        if value is None:
+            return to_value
+        else:
+            # Ensure the value is a string before attempting to replace newlines
+            return str(value).replace("\n", "<br>")
+    except Exception as e:
+        # In case of any unexpected error, return the default value
         return to_value
-    else:
-        return value
+
