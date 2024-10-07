@@ -51,6 +51,19 @@ frappe.ui.form.on('Journal Entry Tax Invoice Detail', {
         if (["Customer", "Supplier"].includes(row.custom_type) && row.custom_party_code) {
             get_name_for_tax_invoice(row);
         }
+        if(row.custom_party_code){
+            if(row.custom_type === 'Supplier'){
+                frappe.db.get_value('Supplier', row.custom_party_code, "tax_id", function (value) {
+                    frappe.model.set_value(cdt, cdn, "custom_tax_id", value['tax_id']);
+                });
+            }else if(row.custom_type === 'Customer'){
+                frappe.db.get_value('Customer', row.custom_party_code, "tax_id", function (value) {
+                    frappe.model.set_value(cdt, cdn, "custom_tax_id", value['tax_id']);
+                });
+            }
+       
+        }
+        
     },
     custom_type(frm, cdt, cdn) {
         // เมื่อ custom_type เปลี่ยนแปลง เคลียร์ค่าของ custom_party_code และ custom_party_name_custom
@@ -58,6 +71,9 @@ frappe.ui.form.on('Journal Entry Tax Invoice Detail', {
         if (row.custom_party_code || row.custom_party_name_custom) {  
             frappe.model.set_value(cdt, cdn, "custom_party_code", "");
             frappe.model.set_value(cdt, cdn, "custom_party_name_custom", "");
+        }
+        if (row.custom_tax_id ){
+            frappe.model.set_value(cdt, cdn, "custom_tax_id", "");
         }
     },
     custom_tax_amount_custom(frm) {

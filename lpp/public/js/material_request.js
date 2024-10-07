@@ -1,4 +1,23 @@
 frappe.ui.form.on("Material Request", {
+    onload: function(frm) {
+        if (!frm.doc.custom_requester) {
+            frappe.call({
+                method: 'frappe.client.get_value',
+                args: {
+                    doctype: 'Employee',
+                    filters: {
+                        user_id: frappe.session.user
+                    },
+                    fieldname: 'name'
+                },
+                callback: function(response) {
+                    if (response.message) {
+                        frm.set_value('custom_requester', response.message.name);
+                    } 
+                }
+            });
+        }
+    },
     refresh: function (frm) {
           // Check if the document is new (unsaved)
           if (frm.doc.__islocal) {
