@@ -49,7 +49,8 @@ doctype_js = {
     "Pricing Rule" : "public/js/pricing_rule.js",
     "Item" : "public/js/item.js",
     "Purchase Receipt": "public/js/purchase_receipt.js",
-    "Address" : "public/js/address.js"
+    "Address" : "public/js/address.js",
+    "Job Card" : "public/js/job_card.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
