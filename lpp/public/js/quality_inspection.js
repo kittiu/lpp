@@ -1,14 +1,5 @@
 frappe.ui.form.on("Quality Inspection", {
     refresh(frm) {
-        // Get today's date
-        let today = frappe.datetime.nowdate();
-
-        // Set 'custom_date_inspected_by' field to today's date by default
-        frm.set_value("custom_date_inspected_by", today);
-
-        // Set 'custom_date_approved_by' field to today's date by default
-        frm.set_value("custom_date_approved_by", today);
-
         // Set ค่า default ของ inspection_type เป็น In Process
         if (!frm.doc.inspection_type) {
             frm.set_value('inspection_type', 'In Process');
@@ -16,19 +7,60 @@ frappe.ui.form.on("Quality Inspection", {
 
         // ซ่อนฟิลด์ inspection_type
         frm.set_df_property('inspection_type', 'hidden', true);
+        frm.events.get_supplier(frm);
+
     },
-	quality_inspection_template: function (frm) {        
-		if (frm.doc.quality_inspection_template) {
-			return frm.call({
-				method: "get_item_specification_details",
-				doc: frm.doc,
-				callback: function () {
-					refresh_field("readings");
-				},
-			});
-		}
-	},
-    custom_quality_inspection_template_2 : function (frm) {
+    get_supplier:function (frm) {
+        if(frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name && !frm.doc.custom_supplier){
+            const pr_name = frm.doc.reference_name;
+            frappe.db.get_value('Purchase Receipt', pr_name, "supplier", function (value) {
+                frm.set_value('custom_supplier', value['supplier']);
+                frm.save();
+                frm.refresh();
+            });
+        }
+    },
+    report_date: function (frm) {
+        frm.events.chk_back_date(frm, 'report_date');
+
+    },
+    custom_date_inspected_by: function (frm) {
+        frm.events.chk_back_date(frm, 'custom_date_inspected_by');
+
+    },
+    custom_date_approved_by: function (frm) {
+        frm.events.chk_back_date(frm, 'custom_date_approved_by');
+
+    },
+    chk_back_date: function (frm, fieldName) {
+        // Getting the current date and stripping the time part
+        let today = frappe.datetime.get_today();
+
+        // Comparing the selected date from the specified field with today's date
+        if (frm.doc[fieldName] < today) {
+            // Show alert if the selected date is before today
+            frappe.msgprint({
+                title: 'วันที่ไม่ถูกต้อง',
+                message: 'ไม่สามารถเลือกวันที่ย้อนหลังจากวันที่ปัจจุบันได้ กรุณาเลือกวันที่ปัจจุบันหรือวันที่ในอนาคต',
+                indicator: 'red'
+            });
+
+            // Reset the specified date field to null or another appropriate value
+            frm.set_value(fieldName, null); // Clears the field
+        }
+    },
+    quality_inspection_template: function (frm) {
+        if (frm.doc.quality_inspection_template) {
+            return frm.call({
+                method: "get_item_specification_details",
+                doc: frm.doc,
+                callback: function () {
+                    refresh_field("readings");
+                },
+            });
+        }
+    },
+    custom_quality_inspection_template_2: function (frm) {
         if (frm.doc.custom_quality_inspection_template_2) {
             return frm.call({
                 method: "custom_get_item_specification_details",
@@ -41,9 +73,9 @@ frappe.ui.form.on("Quality Inspection", {
                     refresh_field("custom_quality_inspection_template_2_table");
                 },
             });
-        }   
+        }
     },
-    custom_quality_inspection_template_3 : function (frm) {
+    custom_quality_inspection_template_3: function (frm) {
         if (frm.doc.custom_quality_inspection_template_3) {
             return frm.call({
                 method: "custom_get_item_specification_details",
@@ -58,14 +90,14 @@ frappe.ui.form.on("Quality Inspection", {
             });
         }
     },
-    custom_quality_inspection_checkbox_1_template_ : function (frm) {
+    custom_quality_inspection_checkbox_1_template_: function (frm) {
         if (frm.doc.custom_quality_inspection_checkbox_1_template_) {
             return frm.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
-                    template_key : "custom_quality_inspection_checkbox_1_template_",
-                    table_key : "custom_quality_inspection_checkbox_1_table"
+                    template_key: "custom_quality_inspection_checkbox_1_template_",
+                    table_key: "custom_quality_inspection_checkbox_1_table"
                 },
                 callback: function () {
                     refresh_field("custom_quality_inspection_checkbox_1_table");
@@ -73,14 +105,14 @@ frappe.ui.form.on("Quality Inspection", {
             });
         }
     },
-    custom_quality_inspection_freetext_1_template_ : function (frm) {
+    custom_quality_inspection_freetext_1_template_: function (frm) {
         if (frm.doc.custom_quality_inspection_freetext_1_template_) {
             return frm.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
-                    template_key : "custom_quality_inspection_freetext_1_template_",
-                    table_key : "custom_quality_inspection_freetext_1_template_table"
+                    template_key: "custom_quality_inspection_freetext_1_template_",
+                    table_key: "custom_quality_inspection_freetext_1_template_table"
                 },
                 callback: function () {
                     refresh_field("custom_quality_inspection_freetext_1_template_table");
@@ -88,14 +120,14 @@ frappe.ui.form.on("Quality Inspection", {
             });
         }
     },
-    custom_quality_inspection_checkbox_2 : function (frm) {
+    custom_quality_inspection_checkbox_2: function (frm) {
         if (frm.doc.custom_quality_inspection_checkbox_2) {
             return frm.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
-                    template_key : "custom_quality_inspection_checkbox_2",
-                    table_key : "custom_quality_inspection_checkbox_2_table"
+                    template_key: "custom_quality_inspection_checkbox_2",
+                    table_key: "custom_quality_inspection_checkbox_2_table"
                 },
                 callback: function () {
                     refresh_field("custom_quality_inspection_checkbox_2_table");
@@ -103,14 +135,14 @@ frappe.ui.form.on("Quality Inspection", {
             });
         }
     },
-    custom_quality_inspection_template_1 : function (frm) {
+    custom_quality_inspection_template_1: function (frm) {
         if (frm.doc.custom_quality_inspection_template_1) {
             return frm.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
-                    template_key : "custom_quality_inspection_template_1",
-                    table_key : "custom_quality_inspection_template_table_1"
+                    template_key: "custom_quality_inspection_template_1",
+                    table_key: "custom_quality_inspection_template_table_1"
                 },
                 callback: function () {
                     refresh_field("custom_quality_inspection_template_table_1");
@@ -121,10 +153,10 @@ frappe.ui.form.on("Quality Inspection", {
 });
 
 frappe.ui.form.on('Quality Inspection Reading', {
-    reading_value: function(frm, cdt, cdn) {
+    reading_value: function (frm, cdt, cdn) {
         // Get the current row
         let row = locals[cdt][cdn];
-    
+
         frappe.db.get_doc('Item', frm.doc.item_code)?.then((doc) => {
             const specs = [
                 { name: 'A (reel diameter)', valueField: 'custom_a_reel_diameter', toleranceField: 'custom_a_reel_diameter_plus_or_minus' },
@@ -138,16 +170,16 @@ frappe.ui.form.on('Quality Inspection Reading', {
                 { name: 'W2', valueField: 'custom_w2', toleranceField: 'custom_w2_plus_or_minus' },
                 { name: 'T (Flange thickness)', valueField: 'custom_t_flange_thickness', toleranceField: 'custom_t_flange_thickness_plus_or_minus' }
             ];
-    
+
             const spec = specs.find(s => s.name === row.specification);
-    
+
             if (spec) {
                 let value = parseFloat(doc[spec.valueField]) || 0;
                 let tolerance = parseFloat(doc[spec.toleranceField]) || 0;
-    
+
                 let min = value - tolerance;
                 let max = value + tolerance;
-    
+
                 if (!(row.reading_value >= min && row.reading_value <= max)) {
                     frappe.msgprint({
                         title: __('Warning'),
@@ -155,24 +187,24 @@ frappe.ui.form.on('Quality Inspection Reading', {
                         indicator: 'orange',
                         primary_action: {
                             label: __('Close'),
-                            action: function() {
+                            action: function () {
                                 // This will close the modal
                                 frappe.msg_dialog.hide();
                             }
                         }
-                    });    
+                    });
                 }
             }
         });
     },
-    reading_1: function(frm, cdt, cdn) {
+    reading_1: function (frm, cdt, cdn) {
         // Get the specific child row using cdt and cdn
         let child = locals[cdt][cdn];
         let reading_value = child.reading_1;
-        
+
         // Initialize the parsed value to 0
         let parsed_value = '';
-        
+
         // Ensure reading_value is a string before calling startsWith
         if (reading_value && typeof reading_value === 'string' && reading_value.startsWith('=')) {
             let number_after_equal = reading_value.substring(1).trim();
@@ -180,8 +212,8 @@ frappe.ui.form.on('Quality Inspection Reading', {
         } else {
             return;
         }
-    
-        
+
+
         // Update all readings in the child row
         for (let i = 1; i <= 32; i++) {
             let field_name = `reading_${i}`;
