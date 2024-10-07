@@ -149,7 +149,8 @@ override_doctype_class = {
     "Sales Billing" : "lpp.custom.custom_sales_billing.CustomSalesBilling",
     "Purchase Billing" : "lpp.custom.custom_purchase_billing.CustomPurchaseBilling",
     "Batch": "lpp.custom.custom_batch.CustomBatch",
-    "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry"
+    "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry",
+    "Item": "lpp.custom.custom_item.CustomItem"
 }
 
 # Document Events
