@@ -12,6 +12,75 @@ frappe.ui.form.on("Payment Entry", {
                 filters: { name: ["in", doctypes] },
             };
         });
+
+        // Add button to create withholding tax cert
+        if (
+            frm.doc.docstatus == 1 &&
+			frm.doc.payment_type == "Pay" &&
+			frm.doc.deductions.length > 0
+        ) {
+            setTimeout(() => {
+                if (frm.custom_buttons && frm.custom_buttons[('Create Withholding Tax Cert')]) {
+                    // Remove Original Button
+                    frm.remove_custom_button(__('Create Withholding Tax Cert'))
+                    frm.add_custom_button(__("Create Withholding Tax Cert"), async function () {
+                        let income_tax_form = "";
+                        if (frm.doc.party_type == "Supplier") {
+                            income_tax_form = (
+                                await frappe.db.get_value(
+                                    frm.doc.party_type, frm.doc.party, "custom_default_income_tax_form"
+                                )
+                            ).message.custom_default_income_tax_form;
+                        }
+                        const fields = [
+                            {
+                                fieldtype: "Link",
+                                label: __("WHT Type"),
+                                fieldname: "wht_type",
+                                options: "Withholding Tax Type",
+                                default: frm.doc.custom_wht_type,
+                                reqd: 1,
+                            },
+                            {
+                                fieldtype: "Date",
+                                label: __("Date"),
+                                fieldname: "date",
+                                reqd: 1,
+                            },
+                            {
+                                fieldtype: "Select",
+                                label: __("Income Tax Form"),
+                                fieldname: "income_tax_form",
+                                options: "PND3\nPND53",
+                                default: income_tax_form
+                            },
+                            {
+                                fieldtype: "Link",
+                                label: __("Company Address"),
+                                fieldname: "company_address",
+                                options: "Address",
+                                get_query: () => {
+                                    return {
+                                        filters: {
+                                            is_your_company_address: 1,
+                                        },
+                                    };
+                                },
+                            },
+                        ];
+                        frappe.prompt(
+                            fields,
+                            function (filters) {
+                                frm.events.make_withholding_tax_cert(frm, filters);
+                            },
+                            __("Withholding Tax Cert"),
+                            __("Create Withholding Tax Cert")
+                        );
+                    });
+                }
+            }, 10);
+        }
+        
     },
     validate(frm) {  
         if (frm.doc.references){              
@@ -24,7 +93,21 @@ frappe.ui.form.on("Payment Entry", {
             }
         });
         }
-    }
+    },
+
+    make_withholding_tax_cert: function (frm, filters) {
+        return frappe.call({
+            method: "lpp.custom.payment_entry.make_withholding_tax_cert",
+            args: {
+                filters: filters,
+                doc: frm.doc,
+            },
+            callback: function (r) {
+                var doclist = frappe.model.sync(r.message);
+                frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+            },
+        });
+    },
 });
 
 frappe.ui.form.on("Payment Entry","setup", function(frm) {
