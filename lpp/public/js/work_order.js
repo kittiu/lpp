@@ -24,6 +24,8 @@ frappe.ui.form.on("Work Order", {
 
         update_custom_jobcard_remaining(frm)
 
+        update_invoice_portion(frm);
+
         setTimeout(() => {
             if (frm.custom_buttons && frm.custom_buttons[('Create Job Card')]) {
                 // Remove Original Button
