@@ -102,14 +102,14 @@ frappe.ui.form.on("Work Order", {
 					{
 						fieldtype: "Link",
 						fieldname: "operation",
-						label: __("Operation"),
+						label: __("Workstation"),
 						read_only: 1,
 						in_list_view: 1,
 					},
 					{
 						fieldtype: "Link",
 						fieldname: "workstation",
-						label: __("Workstation"),
+						label: __("Machine"),
 						read_only: 1,
 						in_list_view: 1,
 					},
