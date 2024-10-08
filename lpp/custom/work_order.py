@@ -128,7 +128,9 @@ def create_job_card(work_order, row, runcard_no, sequence, enable_capacity_plann
             "hour_rate": row.get("hour_rate"),
             "serial_no": row.get("serial_no"),
             "custom_runcard_no": runcard_no,
-            "custom_sequence": sequence
+            "custom_sequence": sequence,
+            "custom_workstation_details": row.get("operation"),
+            "custom_machine": row.get("workstation")
         }
     )
 
