@@ -2,6 +2,33 @@ import frappe # type: ignore
 import json
 from ast import literal_eval
 
+@frappe.whitelist()
+def make_withholding_tax_cert(filters, doc):
+	wht = get_withholding_tax(filters, doc)
+	filters = literal_eval(filters)
+	pay = json.loads(doc)
+	cert = frappe.new_doc("Withholding Tax Cert")
+	cert.supplier = pay.get("party_type") == "Supplier" and pay.get("party") or ""
+	if cert.supplier != "":
+		supplier = frappe.get_doc("Supplier", cert.supplier)
+		cert.supplier_name = supplier and supplier.supplier_name or ""
+		# ดึง supplier_address จาก Doctype Address โดย filter ด้วย supplier_name
+		address_data = frappe.db.get_value("Address", {"address_title": supplier.supplier_name}, "name")
+		cert.supplier_address = address_data
+	cert.voucher_type = "Payment Entry"
+	cert.voucher_no = pay.get("name")
+	cert.company_address = filters.get("company_address")
+	cert.income_tax_form = filters.get("income_tax_form")
+	cert.date = filters.get("date")
+	cert.append(
+		"withholding_tax_items",
+		{
+			"tax_base": wht["base"],
+			"tax_rate": wht["rate"],
+			"tax_amount": wht["amount"],
+		},
+	)
+	return cert
 
 @frappe.whitelist()
 def get_withholding_tax(filters, doc):
