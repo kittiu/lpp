@@ -1,5 +1,7 @@
 frappe.ui.form.on('BOM', {
-
+    refresh(frm) {
+        update_invoice_portion(frm);
+    }
 });
 
 
