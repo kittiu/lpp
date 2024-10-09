@@ -941,7 +941,7 @@
    "search_index": 0,
    "show_dashboard": 0,
    "sort_options": 0,
-   "translatable": 1,
+   "translatable": 0,
    "unique": 0,
    "width": null
   },
@@ -4847,7 +4847,7 @@
    "search_index": 0,
    "show_dashboard": 0,
    "sort_options": 0,
-   "translatable": 1,
+   "translatable": 0,
    "unique": 0,
    "width": null
   },
@@ -5288,7 +5288,7 @@
    "search_index": 0,
    "show_dashboard": 0,
    "sort_options": 0,
-   "translatable": 1,
+   "translatable": 0,
    "unique": 0,
    "width": null
   },
@@ -5603,7 +5603,7 @@
    "search_index": 0,
    "show_dashboard": 0,
    "sort_options": 0,
-   "translatable": 1,
+   "translatable": 0,
    "unique": 0,
    "width": null
   },
