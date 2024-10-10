@@ -58,11 +58,10 @@ def thai_currency_in_en_words(value):
     return words
 
 def adjust_number(number):
-    # Check if the number has a decimal part
-    if number != math.floor(number):
-        return math.floor(number) + 1
-    else:
-        return number
+    """
+    Round the number up to the nearest integer and return as an integer (no decimals).
+    """
+    return int(math.ceil(number))
     
 def convert_none_or_zero(value):
     # Check if value is None or zero, then return 1; otherwise, return the original value
