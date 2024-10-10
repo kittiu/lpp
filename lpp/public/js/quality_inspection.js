@@ -159,26 +159,39 @@ frappe.ui.form.on('Quality Inspection Reading', {
 
         frappe.db.get_doc('Item', frm.doc.item_code)?.then((doc) => {
             const specs = [
-                { name: 'A (reel diameter)', valueField: 'custom_a_reel_diameter', toleranceField: 'custom_a_reel_diameter_plus_or_minus' },
-                { name: 'B (width)', valueField: 'custom_b_width', toleranceField: 'custom_b_width_plus_or_minus' },
-                { name: 'C (diameter)', valueField: 'custom_c_diameter', toleranceField: 'custom_c_diameter_plus_or_minus' },
-                { name: 'D (diameter)', valueField: 'custom_d_diameter', toleranceField: 'custom_d_diameter_plus_or_minus' },
-                { name: 'E', valueField: 'custom_e', toleranceField: 'custom_e_plus_or_minus' },
-                { name: 'F', valueField: 'custom_f', toleranceField: 'custom_f_plus_or_minus' },
-                { name: 'N (hub diameter)', valueField: 'custom_n_hub_diameter', toleranceField: 'custom_n_hub_diameter_plus_or_minus' },
-                { name: 'W1', valueField: 'custom_w1', toleranceField: 'custom_w1_plus_or_minus' },
-                { name: 'W2', valueField: 'custom_w2', toleranceField: 'custom_w2_plus_or_minus' },
-                { name: 'T (Flange thickness)', valueField: 'custom_t_flange_thickness', toleranceField: 'custom_t_flange_thickness_plus_or_minus' }
+                { name: 'Thickness (mm)', valueField: 'custom_thickness_tolerance', toleranceFieldMax: 'custom_thickness_max', toleranceFieldMin: 'custom_thickness_min' },
+                { name: 'Length (mm)', valueField: 'custom_length_tolerance', toleranceFieldMax: 'custom_length_max', toleranceFieldMin: 'custom_length_min' },
+                { name: 'Height (mm)', valueField: 'custom_height_tolerance', toleranceFieldMax: 'custom_height_max', toleranceFieldMin: 'custom_height_min' },
+                { name: 'Surface Resistivity (ohms/sq)', valueField: 'custom_surface_resistivity_ohmssq', toleranceFieldMax: 'custom_surface_resistivity_ohmssq_max', toleranceFieldMin: 'custom_surface_resistivity_ohmssq_min' },
+                { name: 'A0 (mm)', valueField: 'custom_a0_tolerance', toleranceFieldMax: 'custom_a0_max', toleranceFieldMin: 'custom_a0_min' },
+                { name: 'B0 (mm)', valueField: 'custom_b0_tolerance', toleranceFieldMax: 'custom_b0_max', toleranceFieldMin: 'custom_b0_min' },
+                { name: 'K0 (mm)', valueField: 'custom_k0_tolerance', toleranceFieldMax: 'custom_k0_max', toleranceFieldMin: 'custom_k0_min' },
+                { name: 'P1 (mm)', valueField: 'custom_p1_tolerance', toleranceFieldMax: 'custom_p1_max', toleranceFieldMin: 'custom_p1_min' },
+                { name: 'Width (mm)', valueField: 'custom_width_tolerance', toleranceFieldMax: 'custom_width_max', toleranceFieldMin: 'custom_width_min' },
+                { name: 'Length / Reel (m)', valueField: 'custom_length__reel_tolerance', toleranceFieldMax: 'custom_length__reel_max', toleranceFieldMin: 'custom_length__reel_min' },
+                { name: 'Surface Resistivity (ohms/sq)', valueField: 'custom_surface_resistivity_ohmssq', toleranceFieldMax: 'custom_surface_resistivity_ohmssq_max', toleranceFieldMin: 'custom_surface_resistivity_ohmssq_min' },
+                { name: '\u00d8A (mm)', valueField: 'custom_a_tolerance', toleranceFieldMax: 'custom_a_max', toleranceFieldMin: 'custom_a_min' },
+                { name: '\u00d8N (mm) (+)', valueField: 'custom_n_tolerance', toleranceFieldMax: 'custom_n_max', toleranceFieldMin: 'custom_n_min' },
+                { name: 'B (mm)', valueField: 'custom_b_tolerance', toleranceFieldMax: 'custom_b_max', toleranceFieldMin: 'custom_b_min' },
+                { name: '\u00d8C (mm)', valueField: 'custom_c_tolerance', toleranceFieldMax: 'custom_c_max', toleranceFieldMin: 'custom_c_min' },
+                { name: '\u00d8D (mm)', valueField: 'custom_d_tolerance', toleranceFieldMax: 'custom_d_max', toleranceFieldMin: 'custom_d_min' },
+                { name: 'E (mm)', valueField: 'custom_e_tolerance', toleranceFieldMax: 'custom_e_max', toleranceFieldMin: 'custom_e_min' },
+                { name: 'F (mm)', valueField: 'custom_f_tolerance', toleranceFieldMax: 'custom_f_max', toleranceFieldMin: 'custom_f_min' },
+                { name: 'T1 (mm)', valueField: 'custom_t1_tolerance', toleranceFieldMax: 'custom_t1_max', toleranceFieldMin: 'custom_t1_min' },
+                { name: 'T2 (mm)', valueField: 'custom_t2_tolerance', toleranceFieldMax: 'custom_t2_max', toleranceFieldMin: 'custom_t2_min' },
+                { name: 'W1 (mm)', valueField: 'custom_w1_tolerance', toleranceFieldMax: 'custom_w1_max', toleranceFieldMin: 'custom_w1_min' },
+                { name: 'W2 (mm)', valueField: 'custom_w2_tolerance', toleranceFieldMax: 'custom_w2_max', toleranceFieldMin: 'custom_w2_min' }
             ];
 
             const spec = specs.find(s => s.name === row.specification);
 
             if (spec) {
                 let value = parseFloat(doc[spec.valueField]) || 0;
-                let tolerance = parseFloat(doc[spec.toleranceField]) || 0;
+                let toleranceMax = parseFloat(doc[spec.toleranceFieldMax]) || 0;
+                let toleranceMin = parseFloat(doc[spec.toleranceFieldMin]) || 0;
 
-                let min = value - tolerance;
-                let max = value + tolerance;
+                let max = value + toleranceMax;
+                let min = value - toleranceMin;
 
                 if (!(row.reading_value >= min && row.reading_value <= max)) {
                     frappe.msgprint({
