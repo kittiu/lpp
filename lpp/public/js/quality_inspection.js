@@ -1,4 +1,96 @@
+const type_check_box = [
+    "specification",
+    "custom_item_1",
+    "custom_item_2",
+    "custom_item_3",
+    "custom_item_4",
+    "custom_item_5",
+    "custom_item_6",
+    "custom_item_7",
+    "custom_item_8",
+    "custom_item_9",
+]
+
+const type_reading = [
+    "specification",
+    "reading_1",
+    "reading_2",
+    "reading_3",
+    "reading_4",
+    "reading_5",
+    "reading_6",
+    "reading_7",
+    "reading_8",
+    "reading_9",
+]
+
+const type_accept_reject = [
+    "specification",
+    "custom_accept__reject",
+    "custom_quantity",
+    "custom_qty",
+]
+
+// Reusable function to setup user-defined columns
+function setupUserDefinedColumns(frm, tableField, typeArray) {
+    frm.fields_dict[tableField].grid.setup_user_defined_columns = function () {
+        if (typeArray && typeArray.length) {
+            frm.fields_dict[tableField].grid.user_defined_columns = typeArray.map(fieldname => {
+                let column = frappe.meta.get_docfield('Quality Inspection Reading', fieldname);
+                if (column) {
+                    column.in_list_view = 1;
+                    column.columns = 1;
+                    return column;
+                }
+            }).filter(Boolean);
+        }
+    };
+    frm.fields_dict[tableField].grid.setup_user_defined_columns();
+    frm.fields_dict[tableField].grid.refresh();
+    frm.refresh_field(tableField);
+}
+
 frappe.ui.form.on("Quality Inspection", {
+    onload: function (frm) {
+        
+        // ** Tab IMQT
+        // Setup for custom_quality_inspection_checkbox_1_table
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_checkbox_1_table', type_check_box);
+
+        // Setup for custom_quality_inspection_freetext_1_template_table
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_freetext_1_template_table', type_reading);
+
+        // Setup for custom_quality_inspection_freetext_1_template_table
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_checkbox_2_table', type_reading);
+
+        // Setup for custom_quality_inspection_template_table_1
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_table_1', type_check_box);
+
+
+        // ** Tab Final Inspection
+        // Setup for readings
+        setupUserDefinedColumns(frm, 'readings', type_accept_reject);
+
+        // Setup for readings
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_2_table', type_accept_reject);
+
+        // Setup for custom_quality_inspection_template_3_table
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_3_table', type_check_box);
+
+
+        // ** Tab Roving
+        // Setup for custom_roving_table_1
+        setupUserDefinedColumns(frm, 'custom_roving_table_1', type_accept_reject);
+
+        // Setup for custom_roving_table_2
+        setupUserDefinedColumns(frm, 'custom_roving_table_2', type_accept_reject);
+
+        // Setup for custom_roving_table_3
+        setupUserDefinedColumns(frm, 'custom_roving_table_3', type_accept_reject);
+
+
+
+    },
     refresh(frm) {
         // Set ค่า default ของ inspection_type เป็น In Process
         if (!frm.doc.inspection_type) {
@@ -10,8 +102,8 @@ frappe.ui.form.on("Quality Inspection", {
         frm.events.get_supplier(frm);
 
     },
-    get_supplier:function (frm) {
-        if(frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name && !frm.doc.custom_supplier){
+    get_supplier: function (frm) {
+        if (frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name && !frm.doc.custom_supplier) {
             const pr_name = frm.doc.reference_name;
             frappe.db.get_value('Purchase Receipt', pr_name, "supplier", function (value) {
                 frm.set_value('custom_supplier', value['supplier']);
