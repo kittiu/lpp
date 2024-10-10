@@ -10,7 +10,9 @@ frappe.ui.form.on("Work Order", {
         let today = frappe.datetime.nowdate();
 
         // Set 'custom_mfg_date' field to today's date by default
-        frm.set_value("custom_mfg_date", today);
+        if(!frm.doc.custom_mfg_date){
+            frm.set_value("custom_mfg_date", today);
+        }
 
         // Add 12 months to today's date and set the 'custom_exp_date' field
         if(!frm.doc.custom_exp_date){
@@ -80,8 +82,10 @@ frappe.ui.form.on("Work Order", {
         }
     },
     custom_ordered_quantity(frm) {
+        if(frm.doc.custom_ordered_quantity != frm.doc.qty){
+            frm.set_value("qty", frm.doc.custom_ordered_quantity);
+        }
         calculate_total_run_cards(frm);
-        frm.set_value("qty", frm.doc.custom_ordered_quantity);
     },
     custom_quantity__run_card(frm) {
         calculate_total_run_cards(frm);  // Call the function to calculate when custom_quantity__run_card changes
@@ -296,10 +300,13 @@ function calculate_total_run_cards(frm) {
             // If not an integer, round up
             total_run_cards = Math.ceil(total_run_cards);
         }
-
-        frm.set_value("custom_total_run_cards", Math.ceil(total_run_cards));
+        if(frm.doc.custom_total_run_cards != total_run_cards){
+            frm.set_value("custom_total_run_cards", Math.ceil(total_run_cards));
+        }
     } else {
-        frm.set_value("custom_total_run_cards", 0);  // Set total run cards to 0 if invalid division
+        if(frm.doc.custom_total_run_cards != 0){
+            frm.set_value("custom_total_run_cards", 0);
+        }
     }
 }
 
