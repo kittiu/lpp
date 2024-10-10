@@ -3,13 +3,18 @@ frappe.ui.form.on("Batch", {
         add_generate_lot_no_button(frm);
         if (frm.doc.custom_lot_type == "Buying") {
             frm.set_df_property("custom_rescreen", "read_only", 1);
+            frm.set_value("expiry_date", frappe.datetime.add_months(frm.doc.transaction_date, 12));
+        }else if (frm.doc.custom_lot_type == "Selling") {
+            frm.set_value("expiry_date", frappe.datetime.add_months(frm.doc.transaction_date, 24));
         }
     },
     custom_lot_type(frm) {
         if (frm.doc.custom_lot_type == "Buying") {
             frm.set_value("custom_rescreen", 0);
             frm.set_df_property("custom_rescreen", "read_only", 1);
+            frm.set_value("expiry_date", frappe.datetime.add_months(frm.doc.transaction_date, 12));
         } else if (frm.doc.custom_lot_type == "Selling") {
+            frm.set_value("expiry_date", frappe.datetime.add_months(frm.doc.transaction_date, 24));
             frm.set_value("custom_rescreen", 0);
             frm.set_df_property("custom_rescreen", "read_only", 0);
         }
