@@ -31,6 +31,27 @@ const type_accept_reject = [
     "custom_qty",
 ]
 
+const type_dimension_report = [
+    "specification",
+    "reading_1",
+    "reading_2",
+    "reading_3",
+    "reading_4",
+    "reading_5",
+    "custom_accept__reject",
+]
+
+const type_specifications_report = [
+    "specification",
+    "reading_1",
+    "reading_2",
+    "reading_3",
+    "reading_4",
+    "reading_5",
+    "custom_average_",
+    "custom_accept__reject",
+]
+
 // Reusable function to setup user-defined columns
 function setupUserDefinedColumns(frm, tableField, typeArray) {
     frm.fields_dict[tableField].grid.setup_user_defined_columns = function () {
@@ -52,7 +73,7 @@ function setupUserDefinedColumns(frm, tableField, typeArray) {
 
 frappe.ui.form.on("Quality Inspection", {
     onload: function (frm) {
-        
+
         // ** Tab IMQT
         // Setup for custom_quality_inspection_checkbox_1_table
         setupUserDefinedColumns(frm, 'custom_quality_inspection_checkbox_1_table', type_check_box);
@@ -66,16 +87,20 @@ frappe.ui.form.on("Quality Inspection", {
         // Setup for custom_quality_inspection_template_table_1
         setupUserDefinedColumns(frm, 'custom_quality_inspection_template_table_1', type_check_box);
 
+        // ** Tab BuyOff
+        // Setup for custom_buyoff_table_1
+        setupUserDefinedColumns(frm, 'custom_buyoff_table_1', type_specifications_report);
 
-        // ** Tab Final Inspection
-        // Setup for readings
-        setupUserDefinedColumns(frm, 'readings', type_accept_reject);
+        // Setup for custom_buyoff_table_2
+        setupUserDefinedColumns(frm, 'custom_buyoff_table_2', type_accept_reject);
 
-        // Setup for readings
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_2_table', type_accept_reject);
+        // Setup for custom_buyoff_table_3
+        setupUserDefinedColumns(frm, 'custom_buyoff_table_3', type_accept_reject);
 
-        // Setup for custom_quality_inspection_template_3_table
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_3_table', type_check_box);
+        // Setup for custom_buyoff_table_4
+        setupUserDefinedColumns(frm, 'custom_buyoff_table_4', type_dimension_report);
+
+
 
 
         // ** Tab Roving
@@ -88,7 +113,16 @@ frappe.ui.form.on("Quality Inspection", {
         // Setup for custom_roving_table_3
         setupUserDefinedColumns(frm, 'custom_roving_table_3', type_accept_reject);
 
+        
+        // ** Tab Final Inspection
+        // Setup for readings
+        setupUserDefinedColumns(frm, 'readings', type_accept_reject);
 
+        // Setup for readings
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_2_table', type_accept_reject);
+
+        // Setup for custom_quality_inspection_template_3_table
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_3_table', type_check_box);
 
     },
     refresh(frm) {
@@ -241,7 +275,53 @@ frappe.ui.form.on("Quality Inspection", {
                 },
             });
         }
+    },
+    custom_roving_1: function (frm) {
+        if (frm.doc.custom_roving_1) {
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_roving_1",
+                    table_key: "custom_roving_table_1"
+                },
+                callback: function () {
+                    refresh_field("custom_roving_table_1");
+                },
+            });
+        }
+    },
+    custom_roving_2: function (frm) {
+        if (frm.doc.custom_roving_2) {
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_roving_2",
+                    table_key: "custom_roving_table_2"
+                },
+                callback: function () {
+                    refresh_field("custom_roving_table_2");
+                },
+            });
+        }
+    },
+    custom_roving_3: function (frm) {
+        if (frm.doc.custom_roving_3) {
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_roving_3",
+                    table_key: "custom_roving_table_3"
+                },
+                callback: function () {
+                    refresh_field("custom_roving_table_3");
+                },
+            });
+        }
     }
+
 });
 
 frappe.ui.form.on('Quality Inspection Reading', {
