@@ -31,7 +31,7 @@ frappe.ui.form.on("Batch", {
 function add_generate_lot_no_button(frm) {
     setTimeout(() => {
         if (!frm.doc.lot_no) {
-            frm.add_custom_button('Generate Lot No.', function () {
+            frm.add_custom_button('Generate Batch No.', function () {
                 if (!frm.doc.item) {
                     frappe.msgprint("Please Select Item First");
                     return;
