@@ -49,7 +49,8 @@ doctype_js = {
     "Pricing Rule" : "public/js/pricing_rule.js",
     "Item" : "public/js/item.js",
     "Purchase Receipt": "public/js/purchase_receipt.js",
-    "Address" : "public/js/address.js"
+    "Address" : "public/js/address.js",
+    "Job Card" : "public/js/job_card.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
@@ -148,7 +149,8 @@ override_doctype_class = {
     "Sales Billing" : "lpp.custom.custom_sales_billing.CustomSalesBilling",
     "Purchase Billing" : "lpp.custom.custom_purchase_billing.CustomPurchaseBilling",
     "Batch": "lpp.custom.custom_batch.CustomBatch",
-    "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry"
+    "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry",
+    "Item": "lpp.custom.custom_item.CustomItem"
 }
 
 # Document Events

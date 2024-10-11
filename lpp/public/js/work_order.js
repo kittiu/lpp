@@ -10,7 +10,9 @@ frappe.ui.form.on("Work Order", {
         let today = frappe.datetime.nowdate();
 
         // Set 'custom_mfg_date' field to today's date by default
-        frm.set_value("custom_mfg_date", today);
+        if(!frm.doc.custom_mfg_date){
+            frm.set_value("custom_mfg_date", today);
+        }
 
         // Add 12 months to today's date and set the 'custom_exp_date' field
         if(!frm.doc.custom_exp_date){
@@ -24,6 +26,8 @@ frappe.ui.form.on("Work Order", {
 
         update_custom_jobcard_remaining(frm)
 
+        update_invoice_portion(frm);
+
         setTimeout(() => {
             if (frm.custom_buttons && frm.custom_buttons[('Create Job Card')]) {
                 // Remove Original Button
@@ -33,6 +37,29 @@ frappe.ui.form.on("Work Order", {
                 }).addClass("btn-primary");
             }
         }, 10);
+    },
+    setup: async function(frm) {
+        try {
+            // เช็คว่า Sales Order มีค่าและฟิลด์ customer ยังไม่มีข้อมูล
+            if (frm.doc.sales_order && !frm.doc.custom_customer) {
+                const { message } = await frappe.db.get_value("Sales Order", frm.doc.sales_order, "customer");
+                if (message && message.customer) {
+                    frm.set_value("custom_customer", message.customer);
+                }
+            }
+    
+            // ตั้งค่า custom_required_quantity ถ้ายังไม่มีค่า แต่มีค่า custom_ordered_quantity และ Sales Order มีค่า
+            if (frm.doc.sales_order && !frm.doc.custom_required_quantity && frm.doc.custom_ordered_quantity) {
+                frm.set_value("custom_required_quantity", frm.doc.custom_ordered_quantity);
+            }
+        } catch (err) {
+            console.error("Error fetching customer:", err);
+            frappe.msgprint({
+                title: __('Error'),
+                indicator: 'red',
+                message: __('Unable to fetch customer.')
+            });
+        }
     },
     
     custom_customer(frm) {
@@ -55,8 +82,10 @@ frappe.ui.form.on("Work Order", {
         }
     },
     custom_ordered_quantity(frm) {
+        if(frm.doc.custom_ordered_quantity != frm.doc.qty){
+            frm.set_value("qty", frm.doc.custom_ordered_quantity);
+        }
         calculate_total_run_cards(frm);
-        frm.set_value("qty", frm.doc.custom_ordered_quantity);
     },
     custom_quantity__run_card(frm) {
         calculate_total_run_cards(frm);  // Call the function to calculate when custom_quantity__run_card changes
@@ -77,14 +106,14 @@ frappe.ui.form.on("Work Order", {
 					{
 						fieldtype: "Link",
 						fieldname: "operation",
-						label: __("Operation"),
+						label: __("Workstation"),
 						read_only: 1,
 						in_list_view: 1,
 					},
 					{
 						fieldtype: "Link",
 						fieldname: "workstation",
-						label: __("Workstation"),
+						label: __("Machine"),
 						read_only: 1,
 						in_list_view: 1,
 					},
@@ -271,10 +300,13 @@ function calculate_total_run_cards(frm) {
             // If not an integer, round up
             total_run_cards = Math.ceil(total_run_cards);
         }
-
-        frm.set_value("custom_total_run_cards", Math.ceil(total_run_cards));
+        if(frm.doc.custom_total_run_cards != total_run_cards){
+            frm.set_value("custom_total_run_cards", Math.ceil(total_run_cards));
+        }
     } else {
-        frm.set_value("custom_total_run_cards", 0);  // Set total run cards to 0 if invalid division
+        if(frm.doc.custom_total_run_cards != 0){
+            frm.set_value("custom_total_run_cards", 0);
+        }
     }
 }
 
