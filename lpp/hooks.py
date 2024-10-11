@@ -152,7 +152,8 @@ override_doctype_class = {
     "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry",
     "Item": "lpp.custom.custom_item.CustomItem",
     "Pricing Rule": "lpp.custom.custom_pricing_rule.CustomPricingRule",
-    "Purchase Receipt": "lpp.custom.custom_purchase_receipt.CustomPurchaseReceipt"
+    "Purchase Receipt": "lpp.custom.custom_purchase_receipt.CustomPurchaseReceipt",
+    "BOM" : "lpp.custom.custom_bom.CustomBOM"
 }
 
 # Document Events
