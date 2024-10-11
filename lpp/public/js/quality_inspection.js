@@ -136,12 +136,22 @@ frappe.ui.form.on("Quality Inspection", {
         frm.events.get_supplier(frm);
 
     },
-    get_supplier: function (frm) {
-        if (frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name && !frm.doc.custom_supplier) {
+    reference_type: function (frm) {
+        if(frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier){
+            frm.events.get_supplier(frm);
+        }
+    },
+    reference_name: function (frm) {
+        if(frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier){
+            frm.events.get_supplier(frm);
+        }
+    },
+    get_supplier:function (frm) {
+        if(frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name && !frm.doc.custom_supplier){
             const pr_name = frm.doc.reference_name;
             frappe.db.get_value('Purchase Receipt', pr_name, "supplier", function (value) {
                 frm.set_value('custom_supplier', value['supplier']);
-                frm.save();
+                // frm.save();
                 frm.refresh();
             });
         }
