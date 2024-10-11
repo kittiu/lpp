@@ -122,7 +122,7 @@ frappe.ui.form.on("Quality Inspection", {
         setupUserDefinedColumns(frm, 'custom_quality_inspection_template_2_table', type_accept_reject);
 
         // Setup for custom_quality_inspection_template_3_table
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_3_table', type_check_box);
+        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_3_table', type_reading);
 
     },
     refresh(frm) {
