@@ -197,9 +197,9 @@ doc_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-	# "frappe.desk.doctype.event.event.get_events": "lpp.event.get_events"
-# }
+override_whitelisted_methods = {
+	"erpnext.controllers.stock_controller.make_quality_inspections": "lpp.custom.custom_quality_inspection.custom_make_quality_inspections"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
