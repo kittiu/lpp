@@ -40,7 +40,7 @@ def get_column():
             "align": "left"
 		},
 		{
-			"label": _("Production Lot No."),
+			"label": _("Production Batch No."),
 			"fieldname": "lot_no",
 			"fieldtype": "Data",
 			"width": 300,
