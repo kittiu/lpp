@@ -5,5 +5,5 @@
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 
-lpp.lpp.patches.remove_field_from_item
-lpp.lpp.patches.remove_field_from_quotation
+lpp.lpp.patches.remove_field_from_item_20241015_1700
+lpp.lpp.patches.remove_field_from_quotation_20241015_1700
