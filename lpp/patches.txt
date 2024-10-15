@@ -6,3 +6,4 @@
 # Patches added in this section will be executed after doctypes are migrated
 
 lpp.lpp.patches.remove_field_from_item
+lpp.lpp.patches.remove_field_from_qoutation
