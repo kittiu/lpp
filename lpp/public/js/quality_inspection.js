@@ -113,7 +113,7 @@ frappe.ui.form.on("Quality Inspection", {
         // Setup for custom_roving_table_3
         setupUserDefinedColumns(frm, 'custom_roving_table_3', type_accept_reject);
 
-        
+
         // ** Tab Final Inspection
         // Setup for readings
         setupUserDefinedColumns(frm, 'readings', type_accept_reject);
@@ -152,7 +152,7 @@ frappe.ui.form.on("Quality Inspection", {
             frappe.db.get_value('Purchase Receipt', pr_name, "supplier", function (value) {
                 frm.set_value('custom_supplier', value['supplier']);
                 // frm.save();
-                frm.refresh();
+                // frm.refresh();
             });
         }
     },
