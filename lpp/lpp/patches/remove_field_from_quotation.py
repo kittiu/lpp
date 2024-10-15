@@ -2,7 +2,7 @@ import frappe
 
 def execute():
     # ระบุชื่อของ Custom Field ที่ต้องการลบ
-    field_name = "custom_customer_group"
+    field_name = "custom_customer_groups"
     doctype = "Quotation"
     # ตรวจสอบว่าฟิลด์มีอยู่หรือไม่
     if frappe.db.exists("Custom Field", {"fieldname": field_name, "dt": doctype}):
