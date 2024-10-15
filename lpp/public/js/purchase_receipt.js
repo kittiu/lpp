@@ -105,6 +105,30 @@ frappe.ui.form.on("Purchase Receipt", {
 					freeze: true,
 					callback: function (r) {
 						if (r.message.length > 0) {
+							r.message.forEach(name => {
+								frappe.call({
+									method: 'lpp.custom.custom_quality_inspection.trigger_notification',
+									args: { docname: name },
+									callback: function(r) {
+										/*
+											if (!r.exc && r.message.status === "success") {
+												frappe.msgprint({
+													title: __('Notification Sent'),
+													indicator: 'green',
+													message: __('Notification for {0} sent successfully.', [name])
+												});
+											} else {
+												frappe.msgprint({
+													title: __('Error'),
+													indicator: 'red',
+													message: __('Failed to send notification for {0}.', [name])
+												});
+											}
+										*/
+									}
+								});
+							});							
+
 							if (r.message.length === 1) {
 								frappe.set_route("Form", "Quality Inspection", r.message[0]);
 							} else {
