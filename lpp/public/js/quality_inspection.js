@@ -141,10 +141,21 @@ frappe.ui.form.on("Quality Inspection", {
             frm.events.get_supplier(frm);
         }
     },
-    reference_name: function (frm) {
+    reference_name: async function (frm) {
         if(frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier){
             frm.events.get_supplier(frm);
         }
+        if (frm.doc.reference_type === 'Job Card' && frm.doc.reference_name) {
+            frappe.db.get_value('Job Card', frm.doc.reference_name, 'production_item')
+                .then(r => {
+                    if (r.message) {
+                        frm.set_value('item_code', r.message.production_item);
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching production item:', err);
+                });
+        }       
     },
     get_supplier:function (frm) {
         if(frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name && !frm.doc.custom_supplier){
