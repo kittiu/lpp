@@ -7,18 +7,10 @@ frappe.ui.form.on("Pricing Rule", {
 
         // Hide the 'currency' field
         frm.set_df_property('currency', 'hidden', 1);
-
-        // Update the title based on naming_series
-        frm.trigger('update_title');
+        frm.set_df_property('title', 'hidden', 1);
+        frm.set_df_property('title', 'reqd', 0);
+        frm.set_df_property('naming_series', 'hidden', 1);
     },
-
-    naming_series(frm) {
-        frm.trigger('update_title');
-    },
-
-    update_title(frm) {
-        frm.set_value("title", frm.doc.naming_series);
-    }
 });
 
 frappe.ui.form.on("Pricing Rule Item Code", {

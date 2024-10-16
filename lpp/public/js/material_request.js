@@ -67,3 +67,15 @@ frappe.ui.form.on("Material Request", {
         }
     }
 });
+
+frappe.listview_settings['Material Request'] = {
+
+    onload: function (listview) {
+        listview.columns.forEach(field => {
+            if (field.df && field.df.label === "Progress") {
+                field.df.fieldname = 'status';
+            }
+        });
+        listview.refresh();
+    }
+};

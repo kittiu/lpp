@@ -54,7 +54,9 @@ doctype_js = {
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
-    "Payment Entry": "public/js/payment_entry_list.js"
+    "Payment Entry": "public/js/payment_entry_list.js",
+    "Purchase Order": "public/js/purchase_order.js",
+    "Material Request": "public/js/material_request.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -150,7 +152,10 @@ override_doctype_class = {
     "Purchase Billing" : "lpp.custom.custom_purchase_billing.CustomPurchaseBilling",
     "Batch": "lpp.custom.custom_batch.CustomBatch",
     "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry",
-    "Item": "lpp.custom.custom_item.CustomItem"
+    "Item": "lpp.custom.custom_item.CustomItem",
+    "Pricing Rule": "lpp.custom.custom_pricing_rule.CustomPricingRule",
+    "Purchase Receipt": "lpp.custom.custom_purchase_receipt.CustomPurchaseReceipt",
+    "BOM" : "lpp.custom.custom_bom.CustomBOM"
 }
 
 # Document Events
@@ -194,9 +199,9 @@ doc_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-	# "frappe.desk.doctype.event.event.get_events": "lpp.event.get_events"
-# }
+override_whitelisted_methods = {
+	"erpnext.controllers.stock_controller.make_quality_inspections": "lpp.custom.custom_quality_inspection.custom_make_quality_inspections"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
