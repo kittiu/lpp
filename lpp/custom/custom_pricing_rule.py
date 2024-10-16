@@ -1,8 +1,8 @@
-from frappe.model.document import Document
+from erpnext.selling.doctype.pricing_rule.pricing_rule import PricingRule
 from frappe.model.naming import make_autoname
 import frappe
 
-class CustomPricingRule(Document):
+class CustomPricingRule(PricingRule):
     def before_save(self):
         # Set title to the document name (Naming Series)
         self.title = self.name
