@@ -136,6 +136,25 @@ frappe.ui.form.on("Quality Inspection", {
         frm.events.get_supplier(frm);
 
     },
+    custom_inspection_progress: function (frm) {
+        if(frm.doc.custom_inspection_progress === 'Buyoff'){
+            frm.set_value('custom_buyoff_inspect_date', frappe.datetime.now_datetime());
+            frm.set_value('custom_roving_inspect_date', null);
+            frm.set_value('custom_final_inspection_inspect_date', null);
+        }else if(frm.doc.custom_inspection_progress === 'Roving'){
+            frm.set_value('custom_buyoff_inspect_date', null);
+            frm.set_value('custom_roving_inspect_date', frappe.datetime.now_datetime());
+            frm.set_value('custom_final_inspection_inspect_date', null);
+        }else if(frm.doc.custom_inspection_progress === 'Final Inspection'){
+            frm.set_value('custom_buyoff_inspect_date', null);
+            frm.set_value('custom_roving_inspect_date', null);
+            frm.set_value('custom_final_inspection_inspect_date', frappe.datetime.now_datetime());
+        }else{
+            frm.set_value('custom_buyoff_inspect_date', null);
+            frm.set_value('custom_roving_inspect_date', null);
+            frm.set_value('custom_final_inspection_inspect_date', null);
+        }
+    },
     reference_type: function (frm) {
         if(frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier){
             frm.events.get_supplier(frm);
