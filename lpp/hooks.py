@@ -50,7 +50,8 @@ doctype_js = {
     "Item" : "public/js/item.js",
     "Purchase Receipt": "public/js/purchase_receipt.js",
     "Address" : "public/js/address.js",
-    "Job Card" : "public/js/job_card.js"
+    "Job Card" : "public/js/job_card.js",
+    "Sales Order" : "public/js/sales_order.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
