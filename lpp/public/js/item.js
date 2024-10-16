@@ -1,4 +1,8 @@
 frappe.ui.form.on("Item", {
+    refresh: function (frm) {
+        frm.set_df_property('item_code', 'reqd', 0);
+        frm.set_df_property('item_code', 'hidden', 1);
+    },
     item_group(frm) {
         if (frm.doc.item_group) {
             if (frm.doc.item_group == "Sales Products" || frm.doc.item_group == "Products") {
