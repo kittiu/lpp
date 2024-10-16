@@ -8,20 +8,35 @@ from frappe.utils import (
 from erpnext.manufacturing.doctype.work_order.work_order import validate_operation_data, split_qty_based_on_batch_size
 
 @frappe.whitelist()
-def get_jobcard_remaining(data): 
+def get_jobcard_remaining(data):
     data = ensure_json(data)  # Ensure data is parsed once
 
-    job_cards = frappe.db.get_all('Job Card', 
+    # ตรวจสอบว่าค่าที่ใช้เป็น int/float หรือแปลงให้ถูกต้องก่อนคำนวณ
+    try:
+        count_amount = int(data['custom_total_run_cards'])  # แปลงเป็น int
+    except ValueError:
+        frappe.throw("custom_total_run_cards ต้องเป็นตัวเลข")
+
+    job_cards = frappe.db.get_all(
+        'Job Card',
         filters={
             'work_order': data['name'],
             'custom_runcard_no': ['!=', None],  # เพิ่มเงื่อนไข where เพื่อกรองค่า None
-        }, 
+        },
         fields=['custom_runcard_no', 'operation'],
     )
-    count_amount = data['custom_total_run_cards']
+
     count_jobcard = len(job_cards)
     count_operations = len(data['operations'])
-    result = count_amount - (count_jobcard / count_operations)
+
+    # ตรวจสอบว่าจำนวน operations ต้องไม่เป็น 0 เพื่อหลีกเลี่ยงการหารด้วยศูนย์
+    if count_operations == 0:
+        frappe.throw("ไม่พบ operations สำหรับการคำนวณ")
+
+    # คำนวณผลลัพธ์โดยแปลงค่าเป็น float เพื่อป้องกันปัญหาในการหาร
+    result = float(count_amount) - (count_jobcard / count_operations)
+
+    # ปัดผลลัพธ์ให้มีทศนิยม 2 ตำแหน่ง
     result = round(result, 2)
 
     return result
