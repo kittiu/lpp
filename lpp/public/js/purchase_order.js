@@ -31,16 +31,16 @@ frappe.ui.form.on("Purchase Order", {
 });
 
 frappe.listview_settings['Purchase Order'] = {
+    onload: function(listview) {
+        // Check if 'columns' is accessible and iterable
+        if (listview && listview.columns && Array.isArray(listview.columns)) {
+            listview.columns.forEach(field => {
+                if (field.df && field.df.label === "Progress") {
+                    field.df.fieldname = 'status';
+                }
+            });
 
-    onload: function (listview) {
-        // console.log('Original listview columns:', listview.columns);
-        // console.log('Original listview data:', listview.data);
-
-        listview.columns.forEach(field => {
-            if (field.df && field.df.label === "Progress") {
-                field.df.fieldname = 'status';
-            }
-        });
-        listview.refresh();
+            listview.refresh(); // Refresh the list to apply changes
+        }
     }
 };
