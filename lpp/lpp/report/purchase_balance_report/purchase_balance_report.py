@@ -43,6 +43,12 @@ def get_columns():
             "align": "left"
 		},
         {
+			"label": _("Total QTY"),
+			"fieldname": "total_qty",
+			"fieldtype": "Float",
+			"width": 160,
+		},
+        {
 			"label": _("QTY"),
 			"fieldname": "qty",
 			"fieldtype": "Float",
@@ -106,8 +112,7 @@ def get_data(filters):
     total_qty = 0
     
     # Loop through the query results and append to the report_data
-    for idx, pd in enumerate(query_data, start=1): 
-        qty = pd['qty'] if pd['qty'] is not None else 0
+    for pd in query_data: 
         total_qty = pd['total_qty'] if pd['total_qty'] is not None else 0
         
         # Check if the purchase order or part has changed, reset total_qty if necessary
@@ -127,8 +132,8 @@ def get_data(filters):
             "inv_no": pd['supplier_invoice'] if pd['supplier_invoice'] else None,  # Invoice number can be dynamic now (based on row index)
             "date": pd['posting_date'],
             "part": pd['part'],
+            "total_qty": pd['total_qty'],
             "qty": pd['qty'],
-			"total_qty" : total_qty,
             "balance": balance if balance else 0
         })
         
