@@ -2,6 +2,7 @@ frappe.ui.form.on("Item", {
     refresh: function (frm) {
         frm.set_df_property('item_code', 'reqd', 0);
         frm.set_df_property('item_code', 'hidden', 1);
+        frm.set_df_property('is_fixed_asset', 'set_only_once', 0);
     },
     item_group(frm) {
         if (frm.doc.item_group) {
