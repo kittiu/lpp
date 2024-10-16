@@ -200,7 +200,8 @@ doc_events = {
 # ------------------------------
 #
 override_whitelisted_methods = {
-	"erpnext.controllers.stock_controller.make_quality_inspections": "lpp.custom.custom_quality_inspection.custom_make_quality_inspections"
+	"erpnext.controllers.stock_controller.make_quality_inspections": "lpp.custom.custom_quality_inspection.custom_make_quality_inspections",
+    "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_purchase_invoice" : "lpp.custom.custom_purchase_receipt.make_purchase_invoice"
 }
 #
 # each overriding function accepts a `data` argument;
