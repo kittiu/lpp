@@ -4,7 +4,7 @@ def execute():
     try:
         # ระบุชื่อของ Custom Field ที่ต้องการลบ
         field_name = "custom_supplier_purchase_order"
-        doctype = "QuotaSales Invoicetion"
+        doctype = "Sales Invoice"
         # ตรวจสอบว่าฟิลด์มีอยู่หรือไม่
         if frappe.db.exists("Custom Field", {"fieldname": field_name, "dt": doctype}):
             frappe.delete_doc("Custom Field", f"{doctype}-{field_name}", force=True)
@@ -14,7 +14,7 @@ def execute():
             
         # ระบุชื่อของ Custom Field ที่ต้องการลบ
         field_name = "custom_shipping_mark"
-        doctype = "QuotaSales Invoicetion"
+        doctype = "Sales Invoice"
         # ตรวจสอบว่าฟิลด์มีอยู่หรือไม่
         if frappe.db.exists("Custom Field", {"fieldname": field_name, "dt": doctype}):
             frappe.delete_doc("Custom Field", f"{doctype}-{field_name}", force=True)
