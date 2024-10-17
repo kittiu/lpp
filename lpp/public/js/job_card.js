@@ -1,9 +1,7 @@
 
 // Trigger events for the Job Card doctype
 frappe.ui.form.on("Job Card", {
-    refresh(frm) {
-        console.log('frm', frm.doc);
-        
+    refresh(frm) {        
         // Set 'item_code' and 'item_name' fields in 'scrap_items' child table to read-only
         frm.get_field("scrap_items").grid.toggle_enable("item_code", false);
         frm.get_field("scrap_items").grid.toggle_enable("item_name", false);
@@ -15,6 +13,34 @@ frappe.ui.form.on("Job Card", {
 
         if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
             update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
+        }
+
+        if (frm.doc.for_quantity && !frm.doc.custom_input_production) {
+            frm.set_value('custom_input_production', frm.doc.for_quantity);
+        }
+
+        if (frm.doc.total_completed_qty && !frm.doc.custom_output_production) {
+            frm.set_value('custom_output_production', frm.doc.total_completed_qty);
+        }
+
+        if (frm.doc.process_loss_qty && !frm.doc.custom_scrap_production) {
+            frm.set_value('custom_scrap_production', frm.doc.process_loss_qty);
+        }
+
+        // Calculate custom_units__hour_production if output and total hours are available
+        if (frm.doc.custom_output_production && frm.doc.custom_total_hours_production && !frm.doc.custom_units__hour_production) {
+            frm.set_value('custom_units__hour_production', frm.doc.custom_output_production / frm.doc.custom_total_hours_production);
+        }
+
+        // Calculate custom_yield_production if input and output are available
+        if (frm.doc.custom_input_production && frm.doc.custom_output_production && !frm.doc.custom_yield_production) {
+            frm.set_value('custom_yield_production', (frm.doc.custom_output_production / frm.doc.custom_input_production) * 100);
+        }
+
+        // Calculate custom_yield_with_setup_production if all required fields are available
+        if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production && !frm.doc.custom_yield_with_setup_production) {
+            let total_weight = Number(frm.doc.custom_as_weight_setup) + Number(frm.doc.custom_as_weight_production);
+            frm.set_value('custom_yield_with_setup_production', (frm.doc.custom_output_production / (frm.doc.custom_input_production + total_weight)) * 100);
         }
 
         setTimeout(() => {
@@ -118,25 +144,38 @@ frappe.ui.form.on("Job Card", {
     custom_start_date_production(frm) {
         if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
             update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
+            if (frm.doc.custom_output_production && frm.doc.custom_total_hours_production && !frm.doc.custom_units__hour_production) {
+                frm.set_value('custom_units__hour_production', frm.doc.custom_output_production / frm.doc.custom_total_hours_production);
+            }
         }
     },
     custom_end_date_production(frm) {
         if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
             update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
+            if (frm.doc.custom_output_production && frm.doc.custom_total_hours_production && !frm.doc.custom_units__hour_production) {
+                frm.set_value('custom_units__hour_production', frm.doc.custom_output_production / frm.doc.custom_total_hours_production);
+            }
         }
     },
-
     custom_as_unit_quantity_setup: (frm) => {
-        calculate_weight_or_unit(frm, 'custom_as_unit_quantity_setup', 'custom_as_weight_setup', true)}
-    ,
+        calculate_weight_or_unit(frm, 'custom_as_unit_quantity_setup', 'custom_as_weight_setup', true)
+    },
     custom_as_weight_setup: (frm) => {
-        calculate_weight_or_unit(frm, 'custom_as_weight_setup', 'custom_as_unit_quantity_setup', false)},
-    
+        calculate_weight_or_unit(frm, 'custom_as_weight_setup', 'custom_as_unit_quantity_setup', false)
+        if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production && !frm.doc.custom_yield_with_setup_production) {
+            let total_weight = Number(frm.doc.custom_as_weight_setup) + Number(frm.doc.custom_as_weight_production);
+            frm.set_value('custom_yield_with_setup_production', (frm.doc.custom_output_production / (frm.doc.custom_input_production + total_weight)) * 100);
+        }
+    },
     custom_as_unit_quantity_production: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_unit_quantity_production', 'custom_as_weight_production', true)
     },
     custom_as_weight_production: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_weight_production', 'custom_as_unit_quantity_production', false)
+        if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production && !frm.doc.custom_yield_with_setup_production) {
+            let total_weight = Number(frm.doc.custom_as_weight_setup) + Number(frm.doc.custom_as_weight_production);
+            frm.set_value('custom_yield_with_setup_production', (frm.doc.custom_output_production / (frm.doc.custom_input_production + total_weight)) * 100);
+        }
     }
 });
 
@@ -181,12 +220,12 @@ function update_custom_total_hours(frm, start_field, end_field, output_field) {
     let start_date = frm.doc[start_field], end_date = frm.doc[end_field];
     
     if (start_date && end_date) {
-        let total_seconds = Math.floor((new Date(end_date) - new Date(start_date)) / 1000);
-        let hours = String(Math.floor(total_seconds / 3600)).padStart(2, '0');
-        let minutes = String(Math.floor((total_seconds % 3600) / 60)).padStart(2, '0');
-        let seconds = String(total_seconds % 60).padStart(2, '0');
-        
-        frm.set_value(output_field, `${hours}:${minutes}:${seconds}`);
+        // คำนวณความต่างของเวลาจาก start_date และ end_date (เป็นมิลลิวินาที)
+        let total_minutes = (new Date(end_date) - new Date(start_date)) / (1000 * 60);  // แปลงมิลลิวินาทีเป็นนาที
+        let hours_decimal = (total_minutes / 60).toFixed(2);  // แปลงนาทีเป็นชั่วโมงทศนิยม
+
+        // ตั้งค่าเป็นผลลัพธ์ในรูปแบบทศนิยม เช่น 2.20
+        frm.set_value(output_field, hours_decimal);
     } else {
         frm.set_value(output_field, null);
     }
@@ -196,16 +235,10 @@ function calculate_weight_or_unit(frm, source_field, target_field, is_unit_to_we
     if (frm.doc.production_item && frm.doc[source_field]) {
         frappe.db.get_value('Item', { 'item_code': frm.doc.production_item }, 'weight_per_unit', ({ weight_per_unit }) => {
             if (weight_per_unit) {
-                console.log('weight_per_unit', weight_per_unit);
-                console.log('source_field', source_field, frm.doc[source_field]);
-                console.log('target_field', target_field, frm.doc[target_field]);
-
                 let calculated_value = is_unit_to_weight
-                    ? (frm.doc[source_field] / weight_per_unit).toFixed(2)
-                    : (frm.doc[source_field] * weight_per_unit).toFixed(2);
+                    ? (frm.doc[source_field] / weight_per_unit)
+                    : (frm.doc[source_field] * weight_per_unit)
                 
-                console.log('calculated_value', calculated_value);
-
                 if (frm.doc[target_field] != calculated_value) {
                     frm.set_value(target_field, calculated_value);
                 }
