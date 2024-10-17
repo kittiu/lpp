@@ -2,9 +2,20 @@
 // Trigger events for the Job Card doctype
 frappe.ui.form.on("Job Card", {
     refresh(frm) {
+        console.log('frm', frm.doc);
+        
         // Set 'item_code' and 'item_name' fields in 'scrap_items' child table to read-only
         frm.get_field("scrap_items").grid.toggle_enable("item_code", false);
         frm.get_field("scrap_items").grid.toggle_enable("item_name", false);
+
+        // update total hours
+        if (frm.doc.custom_start_date_setup && frm.doc.custom_end_date_setup) {
+            update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
+        }
+
+        if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
+            update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
+        }
 
         setTimeout(() => {
             if (frm.custom_buttons && frm.custom_buttons[('Complete Job')]) {
@@ -94,6 +105,39 @@ frappe.ui.form.on("Job Card", {
         // If the operation passes the checks or is the first/last operation, make the time log
         frm.events.make_time_log(frm, args);
     },
+    custom_start_date_setup(frm) {
+        if (frm.doc.custom_start_date_setup && frm.doc.custom_end_date_setup) {
+            update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
+        }
+    },
+    custom_end_date_setup(frm) {
+        if (frm.doc.custom_start_date_setup && frm.doc.custom_end_date_setup) {
+            update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
+        }
+    },
+    custom_start_date_production(frm) {
+        if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
+            update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
+        }
+    },
+    custom_end_date_production(frm) {
+        if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
+            update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
+        }
+    },
+
+    custom_as_unit_quantity_setup: (frm) => {
+        calculate_weight_or_unit(frm, 'custom_as_unit_quantity_setup', 'custom_as_weight_setup', true)}
+    ,
+    custom_as_weight_setup: (frm) => {
+        calculate_weight_or_unit(frm, 'custom_as_weight_setup', 'custom_as_unit_quantity_setup', false)},
+    
+    custom_as_unit_quantity_production: (frm) => {
+        calculate_weight_or_unit(frm, 'custom_as_unit_quantity_production', 'custom_as_weight_production', true)
+    },
+    custom_as_weight_production: (frm) => {
+        calculate_weight_or_unit(frm, 'custom_as_weight_production', 'custom_as_unit_quantity_production', false)
+    }
 });
 
 // Function to update 'item_code' and 'item_name' in all rows of 'scrap_items' child table
@@ -130,5 +174,42 @@ function set_scrap_item_code(frm, cdt, cdn) {
         // Set the 'item_code' and 'item_name' for the new row
         frappe.model.set_value(cdt, cdn, 'item_code', production_item);
         frappe.model.set_value(cdt, cdn, 'item_name', production_item_name);
+    }
+}
+
+function update_custom_total_hours(frm, start_field, end_field, output_field) {
+    let start_date = frm.doc[start_field], end_date = frm.doc[end_field];
+    
+    if (start_date && end_date) {
+        let total_seconds = Math.floor((new Date(end_date) - new Date(start_date)) / 1000);
+        let hours = String(Math.floor(total_seconds / 3600)).padStart(2, '0');
+        let minutes = String(Math.floor((total_seconds % 3600) / 60)).padStart(2, '0');
+        let seconds = String(total_seconds % 60).padStart(2, '0');
+        
+        frm.set_value(output_field, `${hours}:${minutes}:${seconds}`);
+    } else {
+        frm.set_value(output_field, null);
+    }
+}
+
+function calculate_weight_or_unit(frm, source_field, target_field, is_unit_to_weight) {
+    if (frm.doc.production_item && frm.doc[source_field]) {
+        frappe.db.get_value('Item', { 'item_code': frm.doc.production_item }, 'weight_per_unit', ({ weight_per_unit }) => {
+            if (weight_per_unit) {
+                console.log('weight_per_unit', weight_per_unit);
+                console.log('source_field', source_field, frm.doc[source_field]);
+                console.log('target_field', target_field, frm.doc[target_field]);
+
+                let calculated_value = is_unit_to_weight
+                    ? (frm.doc[source_field] / weight_per_unit).toFixed(2)
+                    : (frm.doc[source_field] * weight_per_unit).toFixed(2);
+                
+                console.log('calculated_value', calculated_value);
+
+                if (frm.doc[target_field] != calculated_value) {
+                    frm.set_value(target_field, calculated_value);
+                }
+            }
+        });
     }
 }
