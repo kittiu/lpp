@@ -6,23 +6,27 @@ frappe.ui.form.on("Job Card", {
         frm.get_field("scrap_items").grid.toggle_enable("item_code", false);
         frm.get_field("scrap_items").grid.toggle_enable("item_name", false);
 
-        // update total hours
-        if (frm.doc.custom_start_date_setup && frm.doc.custom_end_date_setup) {
+        // Update Total Hours Setup
+        if (frm.doc.custom_start_date_setup && frm.doc.custom_end_date_setup && !frm.doc.custom_total_hours_setup) {
             update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
         }
 
-        if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
+        // Update Total Hours Production
+        if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production && !frm.doc.custom_total_hours_production) {
             update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
         }
 
+        // Update Input
         if (frm.doc.for_quantity && !frm.doc.custom_input_production) {
             frm.set_value('custom_input_production', frm.doc.for_quantity);
         }
 
+        // Update Output
         if (frm.doc.total_completed_qty && !frm.doc.custom_output_production) {
             frm.set_value('custom_output_production', frm.doc.total_completed_qty);
         }
 
+        // Update Scrap
         if (frm.doc.process_loss_qty && !frm.doc.custom_scrap_production) {
             frm.set_value('custom_scrap_production', frm.doc.process_loss_qty);
         }
@@ -34,13 +38,12 @@ frappe.ui.form.on("Job Card", {
 
         // Calculate custom_yield_production if input and output are available
         if (frm.doc.custom_input_production && frm.doc.custom_output_production && !frm.doc.custom_yield_production) {
-            frm.set_value('custom_yield_production', (frm.doc.custom_output_production / frm.doc.custom_input_production) * 100);
+            calculate_yield(frm, 'custom_yield_production', 'custom_output_production', 'custom_input_production');
         }
 
         // Calculate custom_yield_with_setup_production if all required fields are available
         if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production && !frm.doc.custom_yield_with_setup_production) {
-            let total_weight = Number(frm.doc.custom_as_weight_setup) + Number(frm.doc.custom_as_weight_production);
-            frm.set_value('custom_yield_with_setup_production', (frm.doc.custom_output_production / (frm.doc.custom_input_production + total_weight)) * 100);
+            calculate_yield_with_setup(frm);
         }
 
         setTimeout(() => {
@@ -132,50 +135,30 @@ frappe.ui.form.on("Job Card", {
         frm.events.make_time_log(frm, args);
     },
     custom_start_date_setup(frm) {
-        if (frm.doc.custom_start_date_setup && frm.doc.custom_end_date_setup) {
-            update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
-        }
+        update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
     },
     custom_end_date_setup(frm) {
-        if (frm.doc.custom_start_date_setup && frm.doc.custom_end_date_setup) {
-            update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
-        }
+        update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
     },
     custom_start_date_production(frm) {
-        if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
-            update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
-            if (frm.doc.custom_output_production && frm.doc.custom_total_hours_production && !frm.doc.custom_units__hour_production) {
-                frm.set_value('custom_units__hour_production', frm.doc.custom_output_production / frm.doc.custom_total_hours_production);
-            }
-        }
+        handle_production_date_update(frm);
     },
     custom_end_date_production(frm) {
-        if (frm.doc.custom_start_date_production && frm.doc.custom_end_date_production) {
-            update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
-            if (frm.doc.custom_output_production && frm.doc.custom_total_hours_production && !frm.doc.custom_units__hour_production) {
-                frm.set_value('custom_units__hour_production', frm.doc.custom_output_production / frm.doc.custom_total_hours_production);
-            }
-        }
+        handle_production_date_update(frm);
     },
     custom_as_unit_quantity_setup: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_unit_quantity_setup', 'custom_as_weight_setup', true)
     },
     custom_as_weight_setup: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_weight_setup', 'custom_as_unit_quantity_setup', false)
-        if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production && !frm.doc.custom_yield_with_setup_production) {
-            let total_weight = Number(frm.doc.custom_as_weight_setup) + Number(frm.doc.custom_as_weight_production);
-            frm.set_value('custom_yield_with_setup_production', (frm.doc.custom_output_production / (frm.doc.custom_input_production + total_weight)) * 100);
-        }
+        calculate_yield_with_setup(frm);
     },
     custom_as_unit_quantity_production: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_unit_quantity_production', 'custom_as_weight_production', true)
     },
     custom_as_weight_production: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_weight_production', 'custom_as_unit_quantity_production', false)
-        if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production && !frm.doc.custom_yield_with_setup_production) {
-            let total_weight = Number(frm.doc.custom_as_weight_setup) + Number(frm.doc.custom_as_weight_production);
-            frm.set_value('custom_yield_with_setup_production', (frm.doc.custom_output_production / (frm.doc.custom_input_production + total_weight)) * 100);
-        }
+        calculate_yield_with_setup(frm);
     }
 });
 
@@ -244,5 +227,25 @@ function calculate_weight_or_unit(frm, source_field, target_field, is_unit_to_we
                 }
             }
         });
+    }
+}
+
+function calculate_yield(frm, output_field, output_value_field, input_value_field) {
+    if (frm.doc[output_value_field] && frm.doc[input_value_field]) {
+        frm.set_value(output_field, (frm.doc[output_value_field] / frm.doc[input_value_field]) * 100);
+    }
+}
+
+function calculate_yield_with_setup(frm) {
+    if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production) {
+        let total_weight = Number(frm.doc.custom_as_weight_setup) + Number(frm.doc.custom_as_weight_production);
+        frm.set_value('custom_yield_with_setup_production', (frm.doc.custom_output_production / (frm.doc.custom_input_production + total_weight)) * 100);
+    }
+}
+
+function handle_production_date_update(frm) {
+    update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
+    if (frm.doc.custom_output_production && frm.doc.custom_total_hours_production) {
+        frm.set_value('custom_units__hour_production', frm.doc.custom_output_production / frm.doc.custom_total_hours_production);
     }
 }
