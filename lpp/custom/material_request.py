@@ -1,4 +1,12 @@
 import frappe # type: ignore
+from erpnext.stock.doctype.material_request.material_request import MaterialRequest
+
+
+class MaterialRequestLPP(MaterialRequest):
+    def validate(self):
+        if self.workflow_state == 'Approved':
+            self.custom_approver = self.modified_by if self.modified_by else None
+        super().validate()
 
 @frappe.whitelist()
 def trigger_notification(docname):
