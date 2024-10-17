@@ -1,41 +1,16 @@
 import frappe
-from erpnext.stock.doctype.batch.batch import Batch
-from frappe.utils import cint
+from erpnext.stock.doctype.batch.batch import Batch 
 import datetime
-import re
-
-def get_name_from_hash():
-	"""
-	Get a name for a Batch by generating a unique hash.
-	:return: The hash that was generated.
-	"""
-	temp = None
-	while not temp:
-		temp = frappe.generate_hash()[:7].upper()
-		if frappe.db.exists("Batch", temp):
-			temp = None
-
-	return temp
-
-def batch_uses_naming_series():
-	"""
-	Verify if the Batch is to be named using a naming series
-	:return: bool
-	"""
-	use_naming_series = cint(frappe.db.get_single_value("Stock Settings", "use_naming_series"))
-	return bool(use_naming_series)
 
 def get_next_sequence(last_lot_no):
     """
     Helper function to calculate the next sequence number from the last batch name.
     Extracts the sequence number from positions 5 to 7.
     """
-    print("")
     if last_lot_no and len(last_lot_no) >= 7:
         last_seq_num = int(last_lot_no[4:7])
         return last_seq_num + 1
     return 1
-
 
 class CustomBatch(Batch):
     def autoname(self):
