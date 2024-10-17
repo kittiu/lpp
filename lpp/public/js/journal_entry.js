@@ -6,14 +6,6 @@ frappe.ui.form.on('Journal Entry', {
             frm.set_value('naming_series', '');  // Set naming_series to an empty string
         }
 
-        // Setting a query filter for the custom_party_type field
-        frm.set_query('custom_party_type', function() {
-            return {
-                filters: [
-                    ['DocType', 'name', 'in', ['Customer', 'Supplier']]  // Only allow Customer and Supplier
-                ]
-            };
-        });
     },
 
     // Event triggered when the custom_journal_type field is updated

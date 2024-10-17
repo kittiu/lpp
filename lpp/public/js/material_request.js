@@ -28,7 +28,7 @@ frappe.ui.form.on("Material Request", {
         // Check if the current user has the "Managing Director" role
         if (!frappe.user.has_role('Managing Director')) {
             // Add a custom button called "Send to MD"
-            let btn = frm.add_custom_button(__('Send to MD'), function() {
+            frm.add_custom_button(__('Send to MD'), function() {
                 // Call the server-side method
                 frappe.call({
                     method: 'lpp.custom.material_request.trigger_notification', // Adjust the method path as needed
@@ -67,3 +67,18 @@ frappe.ui.form.on("Material Request", {
         }
     }
 });
+
+frappe.listview_settings['Material Request'] = {
+    onload: function(listview) {
+        // Check if 'columns' is accessible and iterable
+        if (listview && listview.columns && Array.isArray(listview.columns)) {
+            listview.columns.forEach(field => {
+                if (field.df && field.df.label === "Progress") {
+                    field.df.fieldname = 'status';
+                }
+            });
+
+            listview.refresh(); // Refresh the list to apply changes
+        }
+    }
+};

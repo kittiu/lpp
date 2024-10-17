@@ -8,16 +8,18 @@ frappe.ui.form.on("Work Order", {
     refresh(frm) {
         // Get today's date
         let today = frappe.datetime.nowdate();
+        if (frm.is_new()) {
+            // Set 'custom_mfg_date' field to today's date by default
+            if(!frm.doc.custom_mfg_date){
+                frm.set_value("custom_mfg_date", today);
+            }
 
-        // Set 'custom_mfg_date' field to today's date by default
-        if(!frm.doc.custom_mfg_date){
-            frm.set_value("custom_mfg_date", today);
+            // Add 12 months to today's date and set the 'custom_exp_date' field
+            if(!frm.doc.custom_exp_date){
+                frm.set_value("custom_exp_date", frappe.datetime.add_months(today, 12));
+            }
         }
-
-        // Add 12 months to today's date and set the 'custom_exp_date' field
-        if(!frm.doc.custom_exp_date){
-            frm.set_value("custom_exp_date", frappe.datetime.add_months(today, 12));
-        }
+     
 
         // Calculate total run cards
         calculate_total_run_cards(frm);
@@ -318,7 +320,7 @@ function update_custom_jobcard_remaining(frm) {
                 data: frm.doc
             },
             callback: function (response) {
-                if (response.message) {
+                if (frm.doc.custom_jobcard_remaining != response.message) {
                     frm.set_value("custom_jobcard_remaining", response.message);
                 }
             }

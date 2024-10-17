@@ -6,17 +6,19 @@ frappe.ui.form.on("Purchase Order", {
             return;
         }
 
+        var field = frm.fields_dict.status;
+        console.log('field', field);
         // Check if the current user has the "Managing Director" role
         if (!frappe.user.has_role('Managing Director')) {
             // Add a custom button called "Send to MD"
-            let btn = frm.add_custom_button(__('Send to MD'), function() {
+            frm.add_custom_button(__('Send to MD'), function () {
                 // Call the server-side method
                 frappe.call({
                     method: 'lpp.custom.purchase_order.trigger_notification', // Adjust the method path as needed
                     args: {
                         docname: frm.doc.name // Pass the document name or any other necessary arguments
                     },
-                    callback: function(r) {
+                    callback: function (r) {
                         if (!r.exc) {
                             // Handle the response (optional)
                             frappe.msgprint(__('Notification sent to MD successfully.'));
@@ -27,3 +29,18 @@ frappe.ui.form.on("Purchase Order", {
         }
     }
 });
+
+frappe.listview_settings['Purchase Order'] = {
+    onload: function(listview) {
+        // Check if 'columns' is accessible and iterable
+        if (listview && listview.columns && Array.isArray(listview.columns)) {
+            listview.columns.forEach(field => {
+                if (field.df && field.df.label === "Progress") {
+                    field.df.fieldname = 'status';
+                }
+            });
+
+            listview.refresh(); // Refresh the list to apply changes
+        }
+    }
+};

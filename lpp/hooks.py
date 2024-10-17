@@ -50,11 +50,14 @@ doctype_js = {
     "Item" : "public/js/item.js",
     "Purchase Receipt": "public/js/purchase_receipt.js",
     "Address" : "public/js/address.js",
-    "Job Card" : "public/js/job_card.js"
+    "Job Card" : "public/js/job_card.js",
+    "Sales Order" : "public/js/sales_order.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
-    "Payment Entry": "public/js/payment_entry_list.js"
+    "Payment Entry": "public/js/payment_entry_list.js",
+    "Purchase Order": "public/js/purchase_order.js",
+    "Material Request": "public/js/material_request.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -150,7 +153,10 @@ override_doctype_class = {
     "Purchase Billing" : "lpp.custom.custom_purchase_billing.CustomPurchaseBilling",
     "Batch": "lpp.custom.custom_batch.CustomBatch",
     "Payment Entry": "lpp.custom.custom_payment_entry.CustomPaymentEntry",
-    "Item": "lpp.custom.custom_item.CustomItem"
+    "Item": "lpp.custom.custom_item.CustomItem",
+    "Pricing Rule": "lpp.custom.custom_pricing_rule.CustomPricingRule",
+    "Purchase Receipt": "lpp.custom.custom_purchase_receipt.CustomPurchaseReceipt",
+    "BOM" : "lpp.custom.custom_bom.CustomBOM"
 }
 
 # Document Events
@@ -194,9 +200,12 @@ doc_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-	# "frappe.desk.doctype.event.event.get_events": "lpp.event.get_events"
-# }
+override_whitelisted_methods = {
+	"erpnext.controllers.stock_controller.make_quality_inspections": "lpp.custom.custom_quality_inspection.custom_make_quality_inspections",
+    "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_purchase_invoice" : "lpp.custom.custom_purchase_receipt.make_purchase_invoice",
+    "thai_tax.custom.custom_api.get_withholding_tax" : "lpp.custom.custom_payment_entry.get_withholding_tax",
+    "thai_tax.custom.custom_api.make_withholding_tax_cert" : "lpp.custom.custom_payment_entry.make_withholding_tax_cert"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
