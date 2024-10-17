@@ -85,7 +85,7 @@ def custom_get_mapped_purchase_invoice(source_name, target_doc=None, ignore_perm
 		},
 		"Purchase Taxes and Charges": {"doctype": "Purchase Taxes and Charges", "add_if_empty": True},
 	}
-	print("*"*100)
+
 	doc = get_mapped_doc(
 		"Purchase Order",
 		source_name,
