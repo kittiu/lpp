@@ -4,6 +4,9 @@ frappe.ui.form.on("Sales Order", {
     refresh(frm) {
         
     },
+    onload: function(frm) {
+        frm.fields_dict.items.grid.toggle_display("item_name", false);  // ซ่อนฟิลด์ item_name
+    },
     po_no(frm){
         update_items(frm)
     },
