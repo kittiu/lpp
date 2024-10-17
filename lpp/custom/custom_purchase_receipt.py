@@ -38,7 +38,6 @@ class CustomPurchaseReceipt(PurchaseReceipt):
    
 @frappe.whitelist()
 def make_purchase_invoice(source_name, target_doc=None, args=None):
-	print("+"*100)
 	doc = frappe.get_doc("Purchase Receipt", source_name)
 	returned_qty_map = get_returned_qty_map(source_name)
 	invoiced_qty_map = get_invoiced_qty_map(source_name)
