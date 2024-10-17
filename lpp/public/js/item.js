@@ -62,4 +62,39 @@ frappe.ui.form.on("Item", {
         frm.refresh();
 
     },
+    // Add a helper function to generate mold_id
+    generate_mold_ids: function(frm) {
+        let child_table = frm.doc.custom_molds_items || [];
+        if (child_table.length > 0) {
+            let mold_count = 1;  // Initialize the running count for mold_id
+            
+            // Loop through each row in the child table
+            child_table.forEach(function(row) {
+                if (row.item_code) {
+                    // Generate the mold_id for the current row
+                    let mold_id = `MOLD-${frm.doc.item_code}-${String(mold_count).padStart(3, '0')}`;
+                    
+                    // Set the mold_id in the current row
+                    frappe.model.set_value(row.doctype, row.name, 'mold_id', mold_id);
+                    
+                    mold_count++;  // Increment the mold count for the next row
+                }
+            });
+        }
+    }
+});
+
+frappe.ui.form.on('Item Molds Detail', {
+    custom_molds_items_move: function(frm, cdt, cdn) {
+        frm.events.generate_mold_ids(frm);
+    },
+    custom_molds_items_add: function(frm, cdt, cdn) {
+        frm.events.generate_mold_ids(frm);
+    },
+    custom_molds_items_remove: function(frm, cdt, cdn) {
+        frm.events.generate_mold_ids(frm);
+    },
+    item_code: function(frm, cdt, cdn) {
+        frm.events.generate_mold_ids(frm);
+    }
 });
