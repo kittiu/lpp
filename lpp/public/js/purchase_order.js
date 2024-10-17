@@ -11,7 +11,7 @@ frappe.ui.form.on("Purchase Order", {
         // Check if the current user has the "Managing Director" role
         if (!frappe.user.has_role('Managing Director')) {
             // Add a custom button called "Send to MD"
-            let btn = frm.add_custom_button(__('Send to MD'), function () {
+            frm.add_custom_button(__('Send to MD'), function () {
                 // Call the server-side method
                 frappe.call({
                     method: 'lpp.custom.purchase_order.trigger_notification', // Adjust the method path as needed
