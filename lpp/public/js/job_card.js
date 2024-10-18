@@ -83,6 +83,21 @@ frappe.ui.form.on("Job Card", {
             }
         }, 10);
     },
+    validate(frm) {
+        const process_loss_qty = frm.doc.process_loss_qty;
+        if (process_loss_qty) {
+            // sum stock_qty from scrap_items
+            let total = 0;
+            for (let i = 0; i < frm.doc.scrap_items.length; i++) {
+                total += Number(frm.doc.scrap_items[i].stock_qty);
+            }
+    
+            if (process_loss_qty != total) {
+                // alert error and prevent saving
+                frappe.throw(__('กรุณาระบุจำนวน Defects ให้ครบถ้วน จำนวน (Process Loss Qty) ชิ้น'));
+            }
+        }
+    },    
     // Triggered when 'production_item' changes
     production_item(frm) {
         update_scrap_items(frm);
@@ -184,7 +199,7 @@ frappe.ui.form.on("Job Card Scrap Item", {
     // Triggered when a new row is added to the Scrap Items table
     scrap_items_add(frm, cdt, cdn) {
         set_scrap_item_code(frm, cdt, cdn);
-    }
+    },
 });
 
 // Function to set the Scrap Item Code and Name to the Production Item value when a new row is added
