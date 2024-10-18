@@ -6,6 +6,13 @@ frappe.ui.form.on("Work Order", {
         }
     },
     refresh(frm) {
+        frm.set_query('custom_item_mold', function() {
+            return {
+                filters: {
+                    parent: frm.doc.production_item || 'empty'
+                },
+            };
+        });
         // Get today's date
         let today = frappe.datetime.nowdate();
         if (frm.is_new()) {
