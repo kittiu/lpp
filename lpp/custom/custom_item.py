@@ -17,5 +17,5 @@ class CustomItem(Item):
         super().validate()
         self.meta.get_field("item_code").reqd = 0
         # Custom validation logic if needed
-        if not self.custom_abbreviation:
-            frappe.throw("Custom Abbreviation is mandatory for this item.")
+        # if not self.custom_abbreviation:
+        #     frappe.throw("Custom Abbreviation is mandatory for this item.")
