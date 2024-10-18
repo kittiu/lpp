@@ -31,10 +31,6 @@ frappe.ui.form.on('Journal Entry', {
             frm.set_value('naming_series', '');  // Clear naming_series
             frappe.msgprint(__('Please select a valid Journal Type.'));  // Show message if Journal Type is not selected
         }
-    },
-    custom_tax_charge_template: async function(frm) {
-        await update_custom_tax_amount_custom(frm);
-        calculate_custom_total(frm);
     }
 });
 
@@ -130,29 +126,4 @@ function calculate_custom_total(frm) {
     });
     // // อัพเดตค่าในฟิลด์ custom_total ด้วยผลรวม
     frm.set_value('custom_total', total);
-}
-
-async function update_custom_tax_amount_custom(frm) {
-    if (!frm.doc.custom_tax_charge_template) {
-        return frappe.msgprint(__('Please select a Sales Taxes and Charges Template before updating Tax Amount.'));
-    }
-
-    try {
-        const { taxes } = await frappe.db.get_doc('Sales Taxes and Charges Template', frm.doc.custom_tax_charge_template);
-        const tax_rate = taxes?.[0]?.rate;
-
-        if (tax_rate) {
-            frm.doc.tax_invoice_details.forEach(row => {
-                if (row.custom_tax_base_amount_custom) {
-                    row.custom_tax_amount_custom = row.custom_tax_base_amount_custom * tax_rate
-                }
-            });
-            frm.refresh_field('tax_invoice_details');
-        } else {
-            frappe.msgprint(__('No tax rates found in the selected template.'));
-        }
-    } catch (error) {
-        console.error('Error fetching tax details:', error);
-        frappe.msgprint(__('Error fetching the tax template. Please check and try again.'));
-    }
 }
