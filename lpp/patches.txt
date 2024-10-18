@@ -8,7 +8,7 @@
 lpp.lpp.patches.remove_field_from_item_20241015_1700
 lpp.lpp.patches.remove_field_from_quotation_20241015_1700
 lpp.lpp.patches.remove_field_from_quality_inspection_20241016_0950
-lpp.lpp.patches.remove_field_from_journal_entry_20241016_1130
+lpp.lpp.patches.remove_field_from_journal_entry_20241018_1250
 lpp.lpp.patches.remove_field_from_sales_invoice_20241016_1520
 lpp.lpp.patches.clear_and_trim_item_molds_detail_20241018_1120
 lpp.lpp.patches.remove_field_from_work_order_20241018_1410
