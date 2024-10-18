@@ -32,10 +32,6 @@ frappe.ui.form.on('Journal Entry', {
             frappe.msgprint(__('Please select a valid Journal Type.'));  // Show message if Journal Type is not selected
         }
     },
-    setup: async function (frm) {
-        await update_custom_tax_amount_custom(frm);
-        calculate_custom_total(frm);
-    },
     custom_tax_charge_template: async function(frm) {
         await update_custom_tax_amount_custom(frm);
         calculate_custom_total(frm);
@@ -137,30 +133,26 @@ function calculate_custom_total(frm) {
 }
 
 async function update_custom_tax_amount_custom(frm) {
-    try {        
-        // Fetch rate from the linked Sales Taxes and Charges Template
-        const [taxes_and_charges] = await frappe.db.get_list('Sales Taxes and Charges', {
-            filters: {
-                parent: frm.doc.custom_tax_charge_template,   // Link to the selected template
-                parenttype: 'Sales Taxes and Charges Template' // Ensure correct parent type
-            },
-            fields: ['charge_type', 'rate'],  // Fetch only necessary fields
-            limit: 1  // Fetch only one record, since you are using only the first rate
-        });
-        
-        const tax_rate = taxes_and_charges.rate;
+    if (!frm.doc.custom_tax_charge_template) {
+        return frappe.msgprint(__('Please select a Sales Taxes and Charges Template before updating Tax Amount.'));
+    }
 
-        // Update custom_tax_amount_custom for each row in tax_invoice_details
-        frm.doc.tax_invoice_details.forEach(row => {
-            if (row.custom_tax_base_amount_custom) {
-                row.custom_tax_amount_custom = row.custom_tax_base_amount_custom * tax_rate;
-            }
-        });
+    try {
+        const { taxes } = await frappe.db.get_doc('Sales Taxes and Charges Template', frm.doc.custom_tax_charge_template);
+        const tax_rate = taxes?.[0]?.rate;
 
-        // Refresh the tax_invoice_details field after updates
-        frm.refresh_field('tax_invoice_details');
-        
+        if (tax_rate) {
+            frm.doc.tax_invoice_details.forEach(row => {
+                if (row.custom_tax_base_amount_custom) {
+                    row.custom_tax_amount_custom = row.custom_tax_base_amount_custom * tax_rate
+                }
+            });
+            frm.refresh_field('tax_invoice_details');
+        } else {
+            frappe.msgprint(__('No tax rates found in the selected template.'));
+        }
     } catch (error) {
         console.error('Error fetching tax details:', error);
+        frappe.msgprint(__('Error fetching the tax template. Please check and try again.'));
     }
 }
