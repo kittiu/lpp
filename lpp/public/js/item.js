@@ -72,7 +72,7 @@ frappe.ui.form.on("Item", {
             child_table.forEach(function(row) {
                 if (row.item_code) {
                     // Generate the mold_id for the current row
-                    let mold_id = `MOLD-${frm.doc.item_code}-${String(mold_count).padStart(3, '0')}`;
+                    let mold_id = `MOLD-${frm.doc.item_code}-${String(mold_count).padStart(2, '0')}`;
                     
                     // Set the mold_id in the current row
                     frappe.model.set_value(row.doctype, row.name, 'mold_id', mold_id);
