@@ -2,7 +2,8 @@
 // Trigger events for the Job Card doctype
 frappe.ui.form.on("Sales Order", {
     refresh(frm) {
-        
+        frm.set_df_property('po_no', 'hidden', 0);
+        frm.set_df_property('po_date', 'hidden', 0);
     },
     onload: function(frm) {
         frm.fields_dict.items.grid.toggle_display("item_name", false);  // ซ่อนฟิลด์ item_name
