@@ -96,3 +96,7 @@ def custom_get_mapped_purchase_invoice(source_name, target_doc=None, ignore_perm
 	)
  
 	return doc
+
+# Hook method
+def update_approver(doc, method=None):
+	doc.custom_approver = doc.modified_by if doc.modified_by else None
