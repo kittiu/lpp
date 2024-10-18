@@ -65,6 +65,10 @@ frappe.ui.form.on("Material Request", {
             // บันทึกข้อมูลการเปลี่ยนแปลงกลับไปที่ฟอร์ม
             frm.refresh_field('items');
         }
+    },
+    custom_cost_center : function(frm) {
+        frm.doc.custom_department = frm.doc.custom_cost_center
+        frm.refresh_field('custom_department');
     }
 });
 
