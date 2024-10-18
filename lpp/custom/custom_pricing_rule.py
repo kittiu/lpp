@@ -1,4 +1,4 @@
-from erpnext.selling.doctype.pricing_rule.pricing_rule import PricingRule
+from erpnext.accounts.doctype.pricing_rule.pricing_rule import PricingRule
 from frappe.model.naming import make_autoname
 import frappe
 
