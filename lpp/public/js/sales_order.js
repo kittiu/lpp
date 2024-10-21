@@ -16,6 +16,11 @@ frappe.ui.form.on("Sales Order", {
     },
     delivery_date(frm){
         update_items(frm)
+    },
+    customer(frm){
+        // เมื่อเลือก Customer ใหม่ ให้เคลียร์ตาราง Sales Taxes and Charges
+        frm.clear_table('taxes');  // ชื่อตาราง Sales Taxes and Charges คือ 'taxes'
+        frm.refresh_field('taxes');  // รีเฟรชฟิลด์เพื่อแสดงการเปลี่ยนแปลงบนหน้าจอ
     }
 });
 
