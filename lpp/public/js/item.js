@@ -83,6 +83,31 @@ frappe.ui.form.on("Item", {
         }
     }
 });
+frappe.ui.form.on('Item Customer Detail', {
+    customer_name: function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        
+        // Fetch the customer_code based on the selected customer_name
+        if (row.customer_name) {
+            frappe.call({
+                method: "frappe.client.get_value",
+                args: {
+                    doctype: "Customer",
+                    filters: { name: row.customer_name },
+                    fieldname: "name"
+                },
+                callback: function(response) {
+                    if (response.message) {
+                        // Set the ref_code based on the fetched customer_code
+                        frappe.model.set_value(cdt, cdn, 'ref_code', response.message.name);
+                    } else {
+                        frappe.msgprint(__('No Customer Code found for the selected Customer.'));
+                    }
+                }
+            });
+        }
+    }
+});
 
 frappe.ui.form.on('Item Molds Detail', {
     custom_molds_items_move: function(frm, cdt, cdn) {
