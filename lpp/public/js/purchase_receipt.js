@@ -143,7 +143,6 @@ frappe.ui.form.on("Purchase Receipt", {
 
 		data = dialog.fields_dict.items.df.data;
 		const is_existing = await is_existing_quality_inspections(frm)
-		console.log("is_existing",is_existing);
 		
 		if (!data.length || is_existing) {
 			frappe.msgprint(__("All items in this document already have a linked Quality Inspection."));
