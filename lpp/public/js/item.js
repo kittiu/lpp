@@ -10,14 +10,17 @@ frappe.ui.form.on("Item", {
             }
             else if (frm.doc.item_group == "Raw Material" || frm.doc.item_group == "Raw Materials") {
                 frm.set_value("has_batch_no", 1);
-                // วนลูปผ่านทุกแถวใน item_defaults
-                (frm.doc.item_defaults || []).forEach(function (row) {
-                    // แทนค่าทุกฟิลด์ default_warehouse ใน item_defaults
-                    frappe.model.set_value(row.doctype, row.name, "default_warehouse", "Raw Materials - LPP");
-                });
             } else {
                 frm.set_value("has_batch_no", 0);
             }
+        }
+
+        // default warehouse in table item_defaults
+        if (['Raw Material', 'Raw Materials'].includes(frm.doc.item_group)) {
+            frm.doc.item_defaults.forEach(row => {
+                row.default_warehouse = frm.doc.item_group
+            });
+            frm.refresh_field("item_defaults");
         }
     },
 
@@ -122,3 +125,17 @@ frappe.ui.form.on('Item Molds Detail', {
         frm.events.generate_mold_ids(frm);
     }
 });
+
+frappe.ui.form.on('Item Default', {
+    item_defaults_add(frm, cdt, cdn) {
+          // default warehouse in table item_defaults
+        setDefaultWarehouse(frm, cdt, cdn);
+    }
+});
+
+function setDefaultWarehouse(frm, cdt, cdn) {
+    const itemGroup = frm.doc.item_group;
+    if (['Raw Material', 'Raw Materials'].includes(itemGroup)) {
+        frappe.model.set_value(cdt, cdn, 'default_warehouse', itemGroup);
+    }
+}
