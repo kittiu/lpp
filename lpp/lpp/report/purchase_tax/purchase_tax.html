@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>รายงานภาษีซื้อ</title>
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            margin: 10px;
+            background-color: #f0f0f0; /* Light background color to enhance visibility */
+        }
+        label {
+            color: black;
+        }
+        .header {
+            text-align: center;
+        }
+        .row-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5px;
+        }
+        table {
+            width: 80%; /* Set a reasonable width for the table */
+            max-width: 1200px; /* Set a max width to avoid stretching */
+            border-collapse: collapse;
+            margin: 0 auto; /* This centers the table horizontally */
+            margin-top: 20px;
+            background-color: white; /* Background for the table */
+        }
+        th, td {
+            border: 1px solid black; /* Add border to cells */
+            padding: 8px; /* Adds some padding inside cells for readability */
+        }
+        th {
+            background-color: #f2f2f2; /* Light background for headers */
+            text-align: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-left {
+            text-align: left;
+        }
+        .text-right {
+            text-align: right;
+        }
+        @media screen {
+            .print-format {
+                padding: 35px !important;
+            }
+        }
+    </style>
+</head>
+
+{% let pay_date = data[1]['posting_date']; %}
+{% let dateConvert = String(pay_date) %}
+{% let date_parts = dateConvert.split('-') %}
+{% let year = Number(date_parts[0]) %}
+{% let month = date_parts[1] %}
+{% let day = date_parts[2] %}
+{% let month_th = {
+'01': 'มกราคม', '02': 'กุมภาพันธ์', '03': 'มีนาคม', '04': 'เมษายน',
+'05': 'พฤษภาคม', '06': 'มิถุนายน', '07': 'กรกฎาคม', '08': 'สิงหาคม',
+'09': 'กันยายน', '10': 'ตุลาคม', '11': 'พฤศจิกายน', '12': 'ธันวาคม'
+}[month] %}
+
+
+<body>
+    <div class="header">
+        <label style="font-size: 18px; font-weight: bold;">รายงานภาษีซื้อ</label>
+        <label style="font-size: 18px; font-weight: bold;">{{ __("ประจำเดือน") }} {{month_th}} {{year}}</label>
+    </div>
+
+    <div class="row">
+        <div class="row-flex">
+            <label style="text-align: left; font-size: 14px;">{{ __("ชื่อผู้ประกอบการ") }} : {%= filters['company'] %}</label>
+            <label style="text-align: right; font-size: 14px;">{{ __("เลขประจำตัวผู้เสียภาษี") }}: {%= data[1]['company_tax_id'] %}</label>
+        </div>
+    </div>
+
+    <!-- Add table here -->
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 5%;">{{ __("ลำดับ")}}</th>
+                <th style="width: 10%;">{{ __("วัน/เดือน/ปี ใบกำกับภาษี")}}</th>
+                <th style="width: 15%;">{{ __("เลขที่ใบกำกับภาษี")}}</th>
+                <th style="width: 20%;">{{ __("ชื่อในรายงานภาษี")}}</th>
+                <th style="width: 15%;">{{ __("เลขประจำตัวผู้เสียภาษี")}}</th>
+                <th style="width: 10%;">{{ __("สาขาสถานประกอบการ")}}</th>
+                <th style="width: 10%;">{{ __("จำนวนเงิน")}}</th>
+                <th style="width: 10%;">{{ __("ภาษี")}}</th>
+                <th style="width: 10%;">{{ __("ยอดรวม")}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for(var v=0 ; v < data.length; v++ ) { %}
+            <tr>
+                <td class="text-center" style="font-size: 10px;">
+                    {%= data[v]['no'] %}
+                </td>
+                <td class="text-left" style="font-size: 10px;">
+                    {%= data[v]['posting_date'] %}
+                </td>
+                <td class="text-left" style="font-size: 10px;">
+                    {%= data[v]['voucher_no'] %}
+                </td>
+                <td class="text-left" style="font-size: 10px;">
+                    {%= data[v]['supplier_name'] %}
+                </td>
+                <td class="text-left" style="font-size: 10px;">
+                    {%= data[v]['tax_id'] %}
+                </td>
+                <td class="text-left" style="font-size: 10px;">
+                    {%= data[v]['address_line2'] %}
+                </td>
+                <td class="text-right" style="font-size: 10px;">
+                    {%= !data[v]['no'] ? "" : format_number(data[v]['net_total'], null, 2) %}
+                </td>
+                <td class="text-right" style="font-size: 10px;">
+                    {%= !data[v]['no'] ? "" : format_number(data[v]['total_tax'], null, 2) %}
+                </td>
+                <td class="text-right" style="font-size: 10px;">
+                    {%= !data[v]['no'] ? "" : format_number(data[v]['grand_total'], null, 2) %}
+                </td>
+            </tr>
+            {% } %}
+        </tbody>
+    </table>
+
+</body>
+</html>
