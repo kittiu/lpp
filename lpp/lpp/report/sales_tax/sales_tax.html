@@ -47,13 +47,14 @@
         }
         @media screen {
             .print-format {
-                padding: 35px !important;
+                padding: 16px !important;
             }
         }
     </style>
 </head>
 
-{% let pay_date = data[1]['posting_date']; %}
+
+{% let pay_date = data[0]['posting_date']; %}
 {% let dateConvert = String(pay_date) %}
 {% let date_parts = dateConvert.split('-') %}
 {% let year = Number(date_parts[0]) %}
@@ -66,16 +67,16 @@
 }[month] %}
 
 
+
 <body>
     <div class="header">
-        <label style="font-size: 18px; font-weight: bold;">รายงานภาษีซื้อ</label>
+        <label style="font-size: 18px; font-weight: bold;">รายงานภาษีขาย</label>
         <label style="font-size: 18px; font-weight: bold;">{{ __("ประจำเดือน") }} {{month_th}} {{year}}</label>
     </div>
 
     <div class="row">
-        <div class="row-flex">
-            <label style="text-align: left; font-size: 14px;">{{ __("ชื่อผู้ประกอบการ") }} : {%= filters['company'] %}</label>
-            <label style="text-align: right; font-size: 14px;">{{ __("เลขประจำตัวผู้เสียภาษี") }}: {%= data[1]['company_tax_id'] %}</label>
+        <div class="px-3">
+            <label style="text-align: left; font-size: 14px;">{{ __("ชื่อผู้ประกอบการ") }} : {%= data[1]['company'] %}</label>
         </div>
     </div>
 
@@ -83,14 +84,15 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 5%;">{{ __("ลำดับ")}}</th>
-                <th style="width: 10%;">{{ __("วัน/เดือน/ปี ใบกำกับภาษี")}}</th>
-                <th style="width: 15%;">{{ __("เลขที่ใบกำกับภาษี")}}</th>
-                <th style="width: 20%;">{{ __("ชื่อในรายงานภาษี")}}</th>
-                <th style="width: 15%;">{{ __("เลขประจำตัวผู้เสียภาษี")}}</th>
-                <th style="width: 10%;">{{ __("สาขาสถานประกอบการ")}}</th>
-                <th style="width: 10%;">{{ __("จำนวนเงิน")}}</th>
-                <th style="width: 10%;">{{ __("ภาษี")}}</th>
+                <th style="width: 5%;">{{ __("ชื่อผู้ประกอบการ")}}</th>
+                <th style="width: 10%;">{{ __("เลขประจำตัวผู้เสียภาษี")}}</th>
+                <th style="width: 15%;">{{ __("วัน เดือน ปี")}}</th>
+                <th style="width: 20%;">{{ __("เลขที่ใบกำกับ")}}</th>
+                <th style="width: 15%;">{{ __("ชื่อในรายงานภาษี")}}</th>
+                <th style="width: 10%;">{{ __("เลขที่ประจำตัวผู้เสียภาษี")}}</th>
+                <th style="width: 10%;">{{ __("สาขา")}}</th>
+                <th style="width: 10%;">{{ __("จำนวนเงินก่อนภาษี")}}</th>
+                <th style="width: 10%;">{{ __("จำนวนภาษีมูลค่าเพิ่ม")}}</th>
                 <th style="width: 10%;">{{ __("ยอดรวม")}}</th>
             </tr>
         </thead>
@@ -98,7 +100,10 @@
             {% for(var v=0 ; v < data.length; v++ ) { %}
             <tr>
                 <td class="text-center" style="font-size: 10px;">
-                    {%= data[v]['no'] %}
+                    {%= data[v]['company'] %}
+                </td>
+                <td class="text-left" style="font-size: 10px;">
+                    {%= data[v]['company_tax_id'] %}
                 </td>
                 <td class="text-left" style="font-size: 10px;">
                     {%= data[v]['posting_date'] %}
@@ -107,7 +112,7 @@
                     {%= data[v]['voucher_no'] %}
                 </td>
                 <td class="text-left" style="font-size: 10px;">
-                    {%= data[v]['supplier_name'] %}
+                    {%= data[v]['customer_name'] %}
                 </td>
                 <td class="text-left" style="font-size: 10px;">
                     {%= data[v]['tax_id'] %}
@@ -116,13 +121,13 @@
                     {%= data[v]['address_line2'] %}
                 </td>
                 <td class="text-right" style="font-size: 10px;">
-                    {%= !data[v]['no'] ? "" : format_number(data[v]['net_total'], null, 2) %}
+                    {%= format_number(data[v]['net_total'], null, 2) %}
                 </td>
                 <td class="text-right" style="font-size: 10px;">
-                    {%= !data[v]['no'] ? "" : format_number(data[v]['total_tax'], null, 2) %}
+                    {%= format_number(data[v]['tax_total'], null, 2) %}
                 </td>
                 <td class="text-right" style="font-size: 10px;">
-                    {%= !data[v]['no'] ? "" : format_number(data[v]['grand_total'], null, 2) %}
+                    {%= format_number(data[v]['grand_total'], null, 2) %}
                 </td>
             </tr>
             {% } %}
