@@ -25,7 +25,7 @@ def split_string(input_str, delimiter='-', index=None):
     if index is not None and 0 <= index < len(parts):
         return parts[index]
     return parts
-def calculate_qty(qty, custom_unit):
+def calculate_qty(qty, custom_unit, per_page = 8):
     """
     Calculate qty based on custom_unit.
     If custom_unit is None or 0, return 0.
@@ -38,7 +38,7 @@ def calculate_qty(qty, custom_unit):
         if custom_unit == 0:
             return 0
         
-        result = qty / custom_unit
+        result = (qty / custom_unit) / per_page
         
         # Round up if there is a decimal part
         return math.ceil(result)
