@@ -56,6 +56,19 @@ def trigger_notification(docname):
 def custom_make_quality_inspections(doctype, docname, items):
     if isinstance(items, str):
         items = json.loads(items)
+        
+    if doctype == 'Purchase Receipt':
+        # check already exists 
+        exist_data = frappe.db.get_list('Quality Inspection',
+                filters={
+                    'reference_name': docname
+                },
+                fields=['name'],
+
+        )
+        if exist_data:
+            frappe.throw("All items in this document already have a linked Quality Inspection.")
+    
 
     inspections = []
     for item in items:
@@ -69,21 +82,6 @@ def custom_make_quality_inspections(doctype, docname, items):
                 )
             )
 
-        # quality_inspection = frappe.get_doc(
-        #     {
-        #         "doctype": "Quality Inspection",
-        #         "inspection_type": "Incoming",
-        #         "inspected_by": frappe.session.user,
-        #         "reference_type": doctype,
-        #         "reference_name": docname,
-        #         "item_code": item.get("item_code"),
-        #         "description": item.get("description"),
-        #         "sample_size": flt(item.get("sample_size")),
-        #         "item_serial_no": item.get("serial_no").split("\n")[0] if item.get("serial_no") else None,
-        #         "batch_no": item.get("batch_no"),
-        #         "custom_supplier": 'AP-601'
-        #     }
-        # ).insert()
         quality_inspection_data = {
             "doctype": "Quality Inspection",
             "inspection_type": "Incoming",
@@ -95,16 +93,13 @@ def custom_make_quality_inspections(doctype, docname, items):
             "sample_size": flt(item.get("sample_size")),
             "item_serial_no": item.get("serial_no").split("\n")[0] if item.get("serial_no") else None,
             "batch_no": item.get("batch_no"),
-            
-
         }
-        if doctype == 'Purchase Receipt':
+        
+        if doctype == 'Purchase Receipt' :
             prname = frappe.db.get_value('Purchase Receipt', docname, "supplier",)
             quality_inspection_data["custom_supplier"] = prname
             quality_inspection_data["custom_accepted_quantity_imqa_uom"] = item.get("custom_accepted_quantity_imqa_uom") if item.get("custom_accepted_quantity_imqa_uom") else None
             
-
-
         quality_inspection = frappe.get_doc(quality_inspection_data).insert()
         quality_inspection.save()
         inspections.append(quality_inspection.name)
