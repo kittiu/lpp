@@ -1,0 +1,31 @@
+{
+ "attach_print": 0,
+ "channel": "System Notification",
+ "creation": "2024-10-17 14:04:50.369215",
+ "date_changed": "po_date",
+ "days_in_advance": 150,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Sales Order",
+ "enabled": 1,
+ "event": "Days After",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>{% if doc.po_date %}\n  Attention: The Customer's Purchase Order Date for Sales Order {{ doc.name }} has exceeded 5 months.\n</p>\n\n<p>We would like to inform you that the Purchase Order date for Sales Order {{ doc.name }} associated with the customer {{ doc.customer_name }} has surpassed the allowable 5-month period.</p>\n\n<p>Please review the order details and take the necessary actions as soon as possible to ensure smooth processing and avoid further delays. If this order requires an update or further follow-up, kindly reach out to the customer or the relevant department.</p>\n\n<p><strong>Order Details:</strong><br>\n  - <strong>Sales Order ID:</strong> {{ doc.name }}<br>\n  - <strong>Customer Name:</strong> {{ doc.customer_name }}<br>\n  - <strong>Customer PO Date:</strong> {{ doc.po_date }}<br>\n  - <strong>Days Exceeded:</strong> {{ (nowdate() | date_diff(doc.po_date)) - 150 }} days\n</p>\n\n<p>For any assistance or inquiries, feel free to contact the sales team or support.</p>\n\n<p>Thank you for your prompt attention to this matter.</p>\n\n<p>{% else %}</p>\n\n<p>Customer's Purchase Order Date is not available for Sales Order {{ doc.name }}.</p>\n\n<p>{% endif %}</p>\n",
+ "message_type": "Markdown",
+ "modified": "2024-10-17 14:11:47.441679",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "Customer's  Purchase Order Date Exceeded",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "owner"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "sender": "Ecosoft",
+ "sender_email": "mail@ecosoft.co.th",
+ "subject": "PO Date Over 5 Months: {{doc.name}}"
+}

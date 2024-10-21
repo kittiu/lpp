@@ -6,6 +6,13 @@ frappe.ui.form.on("Work Order", {
         }
     },
     refresh(frm) {
+        frm.set_query('custom_item_mold', function() {
+            return {
+                filters: {
+                    parent: frm.doc.production_item || 'empty'
+                },
+            };
+        });
         // Get today's date
         let today = frappe.datetime.nowdate();
         if (frm.is_new()) {
@@ -183,7 +190,7 @@ frappe.ui.form.on("Work Order", {
 					dialog.fields_dict.operations.df.data.push({
 						name: data.name,
 						operation: data.operation,
-						workstation: data.workstation,
+						workstation: data.operation === 'Packing' ? frm.doc.operations[0].workstation : data.workstation ,
 						batch_size: data.batch_size,
 						qty: pending_qty,
 						pending_qty: pending_qty,

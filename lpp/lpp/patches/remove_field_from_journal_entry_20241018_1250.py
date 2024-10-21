@@ -61,7 +61,8 @@ def execute():
     # รายชื่อฟิลด์ที่ต้องการลบ
     fields_to_delete = [
         "custom_party_type",
-        "custom_party"
+        "custom_party",
+        "custom_tax_charge_template"
     ]
 
     for field in fields_to_delete:

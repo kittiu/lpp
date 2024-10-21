@@ -156,7 +156,8 @@ override_doctype_class = {
     "Item": "lpp.custom.custom_item.CustomItem",
     "Pricing Rule": "lpp.custom.custom_pricing_rule.CustomPricingRule",
     "Purchase Receipt": "lpp.custom.custom_purchase_receipt.CustomPurchaseReceipt",
-    "BOM" : "lpp.custom.custom_bom.CustomBOM"
+    "BOM" : "lpp.custom.custom_bom.CustomBOM",
+    "Material Request": "lpp.custom.material_request.MaterialRequestLPP",
 }
 
 # Document Events
@@ -164,11 +165,11 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
-	# "*": {
-	# 	"on_update": "method",
-	# 	"on_cancel": "method",
-	# 	"on_trash": "method"
-	# }
+	 "Purchase Order": {
+        "validate": [
+            "lpp.custom.purchase_order.update_approver",
+        ]
+    },
 }
 
 # Scheduled Tasks

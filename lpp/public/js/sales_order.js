@@ -2,7 +2,8 @@
 // Trigger events for the Job Card doctype
 frappe.ui.form.on("Sales Order", {
     refresh(frm) {
-        
+        frm.set_df_property('po_no', 'hidden', 0);
+        frm.set_df_property('po_date', 'hidden', 0);
     },
     onload: function(frm) {
         frm.fields_dict.items.grid.toggle_display("item_name", false);  // ซ่อนฟิลด์ item_name
@@ -15,6 +16,11 @@ frappe.ui.form.on("Sales Order", {
     },
     delivery_date(frm){
         update_items(frm)
+    },
+    customer(frm){
+        // เมื่อเลือก Customer ใหม่ ให้เคลียร์ตาราง Sales Taxes and Charges
+        frm.clear_table('taxes');  // ชื่อตาราง Sales Taxes and Charges คือ 'taxes'
+        frm.refresh_field('taxes');  // รีเฟรชฟิลด์เพื่อแสดงการเปลี่ยนแปลงบนหน้าจอ
     }
 });
 
