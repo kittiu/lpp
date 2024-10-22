@@ -23,3 +23,17 @@ frappe.ui.form.on("Quotation", {
         }
     }
 });
+frappe.listview_settings['Quotation'] = {
+    onload: function(listview) {
+        // Check if 'columns' is accessible and iterable
+        if (listview && listview.columns && Array.isArray(listview.columns)) {
+            listview.columns.forEach(field => {
+                if (field.df && field.df.label === "Progress") {
+                    field.df.fieldname = 'status';
+                }
+            });
+
+            listview.refresh(); // Refresh the list to apply changes
+        }
+    }
+};
