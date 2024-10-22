@@ -51,7 +51,8 @@ doctype_js = {
     "Purchase Receipt": "public/js/purchase_receipt.js",
     "Address" : "public/js/address.js",
     "Job Card" : "public/js/job_card.js",
-    "Sales Order" : "public/js/sales_order.js"
+    "Sales Order" : "public/js/sales_order.js",
+    "Sales Invoice": "public/js/sales_invoice.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
