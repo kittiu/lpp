@@ -58,6 +58,7 @@ doctype_list_js = {
     "Payment Entry": "public/js/payment_entry_list.js",
     "Purchase Order": "public/js/purchase_order.js",
     "Material Request": "public/js/material_request.js",
+    "Quotation": "public/js/quotation.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -165,11 +166,16 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
-	 "Purchase Order": {
+    "Purchase Order": {
         "validate": [
             "lpp.custom.purchase_order.update_approver",
         ]
     },
+    "Quotation": {
+        "validate": [
+            "lpp.custom.quotation.update_approver",
+        ],
+    }
 }
 
 # Scheduled Tasks
