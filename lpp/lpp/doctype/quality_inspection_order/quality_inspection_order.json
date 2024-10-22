@@ -12,50 +12,75 @@
   "tolerance_min",
   "accepted",
   "rejected",
-  "remark"
+  "remark",
+  "section_break_hclc",
+  "table_bjqp"
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "defects",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Defects",
    "options": "Quality Inspection Parameter"
   },
   {
+   "columns": 1,
    "fieldname": "nominal_value",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Nominal Value"
   },
   {
+   "columns": 1,
    "fieldname": "tolerance_max",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Tolerance (+)"
   },
   {
+   "columns": 1,
    "fieldname": "tolerance_min",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Tolerance (-)"
   },
   {
+   "columns": 1,
    "fieldname": "accepted",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Accepted"
   },
   {
+   "columns": 1,
    "fieldname": "rejected",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Rejected"
   },
   {
+   "columns": 3,
    "fieldname": "remark",
    "fieldtype": "Small Text",
+   "in_list_view": 1,
    "label": "Remark"
+  },
+  {
+   "fieldname": "section_break_hclc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "table_bjqp",
+   "fieldtype": "Table",
+   "options": "Quality Inspection Sampling"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-22 17:05:55.584447",
+ "modified": "2024-10-22 17:32:56.831696",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Quality Inspection Order",
