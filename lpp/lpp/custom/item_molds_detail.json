@@ -1,7 +1,7 @@
 {
  "custom_fields": [],
  "custom_perms": [],
- "doctype": "Sales Taxes and Charges",
+ "doctype": "Item Molds Detail",
  "links": [],
  "property_setters": [
   {
@@ -9,23 +9,23 @@
    "_comments": null,
    "_liked_by": null,
    "_user_tags": null,
-   "creation": "2024-08-05 11:04:32.851273",
+   "creation": "2024-10-17 16:40:11.419059",
    "default_value": null,
-   "doc_type": "Sales Taxes and Charges",
+   "doc_type": "Item Molds Detail",
    "docstatus": 0,
    "doctype_or_field": "DocField",
-   "field_name": "rate",
+   "field_name": "item_name",
    "idx": 0,
    "is_system_generated": 0,
-   "modified": "2024-10-21 14:06:10.849151",
+   "modified": "2024-10-17 16:48:00.111213",
    "modified_by": "Administrator",
    "module": null,
-   "name": "Sales Taxes and Charges-rate-precision",
+   "name": "Item Molds Detail-item_name-fetch_from",
    "owner": "Administrator",
-   "property": "precision",
-   "property_type": "Select",
+   "property": "fetch_from",
+   "property_type": "Small Text",
    "row_name": null,
-   "value": "6"
+   "value": "item_code.item_name"
   }
  ],
  "sync_on_migrate": 1

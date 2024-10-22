@@ -23,13 +23,17 @@ frappe.ui.form.on("Quotation", {
         }
     }
 });
-/*
-    frappe.ui.form.on('Payment Schedule', {
-        payment_term(frm, cdt, cdn) {
-            let row = frappe.get_doc(cdt, cdn);
-            row.invoice_portion = 100;
-            
-            frm.refresh_field('payment_schedule');
+frappe.listview_settings['Quotation'] = {
+    onload: function(listview) {
+        // Check if 'columns' is accessible and iterable
+        if (listview && listview.columns && Array.isArray(listview.columns)) {
+            listview.columns.forEach(field => {
+                if (field.df && field.df.label === "Progress") {
+                    field.df.fieldname = 'status';
+                }
+            });
+
+            listview.refresh(); // Refresh the list to apply changes
         }
-    })
-*/
+    }
+};

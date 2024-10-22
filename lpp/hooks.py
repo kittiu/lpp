@@ -50,13 +50,15 @@ doctype_js = {
     "Item" : "public/js/item.js",
     "Purchase Receipt": "public/js/purchase_receipt.js",
     "Address" : "public/js/address.js",
-    "Job Card" : "public/js/job_card.js"
+    "Job Card" : "public/js/job_card.js",
+    "Sales Order" : "public/js/sales_order.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
     "Payment Entry": "public/js/payment_entry_list.js",
     "Purchase Order": "public/js/purchase_order.js",
     "Material Request": "public/js/material_request.js",
+    "Quotation": "public/js/quotation.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -155,7 +157,8 @@ override_doctype_class = {
     "Item": "lpp.custom.custom_item.CustomItem",
     "Pricing Rule": "lpp.custom.custom_pricing_rule.CustomPricingRule",
     "Purchase Receipt": "lpp.custom.custom_purchase_receipt.CustomPurchaseReceipt",
-    "BOM" : "lpp.custom.custom_bom.CustomBOM"
+    "BOM" : "lpp.custom.custom_bom.CustomBOM",
+    "Material Request": "lpp.custom.material_request.MaterialRequestLPP",
 }
 
 # Document Events
@@ -163,11 +166,16 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
-	# "*": {
-	# 	"on_update": "method",
-	# 	"on_cancel": "method",
-	# 	"on_trash": "method"
-	# }
+    "Purchase Order": {
+        "validate": [
+            "lpp.custom.purchase_order.update_approver",
+        ]
+    },
+    "Quotation": {
+        "validate": [
+            "lpp.custom.quotation.update_approver",
+        ],
+    }
 }
 
 # Scheduled Tasks
@@ -200,7 +208,10 @@ doc_events = {
 # ------------------------------
 #
 override_whitelisted_methods = {
-	"erpnext.controllers.stock_controller.make_quality_inspections": "lpp.custom.custom_quality_inspection.custom_make_quality_inspections"
+	"erpnext.controllers.stock_controller.make_quality_inspections": "lpp.custom.custom_quality_inspection.custom_make_quality_inspections",
+    "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_purchase_invoice" : "lpp.custom.custom_purchase_receipt.make_purchase_invoice",
+    "thai_tax.custom.custom_api.get_withholding_tax" : "lpp.custom.custom_payment_entry.get_withholding_tax",
+    "thai_tax.custom.custom_api.make_withholding_tax_cert" : "lpp.custom.custom_payment_entry.make_withholding_tax_cert"
 }
 #
 # each overriding function accepts a `data` argument;

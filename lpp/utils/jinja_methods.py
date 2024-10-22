@@ -25,7 +25,7 @@ def split_string(input_str, delimiter='-', index=None):
     if index is not None and 0 <= index < len(parts):
         return parts[index]
     return parts
-def calculate_qty(qty, custom_unit):
+def calculate_qty(qty, custom_unit, per_page = 8):
     """
     Calculate qty based on custom_unit.
     If custom_unit is None or 0, return 0.
@@ -38,7 +38,7 @@ def calculate_qty(qty, custom_unit):
         if custom_unit == 0:
             return 0
         
-        result = qty / custom_unit
+        result = (qty / custom_unit) / per_page
         
         # Round up if there is a decimal part
         return math.ceil(result)
@@ -46,3 +46,38 @@ def calculate_qty(qty, custom_unit):
     except (ValueError, TypeError):
         return 0
 
+def group_and_sum_by_po(docname):
+    try:
+        # Get the Sales Invoice document
+        doc = frappe.get_doc("Sales Invoice", docname)
+        
+        # Safely get the taxes and default rate to 0 if not available
+        taxes = doc.get("taxes", [])
+        tax_rate = taxes[0].rate if taxes and hasattr(taxes[0], 'rate') else 0
+
+        grouped_amounts = {}
+
+        # Iterate through the child table (items)
+        for item in doc.items:
+            # Check if the custom_po_no exists in the grouped_amounts dictionary
+            if item.custom_po_no not in grouped_amounts:
+                grouped_amounts[item.custom_po_no] = 0  # Initialize if not present
+
+            # Add the amount to the corresponding custom_po_no
+            grouped_amounts[item.custom_po_no] += item.amount
+
+        # Convert the result into an array of objects for Jinja
+        result = []
+        for po_no, amount in grouped_amounts.items():
+            grand_total = (amount * tax_rate) / 100 + amount
+            result.append({
+                "po_no": po_no,
+                "total_amount": amount,
+                "grand_total": grand_total
+            })
+
+        return result
+    
+    except Exception as e:
+        frappe.log_error(message=f"Error in group_and_sum_by_po: {str(e)}", title="Jinja Method Error")
+        return []

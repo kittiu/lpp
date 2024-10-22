@@ -1,4 +1,8 @@
 frappe.ui.form.on("Item", {
+    refresh: function (frm) {
+        frm.set_df_property('item_code', 'reqd', 0);
+        frm.set_df_property('item_code', 'hidden', 1);
+    },
     item_group(frm) {
         if (frm.doc.item_group) {
             if (frm.doc.item_group == "Sales Products" || frm.doc.item_group == "Products") {
@@ -6,14 +10,17 @@ frappe.ui.form.on("Item", {
             }
             else if (frm.doc.item_group == "Raw Material" || frm.doc.item_group == "Raw Materials") {
                 frm.set_value("has_batch_no", 1);
-                // วนลูปผ่านทุกแถวใน item_defaults
-                (frm.doc.item_defaults || []).forEach(function (row) {
-                    // แทนค่าทุกฟิลด์ default_warehouse ใน item_defaults
-                    frappe.model.set_value(row.doctype, row.name, "default_warehouse", "Raw Materials - LPP");
-                });
             } else {
                 frm.set_value("has_batch_no", 0);
             }
+        }
+
+        // default warehouse in table item_defaults
+        if (['Raw Material', 'Raw Materials'].includes(frm.doc.item_group)) {
+            frm.doc.item_defaults.forEach(row => {
+                row.default_warehouse = frm.doc.item_group
+            });
+            frm.refresh_field("item_defaults");
         }
     },
 
@@ -57,4 +64,78 @@ frappe.ui.form.on("Item", {
         frm.refresh();
 
     },
+    // Add a helper function to generate mold_id
+    generate_mold_ids: function(frm) {
+        let child_table = frm.doc.custom_molds_items || [];
+        if (child_table.length > 0) {
+            let mold_count = 1;  // Initialize the running count for mold_id
+            
+            // Loop through each row in the child table
+            child_table.forEach(function(row) {
+                if (row.item_code) {
+                    // Generate the mold_id for the current row
+                    let mold_id = `MOLD-${frm.doc.item_code}-${String(mold_count).padStart(2, '0')}`;
+                    
+                    // Set the mold_id in the current row
+                    frappe.model.set_value(row.doctype, row.name, 'mold_id', mold_id);
+                    
+                    mold_count++;  // Increment the mold count for the next row
+                }
+            });
+        }
+    }
 });
+frappe.ui.form.on('Item Customer Detail', {
+    customer_name: function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        
+        // Fetch the customer_code based on the selected customer_name
+        if (row.customer_name) {
+            frappe.call({
+                method: "frappe.client.get_value",
+                args: {
+                    doctype: "Customer",
+                    filters: { name: row.customer_name },
+                    fieldname: "name"
+                },
+                callback: function(response) {
+                    if (response.message) {
+                        // Set the ref_code based on the fetched customer_code
+                        frappe.model.set_value(cdt, cdn, 'ref_code', response.message.name);
+                    } else {
+                        frappe.msgprint(__('No Customer Code found for the selected Customer.'));
+                    }
+                }
+            });
+        }
+    }
+});
+
+frappe.ui.form.on('Item Molds Detail', {
+    custom_molds_items_move: function(frm, cdt, cdn) {
+        frm.events.generate_mold_ids(frm);
+    },
+    custom_molds_items_add: function(frm, cdt, cdn) {
+        frm.events.generate_mold_ids(frm);
+    },
+    custom_molds_items_remove: function(frm, cdt, cdn) {
+        frm.events.generate_mold_ids(frm);
+    },
+    item_code: function(frm, cdt, cdn) {
+        frm.events.generate_mold_ids(frm);
+    }
+});
+
+frappe.ui.form.on('Item Default', {
+    item_defaults_add(frm, cdt, cdn) {
+          // default warehouse in table item_defaults
+        setDefaultWarehouse(frm, cdt, cdn);
+    }
+});
+
+function setDefaultWarehouse(frm, cdt, cdn) {
+    const itemGroup = frm.doc.item_group;
+    if (['Raw Material', 'Raw Materials'].includes(itemGroup)) {
+        frappe.model.set_value(cdt, cdn, 'default_warehouse', itemGroup);
+    }
+}
