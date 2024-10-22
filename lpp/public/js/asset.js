@@ -2,7 +2,7 @@ const type_finance_books = [
     "finance_book",
     "depreciation_method",
     "rate_of_depreciation",
-    "total_number_of_booked_depreciations",
+    "total_number_of_depreciations",
     "frequency_of_depreciation",
     "depreciation_start_date",
     "value_after_depreciation",
