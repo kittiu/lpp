@@ -77,9 +77,6 @@ frappe.listview_settings['Quotation'] = {
 const resetAndAddRowInQuotationItems = (frm) => {
     try {
         frm.clear_table("items"); // ลบแถวทั้งหมดในตาราง 'items'
-        
-        let new_row = frm.add_child("items"); // เพิ่มแถวใหม่
-        new_row.customer_item_code = ""; // ตั้งค่าเริ่มต้นที่แถวใหม่
 
         frm.refresh_field("items"); // รีเฟรชตารางให้แสดงผลการเปลี่ยนแปลง
     } catch (error) {
