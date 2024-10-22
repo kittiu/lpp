@@ -106,37 +106,37 @@ frappe.ui.form.on("Job Card", {
     custom_production_item_name(frm) {
         update_scrap_items(frm);
     },
-    custom_complete_job: async function (frm, status, completed_qty) {
+    custom_complete_job: async function (frm, status, completed_qty) {        
 		const args = {
-			job_card_id: frm.doc.name,
-			complete_time: frappe.datetime.now_datetime(),
-			status: status,
-			completed_qty: completed_qty,
-		};
-
+            job_card_id: frm.doc.name,
+            complete_time: frappe.datetime.now_datetime(),
+            status: status,
+            completed_qty: completed_qty,
+        };
+        
         const current_operation_no = frm.doc.custom_operation_no;
         const total_operations = frm.doc.custom_total_operation;
-
-        // Check if custom_operation_no is neither the first nor the last
-        if (current_operation_no !== '1' && current_operation_no !== total_operations) {
-            const previous_operation_no = current_operation_no - 1;
-
-            const filters = {
-                work_order: frm.doc.work_order,
-                custom_runcard_no: frm.doc.custom_runcard_no,
-                status: "Completed",
-                custom_operation_no: previous_operation_no
-            };
-
-            // Fetch Job Card entries that match the filter criteria
-            const result = await frappe.db.get_list('Job Card', {
-                fields: ['total_completed_qty'],
-                filters: filters
-            });
+        
+        if (!current_operation_no && !total_operations) {
+            // Fetch Work Order details
+            const workOrderDoc = await frappe.db.get_doc("Work Order", frm.doc.work_order);
+        
+            // Find the index of the operation that matches frm.doc.operation
+            const operationIndex = workOrderDoc.operations.findIndex(op => op.operation === frm.doc.operation);
             
-            if (result.length > 0) {
-                const previous_total_completed_qty = result[0].total_completed_qty;
-                // Check if current completed quantity exceeds the previous operation's total completed quantity
+            if (operationIndex === -1) {
+                return frappe.msgprint({
+                    title: __('Error'),
+                    message: __('Operation not found in the Work Order'),
+                    indicator: 'red'
+                });
+            }
+        
+            // Check if this is not the first or last operation
+            if (operationIndex !== 0 && operationIndex !== (workOrderDoc.operations?.length - 1)) {
+                const previous_total_completed_qty = workOrderDoc.operations[operationIndex - 1]?.completed_qty;
+        
+                // Ensure current completed quantity does not exceed previous operation's quantity
                 if ((frm.doc.total_completed_qty + completed_qty) > previous_total_completed_qty) {
                     return frappe.msgprint({
                         title: __('Error'),
@@ -145,9 +145,44 @@ frappe.ui.form.on("Job Card", {
                     });
                 }
             }
-        }
-        // If the operation passes the checks or is the first/last operation, make the time log
-        frm.events.make_time_log(frm, args);
+        
+            // Log time if all checks are passed
+            frm.events.make_time_log(frm, args);
+        } else {
+            // Check if custom_operation_no is neither the first nor the last
+            if (current_operation_no !== '1' && current_operation_no !== total_operations) {
+                const previous_operation_no = current_operation_no - 1;
+        
+                const filters = {
+                    work_order: frm.doc.work_order,
+                    custom_runcard_no: frm.doc.custom_runcard_no,
+                    status: "Completed",
+                    custom_operation_no: previous_operation_no
+                };
+        
+                // Fetch previous Job Card entries
+                const result = await frappe.db.get_list('Job Card', {
+                    fields: ['total_completed_qty'],
+                    filters: filters
+                });
+        
+                if (result.length > 0) {
+                    const previous_total_completed_qty = result[0].total_completed_qty;
+        
+                    // Ensure current completed quantity does not exceed previous operation's total
+                    if ((frm.doc.total_completed_qty + completed_qty) > previous_total_completed_qty) {
+                        return frappe.msgprint({
+                            title: __('Error'),
+                            message: __('ไม่สามารถระบุจำนวน FG ได้เกินกว่าจำนวน FG ของ Operation ก่อนหน้า'),
+                            indicator: 'red'
+                        });
+                    }
+                }
+            }
+        
+            // Log time if all checks are passed
+            frm.events.make_time_log(frm, args);
+        }        
     },
     custom_start_date_setup(frm) {
         update_custom_total_hours(frm, 'custom_start_date_setup', 'custom_end_date_setup', 'custom_total_hours_setup');
