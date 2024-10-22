@@ -5,7 +5,12 @@ from frappe.utils import (
     get_link_to_form,
     nowdate,
 )
-from erpnext.manufacturing.doctype.work_order.work_order import validate_operation_data, split_qty_based_on_batch_size
+from erpnext.manufacturing.doctype.work_order.work_order import validate_operation_data, split_qty_based_on_batch_size, WorkOrder
+
+class CustomWorkOrder(WorkOrder):
+    # ตอน Submit Work Order เอาฟังก์ชัน create_job_card ออก ตรวจสอบแล้วใช้แค่ตอน on_submit ไม่มีเรียกใช้ที่อื่น (เขียนให้ pass ไว้เฉยๆ ไม่มีการทำงานข้างใน)
+    def create_job_card(self):
+        pass
 
 @frappe.whitelist()
 def get_jobcard_remaining(data):
