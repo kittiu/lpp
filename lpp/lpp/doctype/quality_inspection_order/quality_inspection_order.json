@@ -1,0 +1,67 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-10-22 17:05:55.584447",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "defects",
+  "nominal_value",
+  "tolerance_max",
+  "tolerance_min",
+  "accepted",
+  "rejected",
+  "remark"
+ ],
+ "fields": [
+  {
+   "fieldname": "defects",
+   "fieldtype": "Link",
+   "label": "Defects",
+   "options": "Quality Inspection Parameter"
+  },
+  {
+   "fieldname": "nominal_value",
+   "fieldtype": "Float",
+   "label": "Nominal Value"
+  },
+  {
+   "fieldname": "tolerance_max",
+   "fieldtype": "Float",
+   "label": "Tolerance (+)"
+  },
+  {
+   "fieldname": "tolerance_min",
+   "fieldtype": "Float",
+   "label": "Tolerance (-)"
+  },
+  {
+   "fieldname": "accepted",
+   "fieldtype": "Int",
+   "label": "Accepted"
+  },
+  {
+   "fieldname": "rejected",
+   "fieldtype": "Int",
+   "label": "Rejected"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-10-22 17:05:55.584447",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "Quality Inspection Order",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
