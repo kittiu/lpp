@@ -66,9 +66,6 @@ frappe.listview_settings['Quotation'] = {
             });
 
             listview.refresh(); // รีเฟรช listview เพื่อใช้การเปลี่ยนแปลง
-        } else {
-            // หากมีข้อผิดพลาดในข้อมูล listview
-            frappe.msgprint(__('Unable to modify columns due to missing or invalid structure.'));
         }
     }
 };

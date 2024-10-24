@@ -73,9 +73,6 @@ frappe.listview_settings['Purchase Order'] = {
             });
 
             listview.refresh(); // รีเฟรช listview เพื่อใช้การเปลี่ยนแปลง
-        } else {
-            // แจ้งเตือนหากข้อมูล listview ไม่ถูกต้อง
-            frappe.msgprint(__('Unable to modify columns due to missing or invalid structure.'));
         }
     }
 };
