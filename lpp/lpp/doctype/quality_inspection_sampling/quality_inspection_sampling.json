@@ -7,7 +7,6 @@
  "engine": "InnoDB",
  "field_order": [
   "inspected_value",
-  "average_value",
   "approval",
   "remark"
  ],
@@ -17,12 +16,6 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Inspected Value"
-  },
-  {
-   "fieldname": "average_value",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Average Value"
   },
   {
    "default": "Accepted",
@@ -42,7 +35,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-22 17:29:57.537542",
+ "modified": "2024-10-24 10:03:58.276542",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Quality Inspection Sampling",
