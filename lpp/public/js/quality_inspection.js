@@ -211,6 +211,21 @@ frappe.ui.form.on("Quality Inspection", {
             frm.set_value(fieldName, null); // Clears the field
         }
     },
+    custom_quality_inspection_template_link_1: function (frm) {
+        if (frm.doc.custom_quality_inspection_template_link_1) {
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_quality_inspection_template_link_1",
+                    table_key: "custom_quality_inspection_order_table_1"
+                },
+                callback: function () {
+                    refresh_field("custom_quality_inspection_order_table_1");
+                },
+            });
+        }
+    },
     quality_inspection_template: function (frm) {
         if (frm.doc.quality_inspection_template) {
             return frm.call({
