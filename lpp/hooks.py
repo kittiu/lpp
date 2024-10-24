@@ -161,6 +161,7 @@ override_doctype_class = {
     "Purchase Receipt": "lpp.custom.custom_purchase_receipt.CustomPurchaseReceipt",
     "BOM" : "lpp.custom.custom_bom.CustomBOM",
     "Material Request": "lpp.custom.material_request.MaterialRequestLPP",
+    "Work Order": "lpp.custom.work_order.CustomWorkOrder",
 }
 
 # Document Events

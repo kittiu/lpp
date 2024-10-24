@@ -31,8 +31,6 @@ frappe.ui.form.on("Item", {
     reset_specifications_tolerance: function (frm) {
 
         const fields_to_reset = [
-            'custom_height_tolerance', 'custom_height_max', 'custom_height_min',
-            'custom_length_tolerance', 'custom_length_max', 'custom_length_min',
             'custom_thickness_tolerance', 'custom_thickness_max', 'custom_thickness_min',
             'custom_width_tolerance', 'custom_width_max', 'custom_width_min',
             'custom_a0_tolerance', 'custom_a0_max', 'custom_a0_min',
@@ -40,7 +38,7 @@ frappe.ui.form.on("Item", {
             'custom_k0_tolerance', 'custom_k0_max', 'custom_k0_min',
             'custom_p1_tolerance', 'custom_p1_max', 'custom_p1_min',
             'custom_length__reel_tolerance', 'custom_length__reel_max', 'custom_length__reel_min',
-            'custom_cavities', 'custom_step_in_cavity',
+            'custom_cavities',
             'custom_a_tolerance', 'custom_a_max', 'custom_a_min',
             'custom_n_tolerance', 'custom_n_max', 'custom_n_min',
             'custom_b_tolerance', 'custom_b_max', 'custom_b_min',
