@@ -203,7 +203,6 @@ frappe.ui.form.on('Quality Inspection Reading', {
     }
 });
 
-
 frappe.ui.form.on("Quality Inspection Order", {
     form_render(frm, cdt, cdn) {
         const sample_size = frm.doc.sample_size;
