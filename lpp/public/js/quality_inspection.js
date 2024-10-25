@@ -66,7 +66,7 @@ frappe.ui.form.on("Quality Inspection", {
             frm.toggle_display('custom_quality_inspection_order_table_2', false);
             frm.set_value('custom_quality_inspection_template_link_3', "");
             frm.toggle_display('custom_quality_inspection_order_table_3', false);
-            
+
             if (frm.doc.custom_type === 'IMQA - Plastic Sheet') {
                 frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
                 frm.toggle_display('custom_quality_inspection_order_table_1', true);
@@ -212,8 +212,6 @@ frappe.ui.form.on("Quality Inspection", {
         }
     },
     custom_quality_inspection_template_link_1: function (frm) {
-        console.log("custom_quality_inspection_template_link_1",frm.doc.custom_quality_inspection_template_link_1);
-
         if (frm.doc.custom_quality_inspection_template_link_1) {
             
             return frm.call({
@@ -230,8 +228,6 @@ frappe.ui.form.on("Quality Inspection", {
         }
     },
     custom_quality_inspection_template_link_2: function (frm) {
-        console.log("custom_quality_inspection_template_link_2",frm.doc.custom_quality_inspection_template_link_2);
-
         if (frm.doc.custom_quality_inspection_template_link_2) {
 
             return frm.call({
@@ -248,8 +244,6 @@ frappe.ui.form.on("Quality Inspection", {
         }
     },
     custom_quality_inspection_template_link_3: function (frm) {
-        console.log("custom_quality_inspection_template_link_3",frm.doc.custom_quality_inspection_template_link_3);
-
         if (frm.doc.custom_quality_inspection_template_link_3) {
 
             return frm.call({
