@@ -1,6 +1,5 @@
 frappe.ui.form.on("Stock Entry", {
-
-    refresh(frm) {
+    work_order(frm){
         if (frm.doc.work_order){
             frm.events.set_custom_lot_no(frm);
         }
