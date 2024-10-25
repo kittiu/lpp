@@ -31,6 +31,30 @@ frappe.ui.form.on("Quality Inspection", {
             frm.set_value('custom_roving_inspect_date', null);
             frm.set_value('custom_final_inspection_inspect_date', null);
         }
+
+
+        // Get the selected value of Inspection Progress
+        let inspection_progress_value = frm.doc.custom_inspection_progress;
+
+        // Define the options based on the selected Inspection Progress value
+        let type_options = [];
+
+        if (inspection_progress_value === 'IMQA') {
+            type_options = ['IMQA - Plastic Sheet', 'IMQA - Plastic Pellets', 'IMQA - Agent & Others'];
+        } else if (inspection_progress_value === 'Buyoff') {
+            type_options = ['Buyoff - Tray (VAC)', 'Buyoff - Tray (CUT)', 'Buyoff - Reel'];
+        } else if (inspection_progress_value === 'Roving') {
+            type_options = ['Roving - Tray', 'Roving - Reel'];
+        } else if (inspection_progress_value === 'Final Inspection') {
+            type_options = ['Final Inspection - Tray', 'Final Inspection - Reel'];
+        }
+
+        // Set the options dynamically for the Type field
+        frm.set_df_property('custom_type', 'options', type_options.join('\n'));
+
+        // Optionally, you can clear the value of the Type field
+        frm.set_value('custom_type', '');
+
     },
     reference_type: function (frm) {
         if (frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier) {
@@ -99,6 +123,36 @@ frappe.ui.form.on("Quality Inspection", {
                 },
                 callback: function () {
                     refresh_field("custom_quality_inspection_order_table_1");
+                },
+            });
+        }
+    },
+    custom_quality_inspection_template_link_2: function (frm) {
+        if (frm.doc.custom_quality_inspection_template_link_2) {
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_quality_inspection_template_link_2",
+                    table_key: "custom_quality_inspection_order_table_2"
+                },
+                callback: function () {
+                    refresh_field("custom_quality_inspection_order_table_2");
+                },
+            });
+        }
+    },
+    custom_quality_inspection_template_link_3: function (frm) {
+        if (frm.doc.custom_quality_inspection_template_link_3) {
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_quality_inspection_template_link_3",
+                    table_key: "custom_quality_inspection_order_table_3"
+                },
+                callback: function () {
+                    refresh_field("custom_quality_inspection_order_table_3");
                 },
             });
         }
@@ -206,7 +260,7 @@ frappe.ui.form.on('Quality Inspection Reading', {
 frappe.ui.form.on("Quality Inspection Order", {
     form_render(frm, cdt, cdn) {
         const sample_size = frm.doc.sample_size;
-        
+
         for (let i = 1; i <= 32; i++) {
             if (i <= sample_size) {
                 frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
