@@ -165,8 +165,13 @@ frappe.ui.form.on("Quality Inspection", {
     reference_name: async function (frm) {
         if (frm.doc.reference_type === 'Job Card' && frm.doc.reference_name) {
             try {
-                const { message } = await frappe.db.get_value('Job Card', frm.doc.reference_name, 'production_item');
-                message && frm.set_value('item_code', message.production_item);
+                const { message } = await frappe.db.get_value('Job Card', frm.doc.reference_name, ['production_item', 'custom_lot_no']);                
+                if (message) {
+                    frm.set_value({
+                        item_code: message.production_item,
+                        batch_no: message.custom_lot_no
+                    });
+                }
             } catch (err) {
                 console.error('Error fetching production item:', err);
             }
