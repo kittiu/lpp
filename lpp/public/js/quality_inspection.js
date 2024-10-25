@@ -56,6 +56,106 @@ frappe.ui.form.on("Quality Inspection", {
         frm.set_value('custom_type', '');
 
     },
+    custom_type: function (frm) {
+        if (frm.doc.custom_type) {
+            // TODO : wait confirm 
+            // ** IMQA
+            frm.set_value('custom_quality_inspection_template_link_1', "");
+            frm.toggle_display('custom_quality_inspection_order_table_1', false);
+            frm.set_value('custom_quality_inspection_template_link_2', "");
+            frm.toggle_display('custom_quality_inspection_order_table_2', false);
+            frm.set_value('custom_quality_inspection_template_link_3', "");
+            frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            
+            if (frm.doc.custom_type === 'IMQA - Plastic Sheet') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_3', true);
+
+            }
+            else if (frm.doc.custom_type === 'IMQA - Plastic Pellets') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+
+            }
+            else if (frm.doc.custom_type === 'IMQA - Agent & Others') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "");
+                frm.toggle_display('custom_quality_inspection_order_table_2', false);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            // ** Buyoff
+            else if (frm.doc.custom_type === 'Buyoff - Tray (VAC)') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            else if (frm.doc.custom_type === 'Buyoff - Tray (CUT)') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "");
+                frm.toggle_display('custom_quality_inspection_order_table_2', false);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            else if (frm.doc.custom_type === 'Buyoff - Reel') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_3', true);
+            }
+            // ** Roving
+            else if (frm.doc.custom_type === 'Roving - Tray') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            else if (frm.doc.custom_type === 'Roving - Reel') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            // ** Final Inspection
+            else if (frm.doc.custom_type === 'Final Inspection - Tray') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            else if (frm.doc.custom_type === 'Final Inspection - Reel') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+       
+
+        }
+    },
     reference_type: function (frm) {
         if (frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier) {
             frm.events.get_supplier(frm);
@@ -93,7 +193,6 @@ frappe.ui.form.on("Quality Inspection", {
     },
     custom_date_approved_by: function (frm) {
         frm.events.chk_back_date(frm, 'custom_date_approved_by');
-
     },
     chk_back_date: function (frm, fieldName) {
         // Getting the current date and stripping the time part
@@ -113,7 +212,10 @@ frappe.ui.form.on("Quality Inspection", {
         }
     },
     custom_quality_inspection_template_link_1: function (frm) {
+        console.log("custom_quality_inspection_template_link_1",frm.doc.custom_quality_inspection_template_link_1);
+
         if (frm.doc.custom_quality_inspection_template_link_1) {
+            
             return frm.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
@@ -128,7 +230,10 @@ frappe.ui.form.on("Quality Inspection", {
         }
     },
     custom_quality_inspection_template_link_2: function (frm) {
+        console.log("custom_quality_inspection_template_link_2",frm.doc.custom_quality_inspection_template_link_2);
+
         if (frm.doc.custom_quality_inspection_template_link_2) {
+
             return frm.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
@@ -143,7 +248,10 @@ frappe.ui.form.on("Quality Inspection", {
         }
     },
     custom_quality_inspection_template_link_3: function (frm) {
+        console.log("custom_quality_inspection_template_link_3",frm.doc.custom_quality_inspection_template_link_3);
+
         if (frm.doc.custom_quality_inspection_template_link_3) {
+
             return frm.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
@@ -267,10 +375,26 @@ frappe.ui.form.on("Quality Inspection Order", {
                 frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('approval_' + i, "hidden", 0);
                 frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('remark_' + i, "hidden", 0);
 
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('approval_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('remark_' + i, "hidden", 0);
+
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('approval_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('remark_' + i, "hidden", 0);
+
             } else {
                 frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
                 frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('approval_' + i, "hidden", 1);
                 frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('remark_' + i, "hidden", 1);
+
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('approval_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('remark_' + i, "hidden", 1);
+
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('approval_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('remark_' + i, "hidden", 1);
             }
         }
 
