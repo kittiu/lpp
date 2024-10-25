@@ -1,3 +1,4 @@
+const showButtonSendToMD = false
 frappe.ui.form.on("Material Request", {
     onload: function(frm) {
         if (!frm.doc.custom_requester) {
@@ -24,9 +25,8 @@ frappe.ui.form.on("Material Request", {
             // Hide the button if the document is new
             return;
         }
-
         // Check if the current user has the "Managing Director" role
-        if (!frappe.user.has_role('Managing Director')) {
+        if (!frappe.user.has_role('Managing Director') && showButtonSendToMD) {
             // Add a custom button called "Send to MD"
             frm.add_custom_button(__('Send to MD'), function() {
                 // Call the server-side method
