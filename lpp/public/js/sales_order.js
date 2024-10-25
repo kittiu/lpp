@@ -1,67 +1,83 @@
-
-// Trigger events for the Job Card doctype
 frappe.ui.form.on("Sales Order", {
-    refresh(frm) {
+    refresh: function(frm) {
+        // แสดงฟิลด์ po_no และ po_date
         frm.set_df_property('po_no', 'hidden', 0);
         frm.set_df_property('po_date', 'hidden', 0);
     },
     onload: function(frm) {
-        frm.fields_dict.items.grid.toggle_display("item_name", false);  // ซ่อนฟิลด์ item_name
+        // ซ่อนฟิลด์ item_name ในตาราง items
+        frm.fields_dict.items.grid.toggle_display("item_name", false);
     },
-    po_no(frm){
-        update_items(frm)
-    },
-    po_date(frm){
-        update_items(frm)
-    },
-    delivery_date(frm){
-        update_items(frm)
-    },
-    customer(frm){
-        // เมื่อเลือก Customer ใหม่ ให้เคลียร์ตาราง Sales Taxes and Charges
-        frm.clear_table('taxes');  // ชื่อตาราง Sales Taxes and Charges คือ 'taxes'
-        frm.refresh_field('taxes');  // รีเฟรชฟิลด์เพื่อแสดงการเปลี่ยนแปลงบนหน้าจอ
+    // อัปเดตฟิลด์เมื่อมีการเปลี่ยนแปลงใน po_no, po_date, delivery_date
+    po_no: update_items,
+    po_date: update_items,
+    delivery_date: update_items,
+    customer: function(frm) {
+        // เคลียร์ตาราง items เมื่อเปลี่ยน Customer
+        clearSalesOrderItems(frm);
+        
+        // เคลียร์ตาราง Sales Taxes and Charges
+        clearSalesTaxes(frm);
     }
 });
 
-// Function to update 'item_code' and 'item_name' in all rows of 'scrap_items' child table
+// ฟังก์ชันอัปเดต 'custom_po_no', 'custom_po_date' และ 'delivery_date' ในตาราง items
 function update_items(frm) {
-    const po_no = frm.doc.po_no; 
-    const po_date = frm.doc.po_date; 
-    const delivery_date = frm.doc.delivery_date;
+    const { po_no, po_date, delivery_date } = frm.doc;
 
     if (po_no || po_date || delivery_date) {
-        // Loop through each row in the 'scrap_items' child table
         frm.doc.items.forEach(row => {
-            // Set the 'item_code' and 'item_name' to match the Production Item
-            row.custom_po_no = po_no;
-            row.custom_po_date = po_date;
-            row.delivery_date = delivery_date;
+            // อัปเดตค่าฟิลด์ในแต่ละแถวของตาราง items
+            frappe.model.set_value(row.doctype, row.name, {
+                custom_po_no: po_no,
+                custom_po_date: po_date,
+                delivery_date: delivery_date
+            });
         });
-        // Refresh the child table to reflect changes
-        frm.refresh_field("items");
+        frm.refresh_field("items"); // รีเฟรชตารางให้แสดงการเปลี่ยนแปลง
     }
 }
 
-// Trigger events for the child table 'Job Card Scrap Item'
+// Trigger events for the child table 'Sales Order Item'
 frappe.ui.form.on("Sales Order Item", {
-    // Triggered when a new row is added to the Scrap Items table
-    items_add(frm, cdt, cdn) {
+    items_add: function(frm, cdt, cdn) {
         set_value_item(frm, cdt, cdn);
+        // เมื่อเพิ่มรายการใหม่ในตาราง items ให้เซ็ต customer_item_code เป็น customer
+        frappe.model.set_value(cdt, cdn, 'customer_item_code', frm.doc.customer);
     }
 });
 
-// Function to set the Scrap Item Code and Name to the Production Item value when a new row is added
+// ฟังก์ชันเซ็ตค่า po_no, po_date และ delivery_date เมื่อเพิ่มแถวใหม่ในตาราง items
 function set_value_item(frm, cdt, cdn) {
-    const po_no = frm.doc.po_no; 
-    const po_date = frm.doc.po_date; 
-    const delivery_date = frm.doc.delivery_date;
+    const { po_no, po_date, delivery_date } = frm.doc;
 
-    console.log(po_no, po_date, delivery_date);
-    
     if (po_no || po_date || delivery_date) {
-        frappe.model.set_value(cdt, cdn, 'custom_po_no', po_no);
-        frappe.model.set_value(cdt, cdn, 'custom_po_date', po_date);
-        frappe.model.set_value(cdt, cdn, 'delivery_date', delivery_date);
+        frappe.model.set_value(cdt, cdn, {
+            custom_po_no: po_no,
+            custom_po_date: po_date,
+            delivery_date: delivery_date
+        });
+    }
+}
+
+// ฟังก์ชันสำหรับเคลียร์ตาราง Sales Taxes and Charges
+function clearSalesTaxes(frm) {
+    try {
+        frm.clear_table('taxes'); // เคลียร์แถวทั้งหมดในตาราง taxes
+        frm.refresh_field('taxes'); // รีเฟรชฟิลด์เพื่อแสดงผลการเปลี่ยนแปลง
+    } catch (error) {
+        // จัดการข้อผิดพลาดกรณีเคลียร์ตารางไม่สำเร็จ
+        frappe.msgprint(__('Error clearing Sales Taxes and Charges: ') + error.message);
+    }
+}
+
+// ฟังก์ชันสำหรับล้างตาราง 'items' และรีเฟรช
+function clearSalesOrderItems(frm) {
+    try {
+        frm.clear_table("items"); // ลบแถวทั้งหมดในตาราง items
+        frm.refresh_field("items"); // รีเฟรชตารางให้แสดงผลการเปลี่ยนแปลง
+    } catch (error) {
+        // จัดการข้อผิดพลาดกรณีล้างตารางไม่สำเร็จ
+        frappe.msgprint(__('Error resetting and adding rows in Sales Items: ') + error.message);
     }
 }
