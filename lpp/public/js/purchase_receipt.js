@@ -1,21 +1,21 @@
 frappe.ui.form.on("Purchase Receipt", {
-    refresh(frm) {
-        frm.set_df_property('posting_time', 'hidden', true);
+	refresh(frm) {
+		frm.set_df_property('posting_time', 'hidden', true);
 
-        setTimeout(() => {
-            if (!frm.is_new() && frm.doc.docstatus === 0 && frappe.model.can_create("Quality Inspection")) {
-                // Remove Original Button
-                frm.remove_custom_button(__('Quality Inspection(s)'))
-                frm.add_custom_button(__("Quality Inspection(s)"), () => {
-                    frm.trigger("make_quality_inspection_new");
-                }, __("Create"));
-                frm.page.set_inner_btn_group_as_primary(__('Create'));
-            }
-        }, 10);
-    },
+		if (!frm.is_new() && frm.doc.docstatus === 0 && frappe.model.can_create("Quality Inspection")) {
+			// Remove Original Button
+			frm.remove_custom_button(__('Quality Inspection(s)'))
+			frm.add_custom_button(__("Quality Inspection(s)"), async () => {
 
-    make_quality_inspection_new(frm) {
-        
+				frm.trigger("make_quality_inspection_new");
+					
+			}, __("Create"));
+			frm.page.set_inner_btn_group_as_primary(__('Create'));
+		}
+	},
+
+	async make_quality_inspection_new  (frm) {
+
 		let data = [];
 		const fields = [
 			{
@@ -87,14 +87,13 @@ frappe.ui.form.on("Purchase Receipt", {
 				]
 			}
 		];
-        
+
 		const dialog = new frappe.ui.Dialog({
 			title: __("Select Items for Quality Inspection"),
 			size: "extra-large",
 			fields: fields,
-			primary_action: function () {
+			primary_action: async function () {
 				const data = dialog.get_values();
-                
 				frappe.call({
 					method: "erpnext.controllers.stock_controller.make_quality_inspections",
 					args: {
@@ -105,29 +104,6 @@ frappe.ui.form.on("Purchase Receipt", {
 					freeze: true,
 					callback: function (r) {
 						if (r.message.length > 0) {
-							r.message.forEach(name => {
-								frappe.call({
-									method: 'lpp.custom.custom_quality_inspection.trigger_notification',
-									args: { docname: name },
-									callback: function(r) {
-										/*
-											if (!r.exc && r.message.status === "success") {
-												frappe.msgprint({
-													title: __('Notification Sent'),
-													indicator: 'green',
-													message: __('Notification for {0} sent successfully.', [name])
-												});
-											} else {
-												frappe.msgprint({
-													title: __('Error'),
-													indicator: 'red',
-													message: __('Failed to send notification for {0}.', [name])
-												});
-											}
-										*/
-									}
-								});
-							});							
 
 							if (r.message.length === 1) {
 								frappe.set_route("Form", "Quality Inspection", r.message[0]);
@@ -145,7 +121,7 @@ frappe.ui.form.on("Purchase Receipt", {
 			},
 			primary_action_label: __("Create")
 		});
-        
+
 		frm.doc.items.forEach(item => {
 			if (has_inspection_required(frm, item)) {
 				let dialog_items = dialog.fields_dict.items;
@@ -164,14 +140,16 @@ frappe.ui.form.on("Purchase Receipt", {
 		});
 
 		data = dialog.fields_dict.items.df.data;
-		if (!data.length) {
+		const is_existing = await is_existing_quality_inspections(frm)
+		
+		if (!data.length || is_existing) {
 			frappe.msgprint(__("All items in this document already have a linked Quality Inspection."));
 		} else {
 			dialog.show();
 		}
 	},
 
-    
+
 });
 
 function has_inspection_required(frm, item) {
@@ -179,45 +157,69 @@ function has_inspection_required(frm, item) {
         if (item.is_finished_item && !item.quality_inspection) {
             return true;
         }
-    } else if (!item.quality_inspection) {
+    } 
+	else if (!item.quality_inspection) {		
         return true;
     }
 }
 
-frappe.ui.form.on("Purchase Receipt Item", "rate", function(frm, cdt, cdn) {
-    var item = frappe.get_doc(cdt, cdn);
-    var has_margin_field = frappe.meta.has_field(cdt, 'margin_type');
+function is_existing_quality_inspections(frm) {
+    return new Promise((resolve, reject) => {
+        frappe.call({
+            method: "frappe.client.get_list",
+            args: {
+                doctype: "Quality Inspection",
+                filters: {'reference_name': frm.doc.name},
+            },
+            callback: function(r) {
+                if (r.message && r.message.length > 0) {
+                    resolve(true); // Quality Inspections exist
+                } else {
+                    resolve(false); // No Quality Inspections found
+                }
+            },
+            error: function(err) {
+                reject(err); // Handle errors
+            }
+        });
+    });
+}
 
-    frappe.model.round_floats_in(item, ["rate", "price_list_rate"]);
-    let prev_price_list_rate = item.price_list_rate; // เก็บค่า price_list_rate ก่อนหน้า
-    if(item.price_list_rate && !item.blanket_order_rate) {
-        if(item.rate > item.price_list_rate && has_margin_field) {
-            // if rate is greater than price_list_rate, set margin
-            // or set discount
-            item.discount_percentage = 0;
-            item.margin_type = 'Amount';
-            item.margin_rate_or_amount = flt(item.rate - item.price_list_rate,
-                precision("margin_rate_or_amount", item));
-            item.rate_with_margin = item.rate;
-        } else {
-            item.discount_percentage = flt((1 - item.rate / item.price_list_rate) * 100.0,
-                precision("discount_percentage", item));
-            item.discount_amount = flt(item.price_list_rate) - flt(item.rate);
-            item.margin_type = '';
-            item.margin_rate_or_amount = 0;
-            item.rate_with_margin = 0;
-        }
-    } else {
-        item.discount_percentage = 0.0;
-        item.margin_type = '';
-        item.margin_rate_or_amount = 0;
-        item.rate_with_margin = 0;
-    }
-    item.base_rate_with_margin = item.rate_with_margin * flt(frm.doc.conversion_rate);    
-    cur_frm.cscript.set_gross_profit(item);
-    cur_frm.cscript.calculate_taxes_and_totals();
-    cur_frm.cscript.calculate_stock_uom_rate(frm, cdt, cdn);
-    item.price_list_rate = prev_price_list_rate; // นำค่าเก่ามาใช้
-    
+
+frappe.ui.form.on("Purchase Receipt Item", "rate", function (frm, cdt, cdn) {
+	var item = frappe.get_doc(cdt, cdn);
+	var has_margin_field = frappe.meta.has_field(cdt, 'margin_type');
+
+	frappe.model.round_floats_in(item, ["rate", "price_list_rate"]);
+	let prev_price_list_rate = item.price_list_rate; // เก็บค่า price_list_rate ก่อนหน้า
+	if (item.price_list_rate && !item.blanket_order_rate) {
+		if (item.rate > item.price_list_rate && has_margin_field) {
+			// if rate is greater than price_list_rate, set margin
+			// or set discount
+			item.discount_percentage = 0;
+			item.margin_type = 'Amount';
+			item.margin_rate_or_amount = flt(item.rate - item.price_list_rate,
+				precision("margin_rate_or_amount", item));
+			item.rate_with_margin = item.rate;
+		} else {
+			item.discount_percentage = flt((1 - item.rate / item.price_list_rate) * 100.0,
+				precision("discount_percentage", item));
+			item.discount_amount = flt(item.price_list_rate) - flt(item.rate);
+			item.margin_type = '';
+			item.margin_rate_or_amount = 0;
+			item.rate_with_margin = 0;
+		}
+	} else {
+		item.discount_percentage = 0.0;
+		item.margin_type = '';
+		item.margin_rate_or_amount = 0;
+		item.rate_with_margin = 0;
+	}
+	item.base_rate_with_margin = item.rate_with_margin * flt(frm.doc.conversion_rate);
+	cur_frm.cscript.set_gross_profit(item);
+	cur_frm.cscript.calculate_taxes_and_totals();
+	cur_frm.cscript.calculate_stock_uom_rate(frm, cdt, cdn);
+	item.price_list_rate = prev_price_list_rate; // นำค่าเก่ามาใช้
+
 });
 

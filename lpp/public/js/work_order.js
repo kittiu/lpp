@@ -1,18 +1,5 @@
 frappe.ui.form.on("Work Order", {
-    onload_post_render: function(frm) {
-        if (frappe.router.doctype === 'Work Order' && frappe.router.page === 'print') {
-            // Hide the PDF button in the print format
-            $('button[data-label="PDF"]').hide();
-        }
-    },
     refresh(frm) {
-        frm.set_query('custom_item_mold', function() {
-            return {
-                filters: {
-                    parent: frm.doc.production_item || 'empty'
-                },
-            };
-        });
         // Get today's date
         let today = frappe.datetime.nowdate();
         if (frm.is_new()) {
@@ -220,42 +207,25 @@ frappe.ui.form.on('Work Order Item', {
 });
 
 function set_custom_item_molds_query(frm) {
-
-    // Check if 'production_item' is present
     if (frm.doc.production_item) {
-        // Fetch the 'Item' document corresponding to the 'production_item' field
-        frappe.db.get_doc('Item', frm.doc.production_item)
-            .then(doc => {
-                // Check if the 'Item' document and its 'custom_molds_items' child table exist
-                if (doc && doc.custom_molds_items) {
-                    // Extract 'name_molds' from each row in the 'custom_molds_items' child table
-                    let molds_items = doc.custom_molds_items.map(row => row.name_molds);
-
-                    // Set a query on the 'custom_item_molds' field to filter options based on 'molds_items'
-                    frm.set_query('custom_item_molds', () => ({
-                        filters: [
-                            ['Molds', 'name_molds', 'in', molds_items]
-                        ]
-                    }));
-                } else {
-                    // Clear the filter if no molds are found
-                    clear_custom_item_molds_filter(frm);
+        frappe.call({
+            method: "lpp.custom.work_order.get_item_molds",  // The path to your Python method
+            args: {
+                item_code: frm.doc.production_item  // Pass the item code from the form
+            },
+            callback: function(r) {
+                if (r.message) {
+                    let options = r.message.map(mold => {
+                        return {
+                            label: `${mold.mold_id}, ${mold.item_name}`,  // Display both mold_name and mold_size
+                            value: mold.mold_id  // You can use the mold_name or any unique field as the value
+                        };
+                    });
+                    // Set the options for custom_item_mold field
+                    frm.set_df_property('custom_item_mold', 'options', options || []);
                 }
-            })
-            .catch(err => {
-                // Log any errors to the console and notify the user
-                console.error("Error fetching custom molds items:", err);
-                frappe.msgprint({
-                    title: __('Error'),
-                    indicator: 'red',
-                    message: __('Unable to fetch custom molds items.')
-                });
-                // Clear the filter on error
-                clear_custom_item_molds_filter(frm);
-            });
-    } else {
-        // Clear filter if 'production_item' is empty
-        clear_custom_item_molds_filter(frm);
+            }
+        });
     }
 }
 

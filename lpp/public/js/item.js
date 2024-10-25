@@ -2,7 +2,6 @@ frappe.ui.form.on("Item", {
     refresh: function (frm) {
         frm.set_df_property('item_code', 'reqd', 0);
         frm.set_df_property('item_code', 'hidden', 1);
-        frm.set_df_property('is_fixed_asset', 'set_only_once', 0);
     },
     item_group(frm) {
         if (frm.doc.item_group) {
@@ -11,14 +10,17 @@ frappe.ui.form.on("Item", {
             }
             else if (frm.doc.item_group == "Raw Material" || frm.doc.item_group == "Raw Materials") {
                 frm.set_value("has_batch_no", 1);
-                // วนลูปผ่านทุกแถวใน item_defaults
-                (frm.doc.item_defaults || []).forEach(function (row) {
-                    // แทนค่าทุกฟิลด์ default_warehouse ใน item_defaults
-                    frappe.model.set_value(row.doctype, row.name, "default_warehouse", "Raw Materials - LPP");
-                });
             } else {
                 frm.set_value("has_batch_no", 0);
             }
+        }
+
+        // default warehouse in table item_defaults
+        if (['Raw Material', 'Raw Materials'].includes(frm.doc.item_group)) {
+            frm.doc.item_defaults.forEach(row => {
+                row.default_warehouse = frm.doc.item_group
+            });
+            frm.refresh_field("item_defaults");
         }
     },
 
@@ -29,8 +31,6 @@ frappe.ui.form.on("Item", {
     reset_specifications_tolerance: function (frm) {
 
         const fields_to_reset = [
-            'custom_height_tolerance', 'custom_height_max', 'custom_height_min',
-            'custom_length_tolerance', 'custom_length_max', 'custom_length_min',
             'custom_thickness_tolerance', 'custom_thickness_max', 'custom_thickness_min',
             'custom_width_tolerance', 'custom_width_max', 'custom_width_min',
             'custom_a0_tolerance', 'custom_a0_max', 'custom_a0_min',
@@ -38,7 +38,7 @@ frappe.ui.form.on("Item", {
             'custom_k0_tolerance', 'custom_k0_max', 'custom_k0_min',
             'custom_p1_tolerance', 'custom_p1_max', 'custom_p1_min',
             'custom_length__reel_tolerance', 'custom_length__reel_max', 'custom_length__reel_min',
-            'custom_cavities', 'custom_step_in_cavity',
+            'custom_cavities',
             'custom_a_tolerance', 'custom_a_max', 'custom_a_min',
             'custom_n_tolerance', 'custom_n_max', 'custom_n_min',
             'custom_b_tolerance', 'custom_b_max', 'custom_b_min',
@@ -123,3 +123,17 @@ frappe.ui.form.on('Item Molds Detail', {
         frm.events.generate_mold_ids(frm);
     }
 });
+
+frappe.ui.form.on('Item Default', {
+    item_defaults_add(frm, cdt, cdn) {
+          // default warehouse in table item_defaults
+        setDefaultWarehouse(frm, cdt, cdn);
+    }
+});
+
+function setDefaultWarehouse(frm, cdt, cdn) {
+    const itemGroup = frm.doc.item_group;
+    if (['Raw Material', 'Raw Materials'].includes(itemGroup)) {
+        frappe.model.set_value(cdt, cdn, 'default_warehouse', itemGroup);
+    }
+}

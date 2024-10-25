@@ -51,13 +51,16 @@ doctype_js = {
     "Purchase Receipt": "public/js/purchase_receipt.js",
     "Address" : "public/js/address.js",
     "Job Card" : "public/js/job_card.js",
-    "Sales Order" : "public/js/sales_order.js"
+    "Sales Order" : "public/js/sales_order.js",
+    "Sales Invoice": "public/js/sales_invoice.js"
 }
 doctype_list_js = {
     "Journal Entry": "public/js/journal_entry_list.js",
     "Payment Entry": "public/js/payment_entry_list.js",
     "Purchase Order": "public/js/purchase_order.js",
     "Material Request": "public/js/material_request.js",
+    "Quotation": "public/js/quotation.js",
+    "Stock Entry": "public/js/stock_entry_list.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -158,6 +161,7 @@ override_doctype_class = {
     "Purchase Receipt": "lpp.custom.custom_purchase_receipt.CustomPurchaseReceipt",
     "BOM" : "lpp.custom.custom_bom.CustomBOM",
     "Material Request": "lpp.custom.material_request.MaterialRequestLPP",
+    "Work Order": "lpp.custom.work_order.CustomWorkOrder",
 }
 
 # Document Events
@@ -165,11 +169,16 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
-	 "Purchase Order": {
+    "Purchase Order": {
         "validate": [
             "lpp.custom.purchase_order.update_approver",
         ]
     },
+    "Quotation": {
+        "validate": [
+            "lpp.custom.quotation.update_approver",
+        ],
+    }
 }
 
 # Scheduled Tasks

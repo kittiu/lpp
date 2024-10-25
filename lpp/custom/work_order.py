@@ -5,7 +5,12 @@ from frappe.utils import (
     get_link_to_form,
     nowdate,
 )
-from erpnext.manufacturing.doctype.work_order.work_order import validate_operation_data, split_qty_based_on_batch_size
+from erpnext.manufacturing.doctype.work_order.work_order import validate_operation_data, split_qty_based_on_batch_size, WorkOrder
+
+class CustomWorkOrder(WorkOrder):
+    # ตอน Submit Work Order เอาฟังก์ชัน create_job_card ออก ตรวจสอบแล้วใช้แค่ตอน on_submit ไม่มีเรียกใช้ที่อื่น (เขียนให้ pass ไว้เฉยๆ ไม่มีการทำงานข้างใน)
+    def create_job_card(self):
+        pass
 
 @frappe.whitelist()
 def get_jobcard_remaining(data):
@@ -40,6 +45,14 @@ def get_jobcard_remaining(data):
     result = round(result, 2)
 
     return result
+
+@frappe.whitelist()
+def get_item_molds(item_code):
+    # Get the child table records from the Item DocType
+    molds = frappe.get_all("Item Molds Detail", 
+    filters={'parent': item_code},  # Parent is the Item
+    fields=['item_code', 'item_name', 'mold_id'])  # Adjust fields to match your child table fields
+    return molds
 
 
 @frappe.whitelist()
