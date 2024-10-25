@@ -46,6 +46,14 @@ def get_jobcard_remaining(data):
 
     return result
 
+@frappe.whitelist()
+def get_item_molds(item_code):
+    # Get the child table records from the Item DocType
+    molds = frappe.get_all("Item Molds Detail", 
+    filters={'parent': item_code},  # Parent is the Item
+    fields=['item_code', 'item_name', 'mold_id'])  # Adjust fields to match your child table fields
+    return molds
+
 
 @frappe.whitelist()
 def make_job_card(work_order, operations):
