@@ -1,0 +1,711 @@
+{
+    "actions": [],
+    "autoname": "hash",
+    "creation": "2024-10-22 17:05:55.584447",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+        "defects",
+        "nominal_value",
+        "tolerance_max",
+        "tolerance_min",
+        "accepted",
+        "rejected",
+        "remark",
+        "average_value",
+        "1_section",
+        "inspected_value_1",
+        "inspected_value_2",
+        "inspected_value_3",
+        "inspected_value_4",
+        "inspected_value_5",
+        "inspected_value_6",
+        "inspected_value_7",
+        "inspected_value_8",
+        "inspected_value_9",
+        "inspected_value_10",
+        "inspected_value_11",
+        "inspected_value_12",
+        "inspected_value_13",
+        "inspected_value_14",
+        "inspected_value_15",
+        "inspected_value_16",
+        "inspected_value_17",
+        "inspected_value_18",
+        "inspected_value_19",
+        "inspected_value_20",
+        "inspected_value_21",
+        "inspected_value_22",
+        "inspected_value_23",
+        "inspected_value_24",
+        "inspected_value_25",
+        "inspected_value_26",
+        "inspected_value_27",
+        "inspected_value_28",
+        "inspected_value_29",
+        "inspected_value_30",
+        "inspected_value_31",
+        "inspected_value_32",
+        "column_break_htmv",
+        "approval_1",
+        "approval_2",
+        "approval_3",
+        "approval_4",
+        "approval_5",
+        "approval_6",
+        "approval_7",
+        "approval_8",
+        "approval_9",
+        "approval_10",
+        "approval_11",
+        "approval_12",
+        "approval_13",
+        "approval_14",
+        "approval_15",
+        "approval_16",
+        "approval_17",
+        "approval_18",
+        "approval_19",
+        "approval_20",
+        "approval_21",
+        "approval_22",
+        "approval_23",
+        "approval_24",
+        "approval_25",
+        "approval_26",
+        "approval_27",
+        "approval_28",
+        "approval_29",
+        "approval_30",
+        "approval_31",
+        "approval_32",
+        "column_break_rior",
+        "remark_1",
+        "remark_2",
+        "remark_3",
+        "remark_4",
+        "remark_5",
+        "remark_6",
+        "remark_7",
+        "remark_8",
+        "remark_9",
+        "remark_10",
+        "remark_11",
+        "remark_12",
+        "remark_13",
+        "remark_14",
+        "remark_15",
+        "remark_16",
+        "remark_17",
+        "remark_18",
+        "remark_19",
+        "remark_20",
+        "remark_21",
+        "remark_22",
+        "remark_23",
+        "remark_24",
+        "remark_25",
+        "remark_26",
+        "remark_27",
+        "remark_28",
+        "remark_29",
+        "remark_30",
+        "remark_31",
+        "remark_32"
+    ],
+    "fields": [
+        {
+            "columns": 2,
+            "fieldname": "defects",
+            "fieldtype": "Link",
+            "in_list_view": 1,
+            "label": "Defects",
+            "options": "Quality Inspection Parameter"
+        },
+        {
+            "columns": 1,
+            "fieldname": "nominal_value",
+            "fieldtype": "Float",
+            "in_list_view": 1,
+            "label": "Nominal Value"
+        },
+        {
+            "columns": 1,
+            "fieldname": "tolerance_max",
+            "fieldtype": "Float",
+            "in_list_view": 1,
+            "label": "Tolerance (+)"
+        },
+        {
+            "columns": 1,
+            "fieldname": "tolerance_min",
+            "fieldtype": "Float",
+            "in_list_view": 1,
+            "label": "Tolerance (-)"
+        },
+        {
+            "columns": 1,
+            "fieldname": "accepted",
+            "fieldtype": "Int",
+            "in_list_view": 1,
+            "label": "Accepted"
+        },
+        {
+            "columns": 1,
+            "fieldname": "rejected",
+            "fieldtype": "Int",
+            "in_list_view": 1,
+            "label": "Rejected"
+        },
+        {
+            "columns": 3,
+            "fieldname": "remark",
+            "fieldtype": "Small Text",
+            "in_list_view": 1,
+            "label": "Remark"
+        },
+        {
+            "fieldname": "average_value",
+            "fieldtype": "Float",
+            "label": "Average Value"
+        },
+        {
+            "fieldname": "1_section",
+            "fieldtype": "Section Break"
+        },
+        {
+            "fieldname": "inspected_value_1",
+            "fieldtype": "Float",
+            "label": "Inspected Value 1"
+        },
+        {
+            "fieldname": "column_break_htmv",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "approval_1",
+            "fieldtype": "Select",
+            "label": "Approval 1",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "column_break_rior",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "remark_1",
+            "fieldtype": "Data",
+            "label": "Remark 1"
+        },
+        {
+            "fieldname": "inspected_value_2",
+            "fieldtype": "Float",
+            "label": "Inspected Value 2"
+        },
+        {
+            "fieldname": "approval_2",
+            "fieldtype": "Select",
+            "label": "Approval 2",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_2",
+            "fieldtype": "Data",
+            "label": "Remark 2"
+        },
+        {
+            "fieldname": "inspected_value_3",
+            "fieldtype": "Float",
+            "label": "Inspected Value 3"
+        },
+        {
+            "fieldname": "approval_3",
+            "fieldtype": "Select",
+            "label": "Approval 3",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_3",
+            "fieldtype": "Data",
+            "label": "Remark 3"
+        },
+        {
+            "fieldname": "inspected_value_4",
+            "fieldtype": "Float",
+            "label": "Inspected Value 4"
+        },
+        {
+            "fieldname": "approval_4",
+            "fieldtype": "Select",
+            "label": "Approval 4",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_4",
+            "fieldtype": "Data",
+            "label": "Remark 4"
+        },
+        {
+            "fieldname": "inspected_value_5",
+            "fieldtype": "Float",
+            "label": "Inspected Value 5"
+        },
+        {
+            "fieldname": "approval_5",
+            "fieldtype": "Select",
+            "label": "Approval 5",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_5",
+            "fieldtype": "Data",
+            "label": "Remark 5"
+        },
+        {
+            "fieldname": "inspected_value_6",
+            "fieldtype": "Float",
+            "label": "Inspected Value 6"
+        },
+        {
+            "fieldname": "approval_6",
+            "fieldtype": "Select",
+            "label": "Approval 6",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_6",
+            "fieldtype": "Data",
+            "label": "Remark 6"
+        },
+        {
+            "fieldname": "inspected_value_7",
+            "fieldtype": "Float",
+            "label": "Inspected Value 7"
+        },
+        {
+            "fieldname": "approval_7",
+            "fieldtype": "Select",
+            "label": "Approval 7",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_7",
+            "fieldtype": "Data",
+            "label": "Remark 7"
+        },
+        {
+            "fieldname": "inspected_value_8",
+            "fieldtype": "Float",
+            "label": "Inspected Value 8"
+        },
+        {
+            "fieldname": "approval_8",
+            "fieldtype": "Select",
+            "label": "Approval 8",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_8",
+            "fieldtype": "Data",
+            "label": "Remark 8"
+        },
+        {
+            "fieldname": "inspected_value_9",
+            "fieldtype": "Float",
+            "label": "Inspected Value 9"
+        },
+        {
+            "fieldname": "approval_9",
+            "fieldtype": "Select",
+            "label": "Approval 9",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_9",
+            "fieldtype": "Data",
+            "label": "Remark 9"
+        },
+        {
+            "fieldname": "inspected_value_10",
+            "fieldtype": "Float",
+            "label": "Inspected Value 10"
+        },
+        {
+            "fieldname": "approval_10",
+            "fieldtype": "Select",
+            "label": "Approval 10",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_10",
+            "fieldtype": "Data",
+            "label": "Remark 10"
+        },
+        {
+            "fieldname": "inspected_value_11",
+            "fieldtype": "Float",
+            "label": "Inspected Value 11"
+        },
+        {
+            "fieldname": "approval_11",
+            "fieldtype": "Select",
+            "label": "Approval 11",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_11",
+            "fieldtype": "Data",
+            "label": "Remark 11"
+        },
+        {
+            "fieldname": "inspected_value_12",
+            "fieldtype": "Float",
+            "label": "Inspected Value 12"
+        },
+        {
+            "fieldname": "approval_12",
+            "fieldtype": "Select",
+            "label": "Approval 12",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_12",
+            "fieldtype": "Data",
+            "label": "Remark 12"
+        },
+        {
+            "fieldname": "inspected_value_13",
+            "fieldtype": "Float",
+            "label": "Inspected Value 13"
+        },
+        {
+            "fieldname": "approval_13",
+            "fieldtype": "Select",
+            "label": "Approval 13",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_13",
+            "fieldtype": "Data",
+            "label": "Remark 13"
+        },
+        {
+            "fieldname": "inspected_value_14",
+            "fieldtype": "Float",
+            "label": "Inspected Value 14"
+        },
+        {
+            "fieldname": "approval_14",
+            "fieldtype": "Select",
+            "label": "Approval 14",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_14",
+            "fieldtype": "Data",
+            "label": "Remark 14"
+        },
+        {
+            "fieldname": "inspected_value_15",
+            "fieldtype": "Float",
+            "label": "Inspected Value 15"
+        },
+        {
+            "fieldname": "approval_15",
+            "fieldtype": "Select",
+            "label": "Approval 15",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_15",
+            "fieldtype": "Data",
+            "label": "Remark 15"
+        },
+        {
+            "fieldname": "inspected_value_16",
+            "fieldtype": "Float",
+            "label": "Inspected Value 16"
+        },
+        {
+            "fieldname": "approval_16",
+            "fieldtype": "Select",
+            "label": "Approval 16",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_16",
+            "fieldtype": "Data",
+            "label": "Remark 16"
+        },
+        {
+            "fieldname": "inspected_value_17",
+            "fieldtype": "Float",
+            "label": "Inspected Value 17"
+        },
+        {
+            "fieldname": "approval_17",
+            "fieldtype": "Select",
+            "label": "Approval 17",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_17",
+            "fieldtype": "Data",
+            "label": "Remark 17"
+        },
+        {
+            "fieldname": "inspected_value_18",
+            "fieldtype": "Float",
+            "label": "Inspected Value 18"
+        },
+        {
+            "fieldname": "approval_18",
+            "fieldtype": "Select",
+            "label": "Approval 18",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_18",
+            "fieldtype": "Data",
+            "label": "Remark 18"
+        },
+        {
+            "fieldname": "inspected_value_19",
+            "fieldtype": "Float",
+            "label": "Inspected Value 19"
+        },
+        {
+            "fieldname": "approval_19",
+            "fieldtype": "Select",
+            "label": "Approval 19",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_19",
+            "fieldtype": "Data",
+            "label": "Remark 19"
+        },
+        {
+            "fieldname": "inspected_value_20",
+            "fieldtype": "Float",
+            "label": "Inspected Value 20"
+        },
+        {
+            "fieldname": "approval_20",
+            "fieldtype": "Select",
+            "label": "Approval 20",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_20",
+            "fieldtype": "Data",
+            "label": "Remark 20"
+        },
+        {
+            "fieldname": "inspected_value_21",
+            "fieldtype": "Float",
+            "label": "Inspected Value 21"
+        },
+        {
+            "fieldname": "approval_21",
+            "fieldtype": "Select",
+            "label": "Approval 21",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_21",
+            "fieldtype": "Data",
+            "label": "Remark 21"
+        },
+        {
+            "fieldname": "inspected_value_22",
+            "fieldtype": "Float",
+            "label": "Inspected Value 22"
+        },
+        {
+            "fieldname": "approval_22",
+            "fieldtype": "Select",
+            "label": "Approval 22",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_22",
+            "fieldtype": "Data",
+            "label": "Remark 22"
+        },
+        {
+            "fieldname": "inspected_value_23",
+            "fieldtype": "Float",
+            "label": "Inspected Value 23"
+        },
+        {
+            "fieldname": "approval_23",
+            "fieldtype": "Select",
+            "label": "Approval 23",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_23",
+            "fieldtype": "Data",
+            "label": "Remark 23"
+        },
+        {
+            "fieldname": "inspected_value_24",
+            "fieldtype": "Float",
+            "label": "Inspected Value 24"
+        },
+        {
+            "fieldname": "approval_24",
+            "fieldtype": "Select",
+            "label": "Approval 24",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_24",
+            "fieldtype": "Data",
+            "label": "Remark 24"
+        },
+        {
+            "fieldname": "inspected_value_25",
+            "fieldtype": "Float",
+            "label": "Inspected Value 25"
+        },
+        {
+            "fieldname": "approval_25",
+            "fieldtype": "Select",
+            "label": "Approval 25",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_25",
+            "fieldtype": "Data",
+            "label": "Remark 25"
+        },
+        {
+            "fieldname": "inspected_value_26",
+            "fieldtype": "Float",
+            "label": "Inspected Value 26"
+        },
+        {
+            "fieldname": "approval_26",
+            "fieldtype": "Select",
+            "label": "Approval 26",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_26",
+            "fieldtype": "Data",
+            "label": "Remark 26"
+        },
+        {
+            "fieldname": "inspected_value_27",
+            "fieldtype": "Float",
+            "label": "Inspected Value 27"
+        },
+        {
+            "fieldname": "approval_27",
+            "fieldtype": "Select",
+            "label": "Approval 27",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_27",
+            "fieldtype": "Data",
+            "label": "Remark 27"
+        },
+        {
+            "fieldname": "inspected_value_28",
+            "fieldtype": "Float",
+            "label": "Inspected Value 28"
+        },
+        {
+            "fieldname": "approval_28",
+            "fieldtype": "Select",
+            "label": "Approval 28",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_28",
+            "fieldtype": "Data",
+            "label": "Remark 28"
+        },
+        {
+            "fieldname": "inspected_value_29",
+            "fieldtype": "Float",
+            "label": "Inspected Value 29"
+        },
+        {
+            "fieldname": "approval_29",
+            "fieldtype": "Select",
+            "label": "Approval 29",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_29",
+            "fieldtype": "Data",
+            "label": "Remark 29"
+        },
+        {
+            "fieldname": "inspected_value_30",
+            "fieldtype": "Float",
+            "label": "Inspected Value 30"
+        },
+        {
+            "fieldname": "approval_30",
+            "fieldtype": "Select",
+            "label": "Approval 30",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_30",
+            "fieldtype": "Data",
+            "label": "Remark 30"
+        },
+        {
+            "fieldname": "inspected_value_31",
+            "fieldtype": "Float",
+            "label": "Inspected Value 31"
+        },
+        {
+            "fieldname": "approval_31",
+            "fieldtype": "Select",
+            "label": "Approval 31",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_31",
+            "fieldtype": "Data",
+            "label": "Remark 31"
+        },
+        {
+            "fieldname": "inspected_value_32",
+            "fieldtype": "Float",
+            "label": "Inspected Value 32"
+        },
+        {
+            "fieldname": "approval_32",
+            "fieldtype": "Select",
+            "label": "Approval 32",
+            "options": "Accepted\nRejected"
+        },
+        {
+            "fieldname": "remark_32",
+            "fieldtype": "Data",
+            "label": "Remark 32"
+        }
+    ],
+    "index_web_pages_for_search": 1,
+    "istable": 1,
+    "links": [],
+    "modified": "2024-10-24 14:49:02.559617",
+    "modified_by": "Administrator",
+    "module": "LPP",
+    "name": "Quality Inspection Order",
+    "naming_rule": "Random",
+    "owner": "Administrator",
+    "permissions": [],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}
