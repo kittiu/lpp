@@ -2,18 +2,16 @@ frappe.ui.form.on("Purchase Receipt", {
 	refresh(frm) {
 		frm.set_df_property('posting_time', 'hidden', true);
 
-		setTimeout(() => {
-			if (!frm.is_new() && frm.doc.docstatus === 0 && frappe.model.can_create("Quality Inspection")) {
-				// Remove Original Button
-				frm.remove_custom_button(__('Quality Inspection(s)'))
-				frm.add_custom_button(__("Quality Inspection(s)"), async () => {
+		if (!frm.is_new() && frm.doc.docstatus === 0 && frappe.model.can_create("Quality Inspection")) {
+			// Remove Original Button
+			frm.remove_custom_button(__('Quality Inspection(s)'))
+			frm.add_custom_button(__("Quality Inspection(s)"), async () => {
 
-					frm.trigger("make_quality_inspection_new");
+				frm.trigger("make_quality_inspection_new");
 					
-				}, __("Create"));
-				frm.page.set_inner_btn_group_as_primary(__('Create'));
-			}
-		}, 10);
+			}, __("Create"));
+			frm.page.set_inner_btn_group_as_primary(__('Create'));
+		}
 	},
 
 	async make_quality_inspection_new  (frm) {
