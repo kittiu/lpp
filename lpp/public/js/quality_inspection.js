@@ -1,5 +1,5 @@
 frappe.ui.form.on("Quality Inspection", {
-    onload: function (frm) {
+    setup: function (frm) {
 
     },
     refresh: function (frm) {
@@ -11,6 +11,7 @@ frappe.ui.form.on("Quality Inspection", {
         // ซ่อนฟิลด์ inspection_type
         frm.set_df_property('inspection_type', 'hidden', true);
         frm.events.get_supplier(frm);
+
 
     },
     custom_inspection_progress: function (frm) {
@@ -152,7 +153,7 @@ frappe.ui.form.on("Quality Inspection", {
                 frm.set_value('custom_quality_inspection_template_link_3', "");
                 frm.toggle_display('custom_quality_inspection_order_table_3', false);
             }
-       
+
 
         }
     },
@@ -213,7 +214,7 @@ frappe.ui.form.on("Quality Inspection", {
     },
     custom_quality_inspection_template_link_1: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_1) {
-            
+
             return frm.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
@@ -360,37 +361,74 @@ frappe.ui.form.on('Quality Inspection Reading', {
 });
 
 frappe.ui.form.on("Quality Inspection Order", {
-    form_render(frm, cdt, cdn) {
+    form_render(frm,cdt,cdn) {
         const sample_size = frm.doc.sample_size;
 
         for (let i = 1; i <= 32; i++) {
-            if (i <= sample_size) {
-                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
-                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('approval_' + i, "hidden", 0);
-                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('remark_' + i, "hidden", 0);
+            let hidden = i > sample_size ? 1 : 0;
 
-                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
-                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('approval_' + i, "hidden", 0);
-                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('remark_' + i, "hidden", 0);
-
-                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
-                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('approval_' + i, "hidden", 0);
-                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('remark_' + i, "hidden", 0);
-
-            } else {
-                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
-                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('approval_' + i, "hidden", 1);
-                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('remark_' + i, "hidden", 1);
-
-                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
-                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('approval_' + i, "hidden", 1);
-                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('remark_' + i, "hidden", 1);
-
-                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
-                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('approval_' + i, "hidden", 1);
-                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('remark_' + i, "hidden", 1);
-            }
+            ["custom_quality_inspection_order_table_1", "custom_quality_inspection_order_table_2", "custom_quality_inspection_order_table_3"].forEach((table) => {
+                frm.fields_dict[table].grid.update_docfield_property('inspected_value_' + i, "hidden", hidden);
+                frm.fields_dict[table].grid.update_docfield_property('approval_' + i, "hidden", hidden);
+                frm.fields_dict[table].grid.update_docfield_property('remark_' + i, "hidden", hidden);
+            });
         }
+        calculate_average_value(frm, cdt, cdn);
+        count_accepted_rejected(frm,cdt,cdn);
 
+    },
+});
+
+for (let i = 1; i <= 32; i++) {
+    frappe.ui.form.on("Quality Inspection Order", "inspected_value_" + i, function(frm, cdt, cdn) {
+        calculate_average_value(frm, cdt, cdn);
+    });
+    
+    frappe.ui.form.on("Quality Inspection Order", "approval_" + i, function(frm, cdt, cdn) {
+        count_accepted_rejected(frm, cdt, cdn);
+    });
+}
+
+
+
+// function for count Accepted / Rejected
+function count_accepted_rejected(frm, cdt, cdn) {
+    const sample_size = frm.doc.sample_size;
+    const row = locals[cdt][cdn];
+    let count_accepted = 0;
+    let count_rejected = 0;
+    for (let i = 1; i <= sample_size; i++) {
+        const field_name = `approval_${i}`;
+        const value = row[field_name];
+
+        if (value === "Accepted") {
+            count_accepted++;
+        } else if (value === "Rejected") {
+            count_rejected++;
+        }
     }
-})
+    frappe.model.set_value(cdt, cdn, 'accepted', count_accepted);
+    frappe.model.set_value(cdt, cdn, 'rejected', count_rejected);
+
+} 
+
+
+function calculate_average_value(frm, cdt, cdn) {
+    const sample_size = frm.doc.sample_size;
+    const row = locals[cdt][cdn];
+
+    const count = sample_size;
+    let total = 0;
+
+    for (let i = 1; i <= sample_size; i++) {
+        const field_name = `inspected_value_${i}`;
+        const value = row[field_name];
+        if (value) {
+            total += parseFloat(value);
+        }
+    }
+
+    const average = total / count;
+    frappe.model.set_value(cdt, cdn, 'average_value', average.toFixed(2));
+
+}
