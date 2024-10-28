@@ -13,27 +13,36 @@ class CustomQualityInspection(QualityInspection):
     def custom_get_item_specification_details(self, template_key="", table_key=""):
         # Define specifications mapping
         specs = {
-            'Thickness (mm)': {'valueField': 'custom_thickness_tolerance', 'toleranceFieldMax': 'custom_thickness_max', 'toleranceFieldMin': 'custom_thickness_min'},
-            'Length (mm)': {'valueField': 'custom_length_tolerance', 'toleranceFieldMax': 'custom_length_max', 'toleranceFieldMin': 'custom_length_min'},
-            'Height (mm)': {'valueField': 'custom_height_tolerance', 'toleranceFieldMax': 'custom_height_max', 'toleranceFieldMin': 'custom_height_min'},
-            'Surface Resistivity (ohms/sq)': {'valueField': 'custom_surface_resistivity_ohmssq', 'toleranceFieldMax': 'custom_surface_resistivity_ohmssq_max', 'toleranceFieldMin': 'custom_surface_resistivity_ohmssq_min'},
             'A0 (mm)': {'valueField': 'custom_a0_tolerance', 'toleranceFieldMax': 'custom_a0_max', 'toleranceFieldMin': 'custom_a0_min'},
             'B0 (mm)': {'valueField': 'custom_b0_tolerance', 'toleranceFieldMax': 'custom_b0_max', 'toleranceFieldMin': 'custom_b0_min'},
             'K0 (mm)': {'valueField': 'custom_k0_tolerance', 'toleranceFieldMax': 'custom_k0_max', 'toleranceFieldMin': 'custom_k0_min'},
             'P1 (mm)': {'valueField': 'custom_p1_tolerance', 'toleranceFieldMax': 'custom_p1_max', 'toleranceFieldMin': 'custom_p1_min'},
+            'Thickness (mm)': {'valueField': 'custom_thickness_tolerance', 'toleranceFieldMax': 'custom_thickness_max', 'toleranceFieldMin': 'custom_thickness_min'},
             'Width (mm)': {'valueField': 'custom_width_tolerance', 'toleranceFieldMax': 'custom_width_max', 'toleranceFieldMin': 'custom_width_min'},
             'Length / Reel (m)': {'valueField': 'custom_length__reel_tolerance', 'toleranceFieldMax': 'custom_length__reel_max', 'toleranceFieldMin': 'custom_length__reel_min'},
+            'A (mm)': {'valueField': 'custom_a_basic', 'toleranceFieldMax': 'custom_a_basic_max', 'toleranceFieldMin': 'custom_a_basic_min'},
             '\u00d8A (mm)': {'valueField': 'custom_a_tolerance', 'toleranceFieldMax': 'custom_a_max', 'toleranceFieldMin': 'custom_a_min'},
             '\u00d8N (mm) (+)': {'valueField': 'custom_n_tolerance', 'toleranceFieldMax': 'custom_n_max', 'toleranceFieldMin': 'custom_n_min'},
             'B (mm)': {'valueField': 'custom_b_tolerance', 'toleranceFieldMax': 'custom_b_max', 'toleranceFieldMin': 'custom_b_min'},
+            'C (mm)': {'valueField': 'custom_c_basic', 'toleranceFieldMax': 'custom_c_basic_max', 'toleranceFieldMin': 'custom_c_basic_min'},
             '\u00d8C (mm)': {'valueField': 'custom_c_tolerance', 'toleranceFieldMax': 'custom_c_max', 'toleranceFieldMin': 'custom_c_min'},
+            'D (mm)': {'valueField': 'custom_d_basic', 'toleranceFieldMax': 'custom_d_basic_max', 'toleranceFieldMin': 'custom_d_basic_min'},
             '\u00d8D (mm)': {'valueField': 'custom_d_tolerance', 'toleranceFieldMax': 'custom_d_max', 'toleranceFieldMin': 'custom_d_min'},
             'E (mm)': {'valueField': 'custom_e_tolerance', 'toleranceFieldMax': 'custom_e_max', 'toleranceFieldMin': 'custom_e_min'},
             'F (mm)': {'valueField': 'custom_f_tolerance', 'toleranceFieldMax': 'custom_f_max', 'toleranceFieldMin': 'custom_f_min'},
+            'G (mm)': {'valueField': 'custom_g_tolerance', 'toleranceFieldMax': 'custom_g_max', 'toleranceFieldMin': 'custom_g_min'},
+            'H (mm)': {'valueField': 'custom_h_tolerance', 'toleranceFieldMax': 'custom_h_max', 'toleranceFieldMin': 'custom_h_min'},
+            'I (mm)': {'valueField': 'custom_i_tolerance', 'toleranceFieldMax': 'custom_i_max', 'toleranceFieldMin': 'custom_i_min'},
+            'J (mm)': {'valueField': 'custom_j_tolerance', 'toleranceFieldMax': 'custom_j_max', 'toleranceFieldMin': 'custom_j_min'},
+            'K (mm)': {'valueField': 'custom_k_tolerance', 'toleranceFieldMax': 'custom_k_max', 'toleranceFieldMin': 'custom_k_min'},
             'T1 (mm)': {'valueField': 'custom_t1_tolerance', 'toleranceFieldMax': 'custom_t1_max', 'toleranceFieldMin': 'custom_t1_min'},
             'T2 (mm)': {'valueField': 'custom_t2_tolerance', 'toleranceFieldMax': 'custom_t2_max', 'toleranceFieldMin': 'custom_t2_min'},
             'W1 (mm)': {'valueField': 'custom_w1_tolerance', 'toleranceFieldMax': 'custom_w1_max', 'toleranceFieldMin': 'custom_w1_min'},
-            'W2 (mm)': {'valueField': 'custom_w2_tolerance', 'toleranceFieldMax': 'custom_w2_max', 'toleranceFieldMin': 'custom_w2_min'}
+            'W2 (mm)': {'valueField': 'custom_w2_tolerance', 'toleranceFieldMax': 'custom_w2_max', 'toleranceFieldMin': 'custom_w2_min'},
+            'Delta E': {'valueField': 'custom_delta_e_tolerance', 'toleranceFieldMax': 'custom_delta_e_max', 'toleranceFieldMin': 'custom_delta_e_min'},
+            'Surface Resistivity (ohms/sq)': {'valueField': 'custom_surface_resistivity_ohmssq', 'toleranceFieldMax': 'custom_surface_resistivity_ohmssq_max', 'toleranceFieldMin': 'custom_surface_resistivity_ohmssq_min'},
+            'Length (mm)': {'valueField': 'custom_length_tolerance', 'toleranceFieldMax': 'custom_length_max', 'toleranceFieldMin': 'custom_length_min'},
+            'Height (mm)': {'valueField': 'custom_height_tolerance', 'toleranceFieldMax': 'custom_height_max', 'toleranceFieldMin': 'custom_height_min'},
         }
 
         # Retrieve template value and reset the table
