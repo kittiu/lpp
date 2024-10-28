@@ -437,10 +437,17 @@ function validate_inspected_value(frm, cdt, cdn , inspected_value_name) {
                 frappe.msgprint({
                     title: __('Warning'),
                     message: __('Inspected Value should be less than {0} ', [max_value]),
-                    indicator: 'orange'
+                    indicator: 'orange',
+                    primary_action: {
+                        label: __('Close'),
+                        action: function () {
+                            // This will close the modal
+                            frappe.msg_dialog.hide();
+                            row[inspected_value_name] = inspected_value
+
+                        }
+                    }
                 });
-                // ล้างค่า Inspected Value
-                row[inspected_value_name] = 0
             }
         }
 
@@ -453,10 +460,16 @@ function validate_inspected_value(frm, cdt, cdn , inspected_value_name) {
                 frappe.msgprint({
                     title: __('Warning'),
                     message: __('Inspected Value should be more than {0}', [min_value]),
-                    indicator: 'orange'
-                });
-                // ล้างค่า Inspected Value
-                row[inspected_value_name] = 0
+                    indicator: 'orange',
+                    primary_action: {
+                        label: __('Close'),
+                        action: function () {
+                            // This will close the modal
+                            frappe.msg_dialog.hide();
+                            row[inspected_value_name] = inspected_value
+                        }
+                    }
+                });     
             }
         }
     
