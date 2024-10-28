@@ -145,7 +145,7 @@ frappe.ui.form.on("Quality Inspection", {
     reference_name: async function (frm) {
         if (frm.doc.reference_type === 'Job Card' && frm.doc.reference_name) {
             try {
-                const { message } = await frappe.db.get_value('Job Card', frm.doc.reference_name, ['production_item', 'custom_lot_no']);                
+                const { message } = await frappe.db.get_value('Job Card', frm.doc.reference_name, ['production_item', 'custom_lot_no']);
                 if (message) {
                     frm.set_value({
                         item_code: message.production_item,
@@ -346,7 +346,7 @@ frappe.ui.form.on('Quality Inspection Reading', {
 });
 
 frappe.ui.form.on("Quality Inspection Order", {
-    form_render(frm,cdt,cdn) {
+    form_render(frm, cdt, cdn) {
         const sample_size = frm.doc.sample_size;
 
         for (let i = 1; i <= 32; i++) {
@@ -359,18 +359,19 @@ frappe.ui.form.on("Quality Inspection Order", {
             });
         }
         calculate_average_value(frm, cdt, cdn);
-        count_accepted_rejected(frm,cdt,cdn);
+        count_accepted_rejected(frm, cdt, cdn);
 
-    },
+    }, 
 });
 
 for (let i = 1; i <= 32; i++) {
-    frappe.ui.form.on("Quality Inspection Order", "inspected_value_" + i, function(frm, cdt, cdn) {
-        calculate_average_value(frm, cdt, cdn);
+    frappe.ui.form.on("Quality Inspection Order", "inspected_value_" + i, function (frm, cdt, cdn) {
+        validate_inspected_value(frm, cdt, cdn , "inspected_value_" + i)
+        calculate_average_value(frm, cdt, cdn );
     });
-    
-    frappe.ui.form.on("Quality Inspection Order", "approval_" + i, function(frm, cdt, cdn) {
-        count_accepted_rejected(frm, cdt, cdn);
+
+    frappe.ui.form.on("Quality Inspection Order", "approval_" + i, function (frm, cdt, cdn) {
+        count_accepted_rejected(frm, cdt, cdn );
     });
 }
 
@@ -395,7 +396,7 @@ function count_accepted_rejected(frm, cdt, cdn) {
     frappe.model.set_value(cdt, cdn, 'accepted', count_accepted);
     frappe.model.set_value(cdt, cdn, 'rejected', count_rejected);
 
-} 
+}
 
 
 function calculate_average_value(frm, cdt, cdn) {
@@ -416,4 +417,47 @@ function calculate_average_value(frm, cdt, cdn) {
     const average = total / count;
     frappe.model.set_value(cdt, cdn, 'average_value', average.toFixed(2));
 
+}
+
+function validate_inspected_value(frm, cdt, cdn , inspected_value_name) {
+
+        const row = locals[cdt][cdn];
+        let nominal_value = row.nominal_value;
+        let tolerance_max = Number(row.tolerance_max);
+        let tolerance_min = Number(row.tolerance_min);
+        let inspected_value = row[inspected_value_name];
+
+        // ตรวจสอบว่ามีการระบุ tolerance_max และ tolerance_min หรือไม่
+        if (!!tolerance_max) {
+            // คำนวณช่วงค่าที่อนุญาต
+            let max_value = nominal_value + tolerance_max;
+            
+            // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
+            if (inspected_value > max_value) {
+                frappe.msgprint({
+                    title: __('Warning'),
+                    message: __('Inspected Value should be less than {0} ', [max_value]),
+                    indicator: 'orange'
+                });
+                // ล้างค่า Inspected Value
+                row[inspected_value_name] = 0
+            }
+        }
+
+        if (!!tolerance_min) {
+            // คำนวณช่วงค่าที่อนุญาต
+            let min_value = nominal_value - tolerance_min;
+
+            // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
+            if (inspected_value < min_value) {
+                frappe.msgprint({
+                    title: __('Warning'),
+                    message: __('Inspected Value should be more than {0}', [min_value]),
+                    indicator: 'orange'
+                });
+                // ล้างค่า Inspected Value
+                row[inspected_value_name] = 0
+            }
+        }
+    
 }
