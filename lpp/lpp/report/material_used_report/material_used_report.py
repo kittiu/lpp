@@ -6,6 +6,7 @@ import json
 from frappe import _, scrub
 from datetime import date
 from erpnext.stock.report.stock_balance.stock_balance import execute as stock_balance_execute
+from erpnext.stock.report.stock_ledger.stock_ledger import execute as stock_ledger_execute
 
 
 def execute(filters=None):
@@ -174,6 +175,7 @@ def get_data(filters):
 			ORDER BY twoi.item_name , two.production_item
 		""".format(conditions=conditions), filters, as_dict=1)
     
+    act_use = 0
     for qr in query_report:
         # Fetch stock balance data for item
         filter_stock_balance_item = frappe._dict({
@@ -206,7 +208,7 @@ def get_data(filters):
         # Fetch withdrawal and return values by Stock Entry
         query_withdraw_return = frappe.db.sql(
             f"""
-            SELECT SUM(rs.qty) AS sum_qty, SUM(rs.return_qty) AS sum_return_qty
+            SELECT COALESCE(SUM(rs.qty),0) AS sum_qty, COALESCE(SUM(rs.return_qty),0) AS sum_return_qty
             FROM (
                 SELECT 
                     tse.name,
@@ -238,10 +240,60 @@ def get_data(filters):
         )
         
         # Get withdrawal and return values
-        withdraw_value = query_withdraw_return[0].get('sum_qty', 0) if query_withdraw_return else 0
+        withdraw_value = (query_withdraw_return[0].get('sum_qty', 0) if query_withdraw_return else 0 or 0)
         return_value = query_withdraw_return[0].get('sum_return_qty', 0) if query_withdraw_return else 0
 
+
+        # Fetch Batch no. by item_id , material_id
+        query_batch_no = frappe.db.sql(
+            f"""SELECT two.production_item
+                , twoi.item_code AS material_id
+                , tsed.batch_no 
+                , tsed.qty 
+                FROM `tabWork Order` two 
+                INNER JOIN `tabWork Order Item` twoi ON two.name = twoi.parent 
+                INNER JOIN `tabStock Entry` tse ON two.name = tse.work_order 
+                INNER JOIN `tabStock Entry Detail` tsed ON tse.name = tsed.parent 
+                WHERE tse.posting_date BETWEEN %(from_date)s AND %(to_date)s
+                AND two.production_item = %(item_id)s
+                AND twoi.item_code = %(material_id)s
+                AND tsed.batch_no IS NOT NULL
+            """, {
+                "from_date": from_date,
+                "to_date": to_date,
+                "item_id": qr['item_id'],
+                "material_id": qr['material_id']
+            }, 
+            as_dict=True
+        )
+
+        price_mat = 0
+        sum_value_batch_no = 0
+        number_batch_no = 0
+        if query_batch_no:
+            for qb in query_batch_no:
+                number_batch_no += 1
+                # Fetch stock ledger data for item
+                filter_stock_ledger_item = frappe._dict({
+                    "company": filters.get("company", "Lamphun Plastpack"),
+                    "from_date": from_date,
+                    "to_date": to_date,
+                    "item_code": qr['item_id'],
+                    "batch_no": qb['batch_no']
+                })
+                stock_ledger_data = stock_ledger_execute(filter_stock_ledger_item)
+
+                incoming_rate = 0
+                if stock_ledger_data[1]:
+                    for sld in stock_ledger_data[1]:
+                        incoming_rate += sld.get("incoming_rate", 0)
+                sum_value_batch_no += (qb['qty']*incoming_rate)
+        price_mat = sum_value_batch_no/number_batch_no if number_batch_no != 0 else 0
+
         # Append report data
+        std_use = qr.get('bom', 0) * qr.get('pack_out', 0)
+        act_use = begin_fg_value+begin_mat_value+withdraw_value-return_value-end_fg_value-end_mat_value
+        var_value = std_use-act_use
         report_data.append({
             "item_id": qr.get('item_id', ""),
             "item_name": qr.get('item_name', ""),
@@ -249,18 +301,18 @@ def get_data(filters):
             "material": qr.get('material', ""),
             "bom": qr.get('bom', 0),
             "pack_out": qr.get('pack_out', 0),
-            "std_use": qr.get('bom', 0) * qr.get('pack_out', 0),
+            "std_use": std_use,
             "wip_begin_fg": begin_fg_value,
             "wip_begin_mat": begin_mat_value,
             "withdraw": withdraw_value,
             "return": return_value,
             "wip_end_fg": end_fg_value,
             "wip_end_mat": end_mat_value,
-            "act_use": None,
-            "var": None,
-            "percent_var": None,
-            "price_mat": None,
-            "price_var": None
+            "act_use": act_use,
+            "var": var_value,
+            "percent_var": var_value/std_use if std_use != 0 else 0,
+            "price_mat": price_mat,
+            "price_var": price_mat*var_value
         })
 
     return report_data
