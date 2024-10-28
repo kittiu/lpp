@@ -29,6 +29,7 @@ class CustomQualityInspection(QualityInspection):
         for d in parameters:
             child = self.append(table_key, {})
             child.update(d)
+            child.defects = d["specification"]
             child.status = "Accepted"
 
 @frappe.whitelist()
