@@ -1,0 +1,224 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-10-28 10:13:09.207649",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "customer",
+  "item_code",
+  "item_name",
+  "material",
+  "drawing",
+  "sample_quantity",
+  "column_break_iiol",
+  "sales_order",
+  "customer_po_no",
+  "priority",
+  "overall_status",
+  "status_remark",
+  "mold_tab",
+  "item",
+  "mold_base_width_mm",
+  "mold_base_length_mm",
+  "mold_base_higth_mm",
+  "mold_quantity",
+  "cavity__mold",
+  "section_break_ogvq",
+  "mold_recipt",
+  "mold_picture",
+  "sample_production_tab",
+  "workstation"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_filter": 1,
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "ID",
+   "no_copy": 1,
+   "options": "SR.YY..MM.-.####.",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "item.custom_material",
+   "fieldname": "material",
+   "fieldtype": "Data",
+   "label": "Material",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_drawing__buildsheet_no",
+   "fieldname": "drawing",
+   "fieldtype": "Data",
+   "label": "Drawing",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sample_quantity",
+   "fieldtype": "Float",
+   "label": "Sample Quantity"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code ",
+   "link_filters": "[]",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_iiol",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "label": "Sales Order",
+   "options": "Sales Order",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "sales_order.po_no",
+   "fieldname": "customer_po_no",
+   "fieldtype": "Data",
+   "label": "Customer PO No.",
+   "read_only": 1
+  },
+  {
+   "default": "Flexible",
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "Flexible\nHigh"
+  },
+  {
+   "fieldname": "overall_status",
+   "fieldtype": "Select",
+   "label": "Overall Status",
+   "options": "Not Started\nMolding\nProducing\nDelivered"
+  },
+  {
+   "fieldname": "status_remark",
+   "fieldtype": "Long Text",
+   "label": "Status Remark"
+  },
+  {
+   "fieldname": "mold_tab",
+   "fieldtype": "Tab Break",
+   "label": "Mold"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_ogvq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "mold_recipt",
+   "fieldtype": "Attach",
+   "label": "Mold Recipt"
+  },
+  {
+   "fieldname": "mold_picture",
+   "fieldtype": "Attach",
+   "label": "Mold Picture"
+  },
+  {
+   "fetch_from": "item.custom_mold_base_width",
+   "fieldname": "mold_base_width_mm",
+   "fieldtype": "Float",
+   "label": "Mold Base Width (mm)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_mold_base_length",
+   "fieldname": "mold_base_length_mm",
+   "fieldtype": "Float",
+   "label": "Mold Base Length (mm)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_mold_base_height",
+   "fieldname": "mold_base_higth_mm",
+   "fieldtype": "Float",
+   "label": "Mold Base Higth (mm)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_mold_quantity",
+   "fieldname": "mold_quantity",
+   "fieldtype": "Float",
+   "label": "Mold Quantity",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_cavities",
+   "fieldname": "cavity__mold",
+   "fieldtype": "Float",
+   "label": "Cavity / Mold",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sample_production_tab",
+   "fieldtype": "Tab Break",
+   "label": "Sample Production"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Workstation",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-10-29 11:25:25.463767",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "Sample Record",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
