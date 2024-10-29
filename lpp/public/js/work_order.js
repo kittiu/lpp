@@ -88,6 +88,11 @@ frappe.ui.form.on("Work Order", {
     },
     production_item(frm) {
         set_custom_item_molds_query(frm)
+        if(frm.doc.bom_no){            
+            frappe.db.get_value("BOM", frm.doc.bom_no, "custom_bom_name").then(r => {
+                frm.set_value("custom_bom__name", r.message.custom_bom_name);
+            });
+        }
     },
 
     make_job_card_custom: function (frm) {
