@@ -55,6 +55,8 @@ def tape_and_protective_band(filters=None):
         filter_conditions["custom_shift"] = filters["custom_shift"]
     if filters.get("production_item"):
         filter_conditions["production_item"] = filters["production_item"]
+    if filters.get("production_name"):
+        filter_conditions["custom_production_item_name"] = filters["production_name"]
 
     # ใช้ Query Builder เพื่อสร้างการกรองที่ต้องการ
     JobCard = DocType("Job Card")
@@ -86,9 +88,7 @@ def tape_and_protective_band(filters=None):
     # เพิ่มเงื่อนไขจาก filters อื่น ๆ
     for condition, value in filter_conditions.items():
         query = query.where(JobCard[condition] == value)
-    print('query: ', query)
     items = query.run(as_dict=True)
-    print('items: ', items)
     # ดึงข้อมูล Defect จาก Job Card Scrap Item และจัดเก็บตาม Job Card แต่ละตัว
     scrap_items = frappe.db.get_all(
         "Job Card Scrap Item",

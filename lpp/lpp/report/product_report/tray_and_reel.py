@@ -53,6 +53,8 @@ def tray_and_reel(filters=None):
         filter_conditions.append(["custom_shift", "=", filters["custom_shift"]])
     if filters.get("production_item"):
         filter_conditions.append(["production_item", "=", filters["production_item"]])
+    if filters.get("production_name"):
+        filter_conditions.append(["custom_production_item_name", "=", filters["production_name"]])
 
     # ใช้ Query Builder เพื่อเพิ่มเงื่อนไขแบบ OR สำหรับ custom_item_group_2
     JobCard = DocType("Job Card")

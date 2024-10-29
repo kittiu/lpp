@@ -58,13 +58,39 @@ frappe.query_reports["Product Report"] = {
             "options": "Item",  // ดึงข้อมูลจากฟิลด์ production_item
             "description": "Select Product ID"
         },
-        // {
-        //     "fieldname": "custom_production_item_name",
-        //     "label": __("Product Name"),
-        //     "fieldtype": "Link",
-        //     "options": "Item",  // ดึงข้อมูลจากฟิลด์ custom_production_item_name
-        //     "description": "Select Product Name"
-        // }
-    ]
+        {
+            "fieldname": "production_name",
+            "label": __("Production Name"),
+            "fieldtype": "Select",
+            "options": [], // ตั้งค่าเริ่มต้นเป็นค่าว่าง
+        }
+    ],
+
+    onload: function(report) {
+        frappe.call({
+            method: "frappe.client.get_list",
+            args: {
+                doctype: "Job Card",
+                fields: ["distinct custom_production_item_name"],
+                // distinct: true,
+                order_by: "custom_production_item_name"
+            },
+            callback: function(response) {
+                if (response.message) {
+                    let options = [""]; // เพิ่มช่องว่างเป็นตัวเลือกแรก
+                    response.message.forEach(function(item) {
+                        options.push(item.custom_production_item_name);
+                    });
+                    if (options.length > 0) {
+                        let options_filter = report.get_filter("production_name");
+                        options_filter.df.options = options.join("\n");
+                        options_filter.refresh();
+                        // Set default value to the latest year
+                        options_filter.set_input(options[0]);
+                    }
+                }
+            }
+        });
+    }
 };
 
