@@ -1,131 +1,8 @@
-const type_check_box = [
-    "specification",
-    "custom_item_1",
-    "custom_item_2",
-    "custom_item_3",
-    "custom_item_4",
-    "custom_item_5",
-    "custom_item_6",
-    "custom_item_7",
-    "custom_item_8",
-    "custom_item_9",
-]
-
-const type_reading = [
-    "specification",
-    "reading_1",
-    "reading_2",
-    "reading_3",
-    "reading_4",
-    "reading_5",
-    "reading_6",
-    "reading_7",
-    "reading_8",
-    "reading_9",
-]
-
-const type_accept_reject = [
-    "specification",
-    "custom_accept__reject",
-    "custom_quantity",
-    "custom_qty",
-]
-
-const type_dimension_report = [
-    "specification",
-    "reading_1",
-    "reading_2",
-    "reading_3",
-    "reading_4",
-    "reading_5",
-    "custom_accept__reject",
-]
-
-const type_specifications_report = [
-    "specification",
-    "reading_1",
-    "reading_2",
-    "reading_3",
-    "reading_4",
-    "reading_5",
-    "custom_average_",
-    "custom_accept__reject",
-]
-
-// Reusable function to setup user-defined columns
-function setupUserDefinedColumns(frm, tableField, typeArray) {
-    frm.fields_dict[tableField].grid.setup_user_defined_columns = function () {
-        if (typeArray && typeArray.length) {
-            frm.fields_dict[tableField].grid.user_defined_columns = typeArray.map(fieldname => {
-                let column = frappe.meta.get_docfield('Quality Inspection Reading', fieldname);
-                if (column) {
-                    column.in_list_view = 1;
-                    column.columns = 1;
-                    return column;
-                }
-            }).filter(Boolean);
-        }
-    };
-    frm.fields_dict[tableField].grid.setup_user_defined_columns();
-    frm.fields_dict[tableField].grid.refresh();
-    frm.refresh_field(tableField);
-}
-
 frappe.ui.form.on("Quality Inspection", {
     onload: function (frm) {
 
-        // ** Tab IMQT
-        // Setup for custom_quality_inspection_checkbox_1_table
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_checkbox_1_table', type_check_box);
-
-        // Setup for custom_quality_inspection_freetext_1_template_table
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_freetext_1_template_table', type_reading);
-
-        // Setup for custom_quality_inspection_freetext_1_template_table
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_checkbox_2_table', type_reading);
-
-        // Setup for custom_quality_inspection_template_table_1
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_table_1', type_check_box);
-
-        // ** Tab BuyOff
-        // Setup for custom_buyoff_table_1
-        setupUserDefinedColumns(frm, 'custom_buyoff_table_1', type_specifications_report);
-
-        // Setup for custom_buyoff_table_2
-        setupUserDefinedColumns(frm, 'custom_buyoff_table_2', type_accept_reject);
-
-        // Setup for custom_buyoff_table_3
-        setupUserDefinedColumns(frm, 'custom_buyoff_table_3', type_accept_reject);
-
-        // Setup for custom_buyoff_table_4
-        setupUserDefinedColumns(frm, 'custom_buyoff_table_4', type_dimension_report);
-
-
-
-
-        // ** Tab Roving
-        // Setup for custom_roving_table_1
-        setupUserDefinedColumns(frm, 'custom_roving_table_1', type_accept_reject);
-
-        // Setup for custom_roving_table_2
-        setupUserDefinedColumns(frm, 'custom_roving_table_2', type_accept_reject);
-
-        // Setup for custom_roving_table_3
-        setupUserDefinedColumns(frm, 'custom_roving_table_3', type_accept_reject);
-
-
-        // ** Tab Final Inspection
-        // Setup for readings
-        setupUserDefinedColumns(frm, 'readings', type_accept_reject);
-
-        // Setup for readings
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_2_table', type_accept_reject);
-
-        // Setup for custom_quality_inspection_template_3_table
-        setupUserDefinedColumns(frm, 'custom_quality_inspection_template_3_table', type_reading);
-
     },
-    refresh(frm) {
+    refresh: function (frm) {
         // Set ค่า default ของ inspection_type เป็น In Process
         if (!frm.doc.inspection_type) {
             frm.set_value('inspection_type', 'In Process');
@@ -137,43 +14,172 @@ frappe.ui.form.on("Quality Inspection", {
 
     },
     custom_inspection_progress: function (frm) {
-        if(frm.doc.custom_inspection_progress === 'Buyoff'){
+        if (frm.doc.custom_inspection_progress === 'Buyoff') {
             frm.set_value('custom_buyoff_inspect_date', frappe.datetime.now_datetime());
             frm.set_value('custom_roving_inspect_date', null);
             frm.set_value('custom_final_inspection_inspect_date', null);
-        }else if(frm.doc.custom_inspection_progress === 'Roving'){
+        } else if (frm.doc.custom_inspection_progress === 'Roving') {
             frm.set_value('custom_buyoff_inspect_date', null);
             frm.set_value('custom_roving_inspect_date', frappe.datetime.now_datetime());
             frm.set_value('custom_final_inspection_inspect_date', null);
-        }else if(frm.doc.custom_inspection_progress === 'Final Inspection'){
+        } else if (frm.doc.custom_inspection_progress === 'Final Inspection') {
             frm.set_value('custom_buyoff_inspect_date', null);
             frm.set_value('custom_roving_inspect_date', null);
             frm.set_value('custom_final_inspection_inspect_date', frappe.datetime.now_datetime());
-        }else{
+        } else {
             frm.set_value('custom_buyoff_inspect_date', null);
             frm.set_value('custom_roving_inspect_date', null);
             frm.set_value('custom_final_inspection_inspect_date', null);
         }
+
+
+        // Get the selected value of Inspection Progress
+        let inspection_progress_value = frm.doc.custom_inspection_progress;
+
+        // Define the options based on the selected Inspection Progress value
+        let type_options = [];
+
+        if (inspection_progress_value === 'IMQA') {
+            type_options = ['IMQA - Plastic Sheet', 'IMQA - Plastic Pellets', 'IMQA - Agent & Others'];
+        } else if (inspection_progress_value === 'Buyoff') {
+            type_options = ['Buyoff - Tray (VAC)', 'Buyoff - Tray (CUT)', 'Buyoff - Reel'];
+        } else if (inspection_progress_value === 'Roving') {
+            type_options = ['Roving - Tray', 'Roving - Reel'];
+        } else if (inspection_progress_value === 'Final Inspection') {
+            type_options = ['Final Inspection - Tray', 'Final Inspection - Reel'];
+        }
+
+        // Set the options dynamically for the Type field
+        frm.set_df_property('custom_type', 'options', type_options.join('\n'));
+
+        // Optionally, you can clear the value of the Type field
+        frm.set_value('custom_type', '');
+
+    },
+    custom_type: function (frm) {
+        if (frm.doc.custom_type) {
+            // TODO : wait confirm 
+            // ** IMQA
+            frm.set_value('custom_quality_inspection_template_link_1', "");
+            frm.toggle_display('custom_quality_inspection_order_table_1', false);
+            frm.set_value('custom_quality_inspection_template_link_2', "");
+            frm.toggle_display('custom_quality_inspection_order_table_2', false);
+            frm.set_value('custom_quality_inspection_template_link_3', "");
+            frm.toggle_display('custom_quality_inspection_order_table_3', false);
+
+            if (frm.doc.custom_type === 'IMQA - Plastic Sheet') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_3', true);
+
+            }
+            else if (frm.doc.custom_type === 'IMQA - Plastic Pellets') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+
+            }
+            else if (frm.doc.custom_type === 'IMQA - Agent & Others') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "");
+                frm.toggle_display('custom_quality_inspection_order_table_2', false);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            // ** Buyoff
+            else if (frm.doc.custom_type === 'Buyoff - Tray (VAC)') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            else if (frm.doc.custom_type === 'Buyoff - Tray (CUT)') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "");
+                frm.toggle_display('custom_quality_inspection_order_table_2', false);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            else if (frm.doc.custom_type === 'Buyoff - Reel') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_3', true);
+            }
+            // ** Roving
+            else if (frm.doc.custom_type === 'Roving - Tray') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            else if (frm.doc.custom_type === 'Roving - Reel') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            // ** Final Inspection
+            else if (frm.doc.custom_type === 'Final Inspection - Tray') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+            else if (frm.doc.custom_type === 'Final Inspection - Reel') {
+                frm.set_value('custom_quality_inspection_template_link_1', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_1', true);
+                frm.set_value('custom_quality_inspection_template_link_2', "IMQA_Plastic Sheet_Visual Inspection");
+                frm.toggle_display('custom_quality_inspection_order_table_2', true);
+                frm.set_value('custom_quality_inspection_template_link_3', "");
+                frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            }
+       
+
+        }
     },
     reference_type: function (frm) {
-        if(frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier){
+        if (frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier) {
             frm.events.get_supplier(frm);
         }
     },
     reference_name: async function (frm) {
         if (frm.doc.reference_type === 'Job Card' && frm.doc.reference_name) {
             try {
-                const { message } = await frappe.db.get_value('Job Card', frm.doc.reference_name, 'production_item');
-                message && frm.set_value('item_code', message.production_item);
+                const { message } = await frappe.db.get_value('Job Card', frm.doc.reference_name, ['production_item', 'custom_lot_no']);                
+                if (message) {
+                    frm.set_value({
+                        item_code: message.production_item,
+                        batch_no: message.custom_lot_no
+                    });
+                }
             } catch (err) {
                 console.error('Error fetching production item:', err);
             }
         } else if (frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier) {
             frm.events.get_supplier(frm);
         }
-    },    
-    get_supplier:function (frm) {
-        if(frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name && !frm.doc.custom_supplier){
+    },
+    get_supplier: function (frm) {
+        if (frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name && !frm.doc.custom_supplier) {
             const pr_name = frm.doc.reference_name;
             frappe.db.get_value('Purchase Receipt', pr_name, "supplier", function (value) {
                 frm.set_value('custom_supplier', value['supplier']);
@@ -192,7 +198,6 @@ frappe.ui.form.on("Quality Inspection", {
     },
     custom_date_approved_by: function (frm) {
         frm.events.chk_back_date(frm, 'custom_date_approved_by');
-
     },
     chk_back_date: function (frm, fieldName) {
         // Getting the current date and stripping the time part
@@ -211,6 +216,54 @@ frappe.ui.form.on("Quality Inspection", {
             frm.set_value(fieldName, null); // Clears the field
         }
     },
+    custom_quality_inspection_template_link_1: function (frm) {
+        if (frm.doc.custom_quality_inspection_template_link_1) {
+            
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_quality_inspection_template_link_1",
+                    table_key: "custom_quality_inspection_order_table_1"
+                },
+                callback: function () {
+                    refresh_field("custom_quality_inspection_order_table_1");
+                },
+            });
+        }
+    },
+    custom_quality_inspection_template_link_2: function (frm) {
+        if (frm.doc.custom_quality_inspection_template_link_2) {
+
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_quality_inspection_template_link_2",
+                    table_key: "custom_quality_inspection_order_table_2"
+                },
+                callback: function () {
+                    refresh_field("custom_quality_inspection_order_table_2");
+                },
+            });
+        }
+    },
+    custom_quality_inspection_template_link_3: function (frm) {
+        if (frm.doc.custom_quality_inspection_template_link_3) {
+
+            return frm.call({
+                method: "custom_get_item_specification_details",
+                doc: frm.doc,
+                args: {
+                    template_key: "custom_quality_inspection_template_link_3",
+                    table_key: "custom_quality_inspection_order_table_3"
+                },
+                callback: function () {
+                    refresh_field("custom_quality_inspection_order_table_3");
+                },
+            });
+        }
+    },
     quality_inspection_template: function (frm) {
         if (frm.doc.quality_inspection_template) {
             return frm.call({
@@ -221,143 +274,7 @@ frappe.ui.form.on("Quality Inspection", {
                 },
             });
         }
-    },
-    custom_quality_inspection_template_2: function (frm) {
-        if (frm.doc.custom_quality_inspection_template_2) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_quality_inspection_template_2",
-                    table_key: "custom_quality_inspection_template_2_table"
-                },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_template_2_table");
-                },
-            });
-        }
-    },
-    custom_quality_inspection_template_3: function (frm) {
-        if (frm.doc.custom_quality_inspection_template_3) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_quality_inspection_template_3",
-                    table_key: "custom_quality_inspection_template_3_table"
-                },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_template_3_table");
-                },
-            });
-        }
-    },
-    custom_quality_inspection_checkbox_1_template_: function (frm) {
-        if (frm.doc.custom_quality_inspection_checkbox_1_template_) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_quality_inspection_checkbox_1_template_",
-                    table_key: "custom_quality_inspection_checkbox_1_table"
-                },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_checkbox_1_table");
-                },
-            });
-        }
-    },
-    custom_quality_inspection_freetext_1_template_: function (frm) {
-        if (frm.doc.custom_quality_inspection_freetext_1_template_) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_quality_inspection_freetext_1_template_",
-                    table_key: "custom_quality_inspection_freetext_1_template_table"
-                },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_freetext_1_template_table");
-                },
-            });
-        }
-    },
-    custom_quality_inspection_checkbox_2: function (frm) {
-        if (frm.doc.custom_quality_inspection_checkbox_2) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_quality_inspection_checkbox_2",
-                    table_key: "custom_quality_inspection_checkbox_2_table"
-                },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_checkbox_2_table");
-                },
-            });
-        }
-    },
-    custom_quality_inspection_template_1: function (frm) {
-        if (frm.doc.custom_quality_inspection_template_1) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_quality_inspection_template_1",
-                    table_key: "custom_quality_inspection_template_table_1"
-                },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_template_table_1");
-                },
-            });
-        }
-    },
-    custom_roving_1: function (frm) {
-        if (frm.doc.custom_roving_1) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_roving_1",
-                    table_key: "custom_roving_table_1"
-                },
-                callback: function () {
-                    refresh_field("custom_roving_table_1");
-                },
-            });
-        }
-    },
-    custom_roving_2: function (frm) {
-        if (frm.doc.custom_roving_2) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_roving_2",
-                    table_key: "custom_roving_table_2"
-                },
-                callback: function () {
-                    refresh_field("custom_roving_table_2");
-                },
-            });
-        }
-    },
-    custom_roving_3: function (frm) {
-        if (frm.doc.custom_roving_3) {
-            return frm.call({
-                method: "custom_get_item_specification_details",
-                doc: frm.doc,
-                args: {
-                    template_key: "custom_roving_3",
-                    table_key: "custom_roving_table_3"
-                },
-                callback: function () {
-                    refresh_field("custom_roving_table_3");
-                },
-            });
-        }
     }
-
 });
 
 frappe.ui.form.on('Quality Inspection Reading', {
@@ -447,3 +364,38 @@ frappe.ui.form.on('Quality Inspection Reading', {
     }
 });
 
+frappe.ui.form.on("Quality Inspection Order", {
+    form_render(frm, cdt, cdn) {
+        const sample_size = frm.doc.sample_size;
+
+        for (let i = 1; i <= 32; i++) {
+            if (i <= sample_size) {
+                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('approval_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('remark_' + i, "hidden", 0);
+
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('approval_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('remark_' + i, "hidden", 0);
+
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('inspected_value_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('approval_' + i, "hidden", 0);
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('remark_' + i, "hidden", 0);
+
+            } else {
+                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('approval_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_1.grid.update_docfield_property('remark_' + i, "hidden", 1);
+
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('approval_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_2.grid.update_docfield_property('remark_' + i, "hidden", 1);
+
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('inspected_value_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('approval_' + i, "hidden", 1);
+                frm.fields_dict.custom_quality_inspection_order_table_3.grid.update_docfield_property('remark_' + i, "hidden", 1);
+            }
+        }
+
+    }
+})
