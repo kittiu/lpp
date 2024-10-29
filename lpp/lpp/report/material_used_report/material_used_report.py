@@ -5,6 +5,7 @@ import frappe
 import json
 from frappe import _, scrub
 from datetime import date
+from collections import defaultdict
 from erpnext.stock.report.stock_balance.stock_balance import execute as stock_balance_execute
 from erpnext.stock.report.stock_ledger.stock_ledger import execute as stock_ledger_execute
 
@@ -42,7 +43,7 @@ def get_columns():
             "label": _("Material"),
 			"fieldname": "material",
 			"fieldtype": "Data",
-			"width": 450,
+			"width": 500,
             "align": "left"
 		},
         {
@@ -134,6 +135,7 @@ def get_columns():
 
 def get_data(filters):
     report_data = []
+    target_data = []
     conditions = ""
     from_date = None
     to_date = None
@@ -315,4 +317,81 @@ def get_data(filters):
             "price_var": price_mat*var_value
         })
 
-    return report_data
+    # group data by material
+    grouped_data = defaultdict(list)
+    for item in report_data:
+        grouped_data[item['material']].append(item)
+
+    for group, items in sorted(grouped_data.items()):
+        group_total_pack_out = 0
+        group_total_std_use = 0
+        group_total_wip_begin_fg = 0
+        group_total_wip_begin_mat = 0
+        group_total_withdraw= 0
+        group_total_return = 0
+        group_total_wip_end_fg = 0
+        group_total_wip_end_mat = 0
+        group_total_act_use = 0
+        group_total_var = 0
+        group_total_percent_var = 0
+        group_total_price_mat = 0
+        group_total_price_var = 0
+
+        for item in items:
+            group_total_pack_out += item['pack_out']
+            group_total_std_use += item['std_use']
+            group_total_wip_begin_fg += item['wip_begin_fg']
+            group_total_wip_begin_mat += item['wip_begin_mat']
+            group_total_withdraw += item['withdraw']
+            group_total_return += item['return']
+            group_total_wip_end_fg += item['wip_end_fg']
+            group_total_wip_end_mat += item['wip_end_mat']
+            group_total_act_use += item['act_use']
+            group_total_var += item['var']
+            group_total_percent_var += item['percent_var']
+            group_total_price_mat += item['price_mat']
+            group_total_price_var += item['price_var']
+            target_data.append({
+                "item_id": item['item_id'],
+                "item_name": item['item_name'],
+                "uom": item['uom'],
+                "material": item['material'],
+                "bom": item['bom'],
+                "pack_out": item['pack_out'],
+                "std_use": item['std_use'],
+                "wip_begin_fg": item['wip_begin_fg'],
+                "wip_begin_mat": item['wip_begin_mat'],
+                "withdraw": item['withdraw'],
+                "return": item['return'],
+                "wip_end_fg": item['wip_end_fg'],
+                "wip_end_mat": item['wip_end_mat'],
+                "act_use": item['act_use'],
+                "var": item['var'],
+                "percent_var": item['percent_var'],
+                "price_mat": item['price_mat'],
+                "price_var": item['price_var']
+            })
+
+        # Add total row for the group
+        target_data.append({
+            "item_id": None,
+            "item_name": None,
+            "uom": None,
+            "material": "GROUP Material : " + group,
+            "bom": None,
+            "pack_out": group_total_pack_out,
+            "std_use": group_total_std_use,
+            "wip_begin_fg": group_total_wip_begin_fg,
+            "wip_begin_mat": group_total_wip_begin_mat,
+            "withdraw": group_total_withdraw,
+            "return": group_total_return,
+            "wip_end_fg": group_total_wip_end_fg,
+            "wip_end_mat": group_total_wip_end_mat,
+            "act_use": group_total_act_use,
+            "var": group_total_var,
+            "percent_var": group_total_percent_var,
+            "price_mat": group_total_price_mat,
+            "price_var": group_total_price_var
+        })
+    
+    return target_data
