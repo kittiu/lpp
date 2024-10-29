@@ -19,6 +19,16 @@
   "priority",
   "overall_status",
   "status_remark",
+  "section_break_krxl",
+  "sample_parameters",
+  "mold_creation_status",
+  "sample_production_status",
+  "customer_delivery_status",
+  "section_break_rdfi",
+  "operated_by",
+  "column_break_syvo",
+  "mkt_acknowledgement",
+  "qa_acknowledgement",
   "mold_tab",
   "item",
   "mold_base_width_mm",
@@ -75,7 +85,6 @@
    "fieldname": "item_code",
    "fieldtype": "Link",
    "label": "Item Code ",
-   "link_filters": "[]",
    "options": "Item",
    "reqd": 1
   },
@@ -194,11 +203,71 @@
    "label": "Workstation",
    "options": "Workstation",
    "reqd": 1
+  },
+  {
+   "fieldname": "section_break_rdfi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "For Design & Engineering employees only.",
+   "fieldname": "operated_by",
+   "fieldtype": "Link",
+   "label": "Operated By ",
+   "link_filters": "[[\"Employee\",\"department\",\"=\",\"Design & Engineering\"]]",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_syvo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "For Marketing employees only.",
+   "fieldname": "mkt_acknowledgement",
+   "fieldtype": "Link",
+   "label": "MKT Acknowledgement ",
+   "link_filters": "[[\"Employee\",\"department\",\"=\",\"Marketing\"]]",
+   "options": "Employee"
+  },
+  {
+   "description": "For QA employees only.",
+   "fieldname": "qa_acknowledgement",
+   "fieldtype": "Link",
+   "label": "QA Acknowledgement",
+   "link_filters": "[[\"Employee\",\"department\",\"=\",\"QA\"]]",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "section_break_krxl",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sample_parameters",
+   "fieldtype": "Table",
+   "label": "Sample Parameters",
+   "options": "Sample Parameters"
+  },
+  {
+   "fieldname": "mold_creation_status",
+   "fieldtype": "Data",
+   "label": "Mold Creation Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sample_production_status",
+   "fieldtype": "Data",
+   "label": "Sample Production Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer_delivery_status",
+   "fieldtype": "Data",
+   "label": "Customer Delivery Status",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-29 11:25:25.463767",
+ "modified": "2024-10-29 15:48:50.005986",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Sample Record",

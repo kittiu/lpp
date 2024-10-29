@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-10-29 13:08:55.868305",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sample_parameters",
+  "mold_creation",
+  "sample_production",
+  "customer_delivery",
+  "remark"
+ ],
+ "fields": [
+  {
+   "fieldname": "sample_parameters",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Sample Parameters",
+   "options": "Planned Date\nActual Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Long Text",
+   "in_list_view": 1,
+   "label": "Remark"
+  },
+  {
+   "fieldname": "mold_creation",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Mold Creation"
+  },
+  {
+   "fieldname": "sample_production",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Sample Production"
+  },
+  {
+   "fieldname": "customer_delivery",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Customer Delivery"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-10-29 16:09:36.891507",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "Sample Parameters",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
