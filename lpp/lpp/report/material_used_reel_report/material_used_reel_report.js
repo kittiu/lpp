@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Ecosoft and contributors
 // For license information, please see license.txt
 
-frappe.query_reports["Material Used Report"] = {
+frappe.query_reports["Material Used Reel Report"] = {
 	"filters": [
 		{
 			fieldname: "company",
@@ -42,6 +42,13 @@ frappe.query_reports["Material Used Report"] = {
             fieldtype: "Link",
             options: "Item",
             reqd: 0 // Optional field
+        },
+		{
+            fieldname: "item_color",
+            label: __("Item color"),
+            fieldtype: "Data",
+            reqd: 0,
+            default: ""
         }
 	]
 };

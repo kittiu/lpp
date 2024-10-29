@@ -163,7 +163,7 @@ def get_data(filters):
 			, twoi.item_code AS material_id
 			, twoi.item_name AS material
             , SUM(tbi.qty) AS bom
-			, SUM(two.custom_ordered_quantity) AS pact_out
+			, SUM(two.custom_ordered_quantity) AS pack_out
 			FROM `tabWork Order` two 
 			INNER JOIN `tabWork Order Item` twoi ON two.name = twoi.parent 
             LEFT JOIN `tabBOM` tb ON two.bom_no = tb.name 
