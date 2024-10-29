@@ -5,7 +5,7 @@ frappe.ui.form.on("Sample Record", {
 	refresh(frm) {
         if (frm.is_new()) {
             frm.events.set_table_parameters(frm)
-        }        
+        }
 	},
     customer: function(frm) {
         if (frm.doc.customer) {
@@ -68,3 +68,42 @@ frappe.ui.form.on("Sample Record", {
         frm.refresh_field('sample_parameters');
     },
 });
+
+frappe.ui.form.on('Sample Parameters', {
+    mold_creation: function(frm, cdt, cdn) {
+        updateStatus(frm, "mold_creation_status", "mold_creation");
+    },
+    sample_production: function(frm, cdt, cdn) {
+        updateStatus(frm, "sample_production_status", "sample_production");
+    },
+    customer_delivery: function(frm, cdt, cdn) {
+        updateStatus(frm, "customer_delivery_status", "customer_delivery");
+    }
+});
+
+// ฟังก์ชันทั่วไปสำหรับคำนวณสถานะของฟิลด์ที่ต้องการ
+function updateStatus(frm, targetField, dateField) {
+    let plannedDate = null;
+    let actualDate = null;
+
+    // วนลูปผ่านแต่ละแถวใน sample_parameters เพื่อตรวจสอบวันที่
+    (frm.doc.sample_parameters || []).forEach(row => {
+        if (row.sample_parameters === "Planned Date" && row[dateField]) {
+            plannedDate = new Date(row[dateField]);
+        }
+        if (row.sample_parameters === "Actual Date" && row[dateField]) {
+            actualDate = new Date(row[dateField]);
+        }
+    });
+
+    // ตั้งค่าสถานะตามการเปรียบเทียบวันที่
+    let status = null;
+    if (plannedDate && actualDate) {
+        status = actualDate > plannedDate ? 'Late' : 'Ontime';
+    } else {
+        status = null; // กรณีที่ไม่มีค่าทั้งสองวันที่
+    }
+
+    // อัปเดตฟิลด์ targetField ตามสถานะ
+    frm.set_value(targetField, status);
+}
