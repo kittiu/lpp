@@ -22,6 +22,30 @@ frappe.ui.form.on("Quality Inspection", {
 
 
     },
+    sample_size: function (frm) {
+        const custom_quality_inspection_order_table_1 = frm.doc.custom_quality_inspection_order_table_1;
+        const custom_quality_inspection_order_table_2 = frm.doc.custom_quality_inspection_order_table_2;
+        const custom_quality_inspection_order_table_3 = frm.doc.custom_quality_inspection_order_table_3;
+
+        for (let i = 0; i < custom_quality_inspection_order_table_1.length; i++) {
+            const row = custom_quality_inspection_order_table_1[i];            
+            calculate_average_value(frm, "Quality Inspection Order", row.name );
+            count_accepted_rejected(frm, "Quality Inspection Order", row.name );
+        }
+
+        for (let i = 0; i < custom_quality_inspection_order_table_2.length; i++) {
+            const row = custom_quality_inspection_order_table_2[i];            
+            calculate_average_value(frm, "Quality Inspection Order", row.name );
+            count_accepted_rejected(frm, "Quality Inspection Order", row.name );
+        }
+
+        for (let i = 0; i < custom_quality_inspection_order_table_3.length; i++) {
+            const row = custom_quality_inspection_order_table_3[i];            
+            calculate_average_value(frm, "Quality Inspection Order", row.name );
+            count_accepted_rejected(frm, "Quality Inspection Order", row.name );
+        }
+
+    },
     custom_inspection_progress: function (frm) {
         if (frm.doc.custom_inspection_progress === 'Buyoff') {
             frm.set_value('custom_buyoff_inspect_date', frappe.datetime.now_datetime());
@@ -320,7 +344,7 @@ function count_accepted_rejected(frm, cdt, cdn) {
 }
 
 
-function calculate_average_value(frm, cdt, cdn) {
+function calculate_average_value(frm, cdt, cdn) {    
     const sample_size = frm.doc.sample_size;
     const row = locals[cdt][cdn];
 
