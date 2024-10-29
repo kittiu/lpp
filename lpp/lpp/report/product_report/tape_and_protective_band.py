@@ -1,6 +1,5 @@
 import frappe
-from frappe.query_builder import DocType, Field
-
+from frappe.query_builder import DocType
 
 @frappe.whitelist()
 def get_dynamic_columns():
@@ -13,13 +12,16 @@ def get_dynamic_columns():
     # สร้างคอลัมน์พื้นฐาน
     columns = [
         {"label": "Date", "fieldname": "custom_start_date_production", "fieldtype": "Date", "width": 120},
+        # {"label": "Item Group 2", "fieldname": "custom_item_group_2", "fieldtype": "Data", "width": 150},
         {"label": "Workstation", "fieldname": "workstation", "fieldtype": "Link", "options": "Workstation", "width": 150},
         {"label": "Runcard No.", "fieldname": "custom_runcard_no", "fieldtype": "Data", "width": 120},
         {"label": "Work Order", "fieldname": "work_order", "fieldtype": "Link", "options": "Work Order", "width": 150},
         {"label": "Shift", "fieldname": "custom_shift", "fieldtype": "Link", "options": "Shift", "width": 120, "align": "left"},
         {"label": "Product Name", "fieldname": "custom_production_item_name", "fieldtype": "Data", "width": 250},
-        {"label": "IN", "fieldname": "custom_input_production", "fieldtype": "Float", "width": 100},
-        {"label": "OUT", "fieldname": "custom_output_production", "fieldtype": "Float", "width": 100},
+        {"label": "IN (REEL)", "fieldname": "custom_input_production", "fieldtype": "Float", "width": 115},
+        {"label": "IN (METRE)", "fieldname": "input_production_divide_length", "fieldtype": "Float", "width": 115},
+        {"label": "OUT (REEL)", "fieldname": "custom_output_production", "fieldtype": "Float", "width": 115},
+        {"label": "OUT (METRE)", "fieldname": "output_production_divide_length", "fieldtype": "Float", "width": 120},
         {"label": "NG", "fieldname": "custom_scrap_production", "fieldtype": "Float", "width": 100},
         {"label": "%YIELD", "fieldname": "custom_yield_production", "fieldtype": "Float", "width": 100},
         {"label": "Working Hours", "fieldname": "custom_total_hours_production", "fieldtype": "Float", "width": 130},
@@ -36,25 +38,25 @@ def get_dynamic_columns():
 
     return columns
 
-def tray_and_reel(filters=None):
+def tape_and_protective_band(filters=None):
     columns = get_dynamic_columns()
 
     # สร้างเงื่อนไขการกรอง
-    filter_conditions = []
+    filter_conditions = {}
     if filters.get("start_date"):
-        filter_conditions.append(["custom_start_date_production", ">=", filters["start_date"]])
+        filter_conditions["custom_start_date_production"] = [">=", filters["start_date"]]
     if filters.get("end_date"):
-        filter_conditions.append(["custom_end_date_production", "<=", filters["end_date"]])
+        filter_conditions["custom_end_date_production"] = ["<=", filters["end_date"]]
     if filters.get("workstation"):
-        filter_conditions.append(["workstation", "=", filters["workstation"]])
+        filter_conditions["workstation"] = filters["workstation"]
     if filters.get("work_order"):
-        filter_conditions.append(["work_order", "=", filters["work_order"]])
+        filter_conditions["work_order"] = filters["work_order"]
     if filters.get("custom_shift"):
-        filter_conditions.append(["custom_shift", "=", filters["custom_shift"]])
+        filter_conditions["custom_shift"] = filters["custom_shift"]
     if filters.get("production_item"):
-        filter_conditions.append(["production_item", "=", filters["production_item"]])
+        filter_conditions["production_item"] = filters["production_item"]
 
-    # ใช้ Query Builder เพื่อเพิ่มเงื่อนไขแบบ OR สำหรับ custom_item_group_2
+    # ใช้ Query Builder เพื่อสร้างการกรองที่ต้องการ
     JobCard = DocType("Job Card")
     query = (
         frappe.qb.from_(JobCard)
@@ -72,20 +74,21 @@ def tray_and_reel(filters=None):
             JobCard.custom_yield_production,
             JobCard.custom_total_hours_production,
             JobCard.custom_shift,
-            JobCard.custom_item_group_2
+            JobCard.custom_item_group_2,
+            JobCard.custom_length
         )
         .where(
-            (Field("custom_item_group_2").not_like("%Carrier%")) &
-            (Field("custom_item_group_2").not_like("%Band%"))
+            (JobCard.custom_item_group_2.like("%Carrier%")) |
+            (JobCard.custom_item_group_2.like("%Band%"))
         )
     )
-
+    
     # เพิ่มเงื่อนไขจาก filters อื่น ๆ
-    for condition in filter_conditions:
-        query = query.where(Field(condition[0]) == condition[2])
-
+    for condition, value in filter_conditions.items():
+        query = query.where(JobCard[condition] == value)
+    print('query: ', query)
     items = query.run(as_dict=True)
-
+    print('items: ', items)
     # ดึงข้อมูล Defect จาก Job Card Scrap Item และจัดเก็บตาม Job Card แต่ละตัว
     scrap_items = frappe.db.get_all(
         "Job Card Scrap Item",
@@ -110,6 +113,18 @@ def tray_and_reel(filters=None):
         row = item.copy()
         product_name = item["custom_production_item_name"]
 
+        # คำนวณค่า input_production_divide_length
+        row["input_production_divide_length"] = (
+            float(row["custom_input_production"]) / float(row["custom_length"])
+            if row["custom_length"] else 0.0
+        )
+
+        # คำนวณค่า output_production_divide_length
+        row["output_production_divide_length"] = (
+            float(row["custom_output_production"]) / float(row["custom_length"])
+            if row["custom_length"] else 0.0
+        )
+        
         # ถ้าเริ่มกลุ่มใหม่และมีผลรวมของกลุ่มก่อนหน้า ให้เพิ่มแถวสรุปผลรวมของกลุ่มก่อนหน้า
         if current_product_name and current_product_name != product_name:
             summary_row = {
@@ -142,7 +157,6 @@ def tray_and_reel(filters=None):
 
         # ตั้งค่า custom_yield_production เป็น None สำหรับแถวปกติ
         row["custom_yield_production"] = None
-
         # เพิ่ม row ปัจจุบันใน data
         data.append(row)
 
