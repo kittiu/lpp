@@ -8,26 +8,29 @@ frappe.ui.form.on("Sample Record", {
         }
 
         // Update Total Hours Setup
-        if (frm.doc.start_date_setup && frm.doc.end_date_setup && !frm.doc.total_hours_setup) {
-            update_total_hours(frm, 'start_date_setup', 'end_date_setup', 'total_hours_setup');
+        if (frm.doc.start_date_setup_sample && frm.doc.end_date_setup_sample && !frm.doc.total_hours_setup_sample) {
+            updateTotalHours(frm, 'start_date_setup_sample_sample', 'end_date_setup_sample', 'total_hours_setup_sample');
         }
 
         // Update Total Hours Production
-        if (frm.doc.start_date_production && frm.doc.end_date_production && !frm.doc.total_hours_production) {
-            update_total_hours(frm, 'start_date_production', 'end_date_production', 'total_hours_production');
+        if (frm.doc.start_date_production_sample && frm.doc.end_date_production_sample && !frm.doc.total_hours_production_sample) {
+            updateTotalHours(frm, 'start_date_production_sample', 'end_date_production_sample', 'total_hours_production_sample');
         }
 
         // Update Scrap
         updateScrap(frm);
 
         // Calculate units__hour if output and total hours are available
-        if (frm.doc.output && frm.doc.total_hours_production && !frm.doc.units__hour) {
-            frm.set_value('units__hour', frm.doc.output / frm.doc.total_hours_production);
-        }
+        updateUnitsPerHour(frm);
 
         // Calculate yield if input and output are available
-        if (frm.doc.input && frm.doc.output && !frm.doc.yield) {
-            calculate_yield(frm, 'yield', 'output', 'input');
+        if (frm.doc.input_sample && frm.doc.output_sample && !frm.doc.yield_sample) {
+            calculateYield(frm, 'yield_sample', 'output_sample', 'input_sample');
+        }
+
+        // Calculate yield_with_setup_sample if all required fields are available
+        if (frm.doc.input_sample && frm.doc.output_sample && frm.doc.setup_quantity_setup_sample && frm.doc.setup_quantity_production_sample && !frm.doc.yield_with_setup_sample) {
+            calculateYieldWithSetup(frm);
         }
 
 	},
@@ -91,23 +94,41 @@ frappe.ui.form.on("Sample Record", {
         // Refresh the child table to show changes
         frm.refresh_field('sample_parameters');
     },
-    start_date_setup(frm) {
-        update_total_hours(frm, 'start_date_setup', 'end_date_setup', 'total_hours_setup');
+    start_date_setup_sample(frm) {
+        updateTotalHours(frm, 'start_date_setup_sample', 'end_date_setup_sample', 'total_hours_setup_sample');
     },
-    end_date_setup(frm) {
-        update_total_hours(frm, 'start_date_setup', 'end_date_setup', 'total_hours_setup');
+    end_date_setup_sample(frm) {
+        updateTotalHours(frm, 'start_date_setup_sample', 'end_date_setup_sample', 'total_hours_setup_sample');
     },
-    start_date_production(frm) {
-        handle_production_date_update(frm);
+    start_date_production_sample(frm) {
+        updateTotalHours(frm, 'start_date_production_sample', 'end_date_production_sample', 'total_hours_production_sample');
+        updateUnitsPerHour(frm);
     },
-    end_date_production(frm) {
-        handle_production_date_update(frm);
+    end_date_production_sample(frm) {
+        updateTotalHours(frm, 'start_date_production_sample', 'end_date_production_sample', 'total_hours_production_sample');
+        updateUnitsPerHour(frm);
     },
-    input(frm) {
+    setup_weight_setup_sample(frm) {
+        calculateWeightOrUnit(frm, 'setup_weight_setup_sample', 'setup_quantity_setup_sample', true)
+    },
+    setup_quantity_setup_sample(frm) {
+        calculateWeightOrUnit(frm, 'setup_quantity_setup_sample', 'setup_weight_setup_sample', false)
+        calculateYieldWithSetup(frm);
+    },
+    setup_weight_production_sample(frm) {
+        calculateWeightOrUnit(frm, 'setup_weight_production_sample', 'setup_quantity_production_sample', true)
+    },
+    setup_quantity_production_sample(frm) {
+        calculateWeightOrUnit(frm, 'setup_quantity_production_sample', 'setup_weight_production_sample', false)
+        calculateYieldWithSetup(frm);
+    },
+    input_sample(frm) {
         updateScrap(frm);
+        calculateYieldWithSetup(frm);
     },
-    output(frm) {
+    output_sample(frm) {
         updateScrap(frm);
+        calculateYieldWithSetup(frm);
     }
 });
 
@@ -150,7 +171,7 @@ function updateStatus(frm, targetField, dateField) {
     frm.set_value(targetField, status);
 }
 
-function update_total_hours(frm, start_field, end_field, output_field) {
+function updateTotalHours(frm, start_field, end_field, output_field) {
     let start_date = frm.doc[start_field], end_date = frm.doc[end_field];
     
     if (start_date && end_date) {
@@ -165,24 +186,50 @@ function update_total_hours(frm, start_field, end_field, output_field) {
     }
 }
 
-function handle_production_date_update(frm) {
-    update_total_hours(frm, 'start_date_production', 'end_date_production', 'total_hours_production');
-    if (frm.doc.output && frm.doc.total_hours_production) {
-        frm.set_value('units__hour', frm.doc.output / frm.doc.total_hours_production);
+function calculateWeightOrUnit(frm, source_field, target_field, is_unit_to_weight) {    
+    if (frm.doc.weight__unit && frm.doc[source_field]) {
+        let calculated_value = is_unit_to_weight
+            ? (frm.doc[source_field] / frm.doc.weight__unit)
+            : (frm.doc[source_field] * frm.doc.weight__unit)
+        if (frm.doc[target_field] != calculated_value) {
+            frm.set_value(target_field, calculated_value);
+        }
+    }
+}
+
+// Update units per hour
+function updateUnitsPerHour(frm) {    
+    if (frm.doc.output_sample && frm.doc.total_hours_production_sample) {
+        frm.set_value(
+            'units__hour_sample', 
+            parseInt(frm.doc.total_hours_production_sample, 10) === 0 
+                ? null 
+                : frm.doc.output_sample / frm.doc.total_hours_production_sample
+        );
+    } else {
+        frm.set_value('units__hour_sample', null);
     }
 }
 
 // Function to update Scrap
 function updateScrap(frm) {
-    if (!isNaN(frm.doc.input) && !isNaN(frm.doc.output)) {
-        frm.set_value('scrap', frm.doc.input - frm.doc.output);
+    if (!isNaN(frm.doc.input_sample) && !isNaN(frm.doc.output_sample)) {
+        frm.set_value('scrap_sample', frm.doc.input_sample - frm.doc.output_sample);
     }
-    handle_production_date_update(frm);
-    calculate_yield(frm, 'yield', 'output', 'input');
+    updateTotalHours(frm, 'start_date_production_sample', 'end_date_production_sample', 'total_hours_production_sample');
+    updateUnitsPerHour(frm);
+    calculateYield(frm, 'yield_sample', 'output_sample', 'input_sample');
 }
 
-function calculate_yield(frm, output_field, output_value_field, input_value_field) {
+function calculateYield(frm, output_field, output_value_field, input_value_field) {
     if (frm.doc[output_value_field] && frm.doc[input_value_field]) {
         frm.set_value(output_field, (frm.doc[output_value_field] / frm.doc[input_value_field]) * 100);
+    }
+}
+
+function calculateYieldWithSetup(frm) {
+    if (frm.doc.input_sample && frm.doc.output_sample && frm.doc.setup_weight_setup_sample && frm.doc.setup_weight_production_sample) {
+        let total_weight = Number(frm.doc.setup_weight_setup_sample) + Number(frm.doc.setup_weight_production_sample);
+        frm.set_value('yield_with_setup_sample', (frm.doc.output_sample / (frm.doc.input_sample + total_weight)) * 100);
     }
 }

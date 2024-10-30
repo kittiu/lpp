@@ -10,6 +10,7 @@
   "customer",
   "item_code",
   "item_name",
+  "weight__unit",
   "material",
   "drawing",
   "sample_quantity",
@@ -42,27 +43,33 @@
   "sample_production_tab",
   "workstation",
   "setup_section",
-  "start_date_setup",
-  "end_date_setup",
-  "total_hours_setup",
-  "setup_weight_setup",
-  "setup_quantity_setup",
+  "start_date_setup_sample",
+  "end_date_setup_sample",
+  "total_hours_setup_sample",
+  "setup_weight_setup_sample",
+  "setup_quantity_setup_sample",
   "production_section",
-  "start_date_production",
-  "end_date_production",
-  "total_hours_production",
-  "setup_weight_production",
-  "setup_quantity_production",
+  "start_date_production_sample",
+  "end_date_production_sample",
+  "total_hours_production_sample",
+  "setup_weight_production_sample",
+  "setup_quantity_production_sample",
   "details_section",
-  "input",
-  "output",
-  "scrap",
-  "units__hour",
-  "yield",
-  "yield_with_setup",
+  "input_sample",
+  "output_sample",
+  "scrap_sample",
+  "units__hour_sample",
+  "yield_sample",
+  "yield_with_setup_sample",
   "defects_section",
   "scrap_items",
   "section_break_mrwy",
+  "problem_sample",
+  "action_sample",
+  "lesson_learned_sample",
+  "1st_mass_production_tab",
+  "work_order",
+  "section_break_jvnh",
   "problem",
   "action",
   "lesson_learned"
@@ -298,58 +305,6 @@
    "label": "Production"
   },
   {
-   "fieldname": "start_date_production",
-   "fieldtype": "Datetime",
-   "label": "Start Date"
-  },
-  {
-   "fieldname": "end_date_production",
-   "fieldtype": "Datetime",
-   "label": "End Date"
-  },
-  {
-   "fieldname": "total_hours_production",
-   "fieldtype": "Data",
-   "label": "Total Hours",
-   "read_only": 1
-  },
-  {
-   "fieldname": "setup_weight_production",
-   "fieldtype": "Float",
-   "label": "Setup Weight"
-  },
-  {
-   "fieldname": "setup_quantity_production",
-   "fieldtype": "Float",
-   "label": "Setup Quantity"
-  },
-  {
-   "fieldname": "start_date_setup",
-   "fieldtype": "Datetime",
-   "label": "Start Date"
-  },
-  {
-   "fieldname": "end_date_setup",
-   "fieldtype": "Datetime",
-   "label": "End Date"
-  },
-  {
-   "fieldname": "total_hours_setup",
-   "fieldtype": "Data",
-   "label": "Total Hours",
-   "read_only": 1
-  },
-  {
-   "fieldname": "setup_weight_setup",
-   "fieldtype": "Float",
-   "label": "Setup Weight"
-  },
-  {
-   "fieldname": "setup_quantity_setup",
-   "fieldtype": "Float",
-   "label": "Setup Quantity"
-  },
-  {
    "fieldname": "section_break_mrwy",
    "fieldtype": "Section Break"
   },
@@ -357,6 +312,52 @@
    "fieldname": "problem",
    "fieldtype": "Long Text",
    "label": "Problem"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "defects_section",
+   "fieldtype": "Section Break",
+   "label": "Defects"
+  },
+  {
+   "fieldname": "scrap_items",
+   "fieldtype": "Table",
+   "label": "Scrap Items",
+   "options": "Job Card Scrap Item"
+  },
+  {
+   "fieldname": "1st_mass_production_tab",
+   "fieldtype": "Tab Break",
+   "label": "1st Mass Production"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "problem_sample",
+   "fieldtype": "Long Text",
+   "label": "Problem"
+  },
+  {
+   "fieldname": "action_sample",
+   "fieldtype": "Long Text",
+   "label": "Action"
+  },
+  {
+   "fieldname": "lesson_learned_sample",
+   "fieldtype": "Long Text",
+   "label": "Lesson Learned"
+  },
+  {
+   "fieldname": "section_break_jvnh",
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "action",
@@ -369,59 +370,103 @@
    "label": "Lesson Learned"
   },
   {
-   "fieldname": "details_section",
-   "fieldtype": "Section Break",
-   "label": "Details"
+   "fieldname": "start_date_setup_sample",
+   "fieldtype": "Datetime",
+   "label": "Start Date"
   },
   {
-   "fieldname": "input",
+   "fieldname": "end_date_setup_sample",
+   "fieldtype": "Datetime",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "total_hours_setup_sample",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_setup_sample",
+   "fieldtype": "Float",
+   "label": "Setup Weight"
+  },
+  {
+   "fieldname": "setup_quantity_setup_sample",
+   "fieldtype": "Float",
+   "label": "Setup Quantity"
+  },
+  {
+   "fieldname": "start_date_production_sample",
+   "fieldtype": "Datetime",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date_production_sample",
+   "fieldtype": "Datetime",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "total_hours_production_sample",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_production_sample",
+   "fieldtype": "Float",
+   "label": "Setup Weight"
+  },
+  {
+   "fieldname": "setup_quantity_production_sample",
+   "fieldtype": "Float",
+   "label": "Setup Quantity"
+  },
+  {
+   "fieldname": "input_sample",
    "fieldtype": "Float",
    "label": "Input"
   },
   {
-   "fieldname": "output",
+   "fieldname": "output_sample",
    "fieldtype": "Float",
    "label": "Output"
   },
   {
-   "fieldname": "scrap",
+   "fieldname": "scrap_sample",
    "fieldtype": "Float",
    "label": "Scrap",
    "read_only": 1
   },
   {
-   "fieldname": "units__hour",
+   "fieldname": "units__hour_sample",
    "fieldtype": "Float",
    "label": "Units / Hour",
    "read_only": 1
   },
   {
-   "fieldname": "yield",
+   "fieldname": "yield_sample",
    "fieldtype": "Float",
    "label": "Yield",
    "read_only": 1
   },
   {
-   "fieldname": "yield_with_setup",
+   "fieldname": "yield_with_setup_sample",
    "fieldtype": "Float",
    "label": "Yield with Setup",
    "read_only": 1
   },
   {
-   "fieldname": "defects_section",
-   "fieldtype": "Section Break",
-   "label": "Defects"
-  },
-  {
-   "fieldname": "scrap_items",
-   "fieldtype": "Table",
-   "label": "Scrap Items",
-   "options": "Job Card Scrap Item"
+   "fetch_from": "item_code.weight_per_unit",
+   "fieldname": "weight__unit",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Weight / Unit",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-30 13:19:24.275754",
+ "modified": "2024-10-30 16:26:20.191459",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Sample Record",
