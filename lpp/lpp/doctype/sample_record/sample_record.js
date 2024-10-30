@@ -6,6 +6,30 @@ frappe.ui.form.on("Sample Record", {
         if (frm.is_new()) {
             frm.events.set_table_parameters(frm)
         }
+
+        // Update Total Hours Setup
+        if (frm.doc.start_date_setup && frm.doc.end_date_setup && !frm.doc.total_hours_setup) {
+            update_total_hours(frm, 'start_date_setup', 'end_date_setup', 'total_hours_setup');
+        }
+
+        // Update Total Hours Production
+        if (frm.doc.start_date_production && frm.doc.end_date_production && !frm.doc.total_hours_production) {
+            update_total_hours(frm, 'start_date_production', 'end_date_production', 'total_hours_production');
+        }
+
+        // Update Scrap
+        updateScrap(frm);
+
+        // Calculate units__hour if output and total hours are available
+        if (frm.doc.output && frm.doc.total_hours_production && !frm.doc.units__hour) {
+            frm.set_value('units__hour', frm.doc.output / frm.doc.total_hours_production);
+        }
+
+        // Calculate yield if input and output are available
+        if (frm.doc.input && frm.doc.output && !frm.doc.yield) {
+            calculate_yield(frm, 'yield', 'output', 'input');
+        }
+
 	},
     customer: function(frm) {
         if (frm.doc.customer) {
@@ -67,6 +91,24 @@ frappe.ui.form.on("Sample Record", {
         // Refresh the child table to show changes
         frm.refresh_field('sample_parameters');
     },
+    start_date_setup(frm) {
+        update_total_hours(frm, 'start_date_setup', 'end_date_setup', 'total_hours_setup');
+    },
+    end_date_setup(frm) {
+        update_total_hours(frm, 'start_date_setup', 'end_date_setup', 'total_hours_setup');
+    },
+    start_date_production(frm) {
+        handle_production_date_update(frm);
+    },
+    end_date_production(frm) {
+        handle_production_date_update(frm);
+    },
+    input(frm) {
+        updateScrap(frm);
+    },
+    output(frm) {
+        updateScrap(frm);
+    }
 });
 
 frappe.ui.form.on('Sample Parameters', {
@@ -106,4 +148,41 @@ function updateStatus(frm, targetField, dateField) {
 
     // อัปเดตฟิลด์ targetField ตามสถานะ
     frm.set_value(targetField, status);
+}
+
+function update_total_hours(frm, start_field, end_field, output_field) {
+    let start_date = frm.doc[start_field], end_date = frm.doc[end_field];
+    
+    if (start_date && end_date) {
+        // คำนวณความต่างของเวลาจาก start_date และ end_date (เป็นมิลลิวินาที)
+        let total_minutes = (new Date(end_date) - new Date(start_date)) / (1000 * 60);  // แปลงมิลลิวินาทีเป็นนาที
+        let hours_decimal = (total_minutes / 60).toFixed(2);  // แปลงนาทีเป็นชั่วโมงทศนิยม
+
+        // ตั้งค่าเป็นผลลัพธ์ในรูปแบบทศนิยม เช่น 2.20
+        frm.set_value(output_field, hours_decimal);
+    } else {
+        frm.set_value(output_field, null);
+    }
+}
+
+function handle_production_date_update(frm) {
+    update_total_hours(frm, 'start_date_production', 'end_date_production', 'total_hours_production');
+    if (frm.doc.output && frm.doc.total_hours_production) {
+        frm.set_value('units__hour', frm.doc.output / frm.doc.total_hours_production);
+    }
+}
+
+// Function to update Scrap
+function updateScrap(frm) {
+    if (!isNaN(frm.doc.input) && !isNaN(frm.doc.output)) {
+        frm.set_value('scrap', frm.doc.input - frm.doc.output);
+    }
+    handle_production_date_update(frm);
+    calculate_yield(frm, 'yield', 'output', 'input');
+}
+
+function calculate_yield(frm, output_field, output_value_field, input_value_field) {
+    if (frm.doc[output_value_field] && frm.doc[input_value_field]) {
+        frm.set_value(output_field, (frm.doc[output_value_field] / frm.doc[input_value_field]) * 100);
+    }
 }
