@@ -345,7 +345,8 @@
    "fieldname": "work_order",
    "fieldtype": "Link",
    "label": "Work Order",
-   "options": "Work Order"
+   "options": "Work Order",
+   "reqd": 1
   },
   {
    "fieldname": "problem_sample",
@@ -612,7 +613,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-30 18:03:14.571854",
+ "modified": "2024-10-31 03:03:15.905056",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Sample Record",

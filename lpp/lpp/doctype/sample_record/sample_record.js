@@ -205,8 +205,8 @@ function fetchJobCardsForWorkOrder(frm) {
             args: {
                 work_order: frm.doc.work_order
             },
-            callback: function(response) {
-                const jobCards = response.message || [];
+            callback: async function(response) {
+                const { job_cards: jobCards = [], scrap_items: scrapItems = [] } = response.message || {};
                 
                 // เคลียร์ค่าหากไม่มี Job Cards
                 if (!jobCards.length) {
@@ -214,8 +214,6 @@ function fetchJobCardsForWorkOrder(frm) {
                     return;
                 }
                 
-                console.log("Job Cards for Work Order:", jobCards);
-
                 const firstJobCard = jobCards[0];
                 const lastJobCard = jobCards[jobCards.length - 1];
 
@@ -252,7 +250,7 @@ function fetchJobCardsForWorkOrder(frm) {
                 
                 const scrap = avgInputProduction - avgOutputProduction || 0; // Default to 0 if undefined
                 const hoursDifference = calculateHoursDifference(firstJobCard.custom_start_date_production, lastJobCard.custom_end_date_production) || 1; // Prevent division by zero
-
+                
                 // ตั้งค่าผลลัพธ์ในฟอร์ม
                 frm.set_value({
                     'setup_weight_setup': avgUnitQuantitySetup || null,
@@ -262,12 +260,18 @@ function fetchJobCardsForWorkOrder(frm) {
                     'input': avgInputProduction || null,
                     'output': avgOutputProduction || null,
                     'scrap': scrap,
-                    'units__hour': hoursDifference === 0 ? null : (avgOutputProduction / hoursDifference).toFixed(2),
+                    'units__hour': parseInt(hoursDifference) === 0 ? null : (avgOutputProduction / hoursDifference).toFixed(2),
                     'yield': avgInputProduction ? ((avgOutputProduction / avgInputProduction) * 100).toFixed(2) : null,
-                    'yield_with_setup': (avgInputProduction + avgWeightSetup + avgWeightProduction) === 0
+                    'yield_with_setup': parseInt(avgInputProduction + avgWeightSetup + avgWeightProduction) === 0
                         ? null
                         : ((avgOutputProduction / (avgInputProduction + avgWeightSetup + avgWeightProduction)) * 100).toFixed(2),
-                });                                    
+                });
+                
+                if(scrapItems){
+                    frm.clear_table('scrap_items');
+                    scrapItems.forEach(data => frm.add_child('scrap_items', data));
+                    frm.refresh_field('scrap_items');
+                }
             }
         });
     } else {

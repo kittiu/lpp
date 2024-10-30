@@ -43,5 +43,33 @@ def get_job_cards_for_work_order(work_order):
         fields="*",
         order_by="name asc"
     )
+
+    scrap_items = {}
+
+    # วนลูปผ่าน Job Cards เพื่อดึง Scrap Items
+    for job_card in job_cards:
+        job_card_items = frappe.get_all("Job Card Scrap Item", 
+            filters={"parent": job_card.name}, 
+            fields=["item_code", "item_name", "stock_qty"])
+
+        for item in job_card_items:
+            if item.stock_qty > 0:
+                if item.item_code in scrap_items:
+                    scrap_items[item.item_code]['stock_qty'] += item.stock_qty  # รวมค่า stock_qty
+                else:
+                    scrap_items[item.item_code] = {
+                        "item_name": item.item_name,
+                        "stock_qty": item.stock_qty
+                    }
+
+    # เปลี่ยน scrap_items เป็นรูปแบบที่ต้องการ
+    result_scrap_items = [
+        {
+            "item_code": item_code,
+            "item_name": details["item_name"],
+            "stock_qty": details["stock_qty"]
+        }
+        for item_code, details in scrap_items.items()
+    ]
     
-    return job_cards
+    return { "job_cards": job_cards, "scrap_items": result_scrap_items }
