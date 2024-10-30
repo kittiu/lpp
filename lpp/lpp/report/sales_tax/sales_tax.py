@@ -79,39 +79,38 @@ def get_columns():
     return columns
 
 def get_data(filters):
-    # try:
     sales_register_data = sales_register_execute(filters)
     report_data = []
-    # target_data = []
 
     if sales_register_data:
-
         for dt in sales_register_data[1]:
+            try:
+                query_data = frappe.db.sql(
+                    """
+                    SELECT tsi.company, tsi.company_tax_id, ta.address_line2, tsi.name 
+                    FROM `tabSales Invoice` tsi
+                    INNER JOIN `tabAddress` ta ON tsi.customer_address = ta.name 
+                    WHERE tsi.name = %s
+                    GROUP BY tsi.name, tsi.company
+                    """,
+                    (dt['voucher_no'],), as_dict=True
+                )
 
-            query_data = frappe.db.sql(
-                f"""SELECT tsi.company ,tsi.company_tax_id ,ta.address_line2 ,tsi.name 
-                from `tabSales Invoice` tsi
-                inner join tabAddress ta on tsi.customer_address = ta.name 
-				where tsi.name = '{dt["voucher_no"]}'
-                GROUP BY tsi.name,tsi.company
-                """,
-                as_dict=True,
-            )
-            
-        for dr in query_data:
-            json_data = {
-                "company" : dr['company'],
-                "company_tax_id" : dr["company_tax_id"],
-                "posting_date" : dt["posting_date"],
-                "voucher_no" : dt['voucher_no'],
-                "customer_name" : dt["customer_name"],
-                "tax_id" : dt['tax_id'],
-                "address_line2" : dr["address_line2"],
-                "net_total" : dt["net_total"],
-                "tax_total" : dt['tax_total'],
-                "grand_total" : dt["grand_total"],
-            }
-            report_data.append(json_data)
+                for dr in query_data:
+                    report_data.append({
+                        "company": dr['company'],
+                        "company_tax_id": dr["company_tax_id"],
+                        "posting_date": dt["posting_date"],
+                        "voucher_no": dt['voucher_no'],
+                        "customer_name": dt["customer_name"],
+                        "tax_id": dt['tax_id'],
+                        "address_line2": dr["address_line2"],
+                        "net_total": dt["net_total"],
+                        "tax_total": dt['tax_total'],
+                        "grand_total": dt["grand_total"],
+                    })
 
+            except Exception as e:
+                frappe.log_error(frappe.get_traceback(), _("Error in fetching data for Sales Invoice"))
 
     return report_data
