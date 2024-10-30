@@ -42,33 +42,54 @@
   "mold_picture",
   "sample_production_tab",
   "workstation",
-  "setup_section",
+  "setup_sample_section",
   "start_date_setup_sample",
   "end_date_setup_sample",
   "total_hours_setup_sample",
   "setup_weight_setup_sample",
   "setup_quantity_setup_sample",
-  "production_section",
+  "production_sample_section",
   "start_date_production_sample",
   "end_date_production_sample",
   "total_hours_production_sample",
   "setup_weight_production_sample",
   "setup_quantity_production_sample",
-  "details_section",
+  "details_sample_section",
   "input_sample",
   "output_sample",
   "scrap_sample",
   "units__hour_sample",
   "yield_sample",
   "yield_with_setup_sample",
-  "defects_section",
-  "scrap_items",
+  "defects_sample_section",
+  "scrap_items_sample",
   "section_break_mrwy",
   "problem_sample",
   "action_sample",
   "lesson_learned_sample",
   "1st_mass_production_tab",
   "work_order",
+  "setup_section",
+  "start_date_setup",
+  "end_date_setup",
+  "total_hours_setup",
+  "setup_weight_setup",
+  "setup_quantity_setup",
+  "production_section",
+  "start_date_production",
+  "end_date_production",
+  "total_hours_production",
+  "setup_weight_production",
+  "setup_quantity_production",
+  "details_section",
+  "input",
+  "output",
+  "scrap",
+  "units__hour",
+  "yield",
+  "yield_with_setup",
+  "defects_section",
+  "scrap_items",
   "section_break_jvnh",
   "problem",
   "action",
@@ -300,11 +321,6 @@
    "label": "Setup"
   },
   {
-   "fieldname": "production_section",
-   "fieldtype": "Section Break",
-   "label": "Production"
-  },
-  {
    "fieldname": "section_break_mrwy",
    "fieldtype": "Section Break"
   },
@@ -314,20 +330,11 @@
    "label": "Problem"
   },
   {
-   "fieldname": "details_section",
-   "fieldtype": "Section Break",
-   "label": "Details"
-  },
-  {
-   "fieldname": "defects_section",
-   "fieldtype": "Section Break",
-   "label": "Defects"
-  },
-  {
    "fieldname": "scrap_items",
    "fieldtype": "Table",
    "label": "Scrap Items",
-   "options": "Job Card Scrap Item"
+   "options": "Job Card Scrap Item",
+   "read_only": 1
   },
   {
    "fieldname": "1st_mass_production_tab",
@@ -462,11 +469,150 @@
    "hidden": 1,
    "label": "Weight / Unit",
    "read_only": 1
+  },
+  {
+   "fieldname": "setup_sample_section",
+   "fieldtype": "Section Break",
+   "label": "Setup"
+  },
+  {
+   "fieldname": "production_sample_section",
+   "fieldtype": "Section Break",
+   "label": "Production"
+  },
+  {
+   "fieldname": "details_sample_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "defects_sample_section",
+   "fieldtype": "Section Break",
+   "label": "Defects"
+  },
+  {
+   "fieldname": "start_date_setup",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_date_setup",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_hours_setup",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_setup",
+   "fieldtype": "Float",
+   "label": "Setup Weight",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_quantity_setup",
+   "fieldtype": "Float",
+   "label": "Setup Quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "production_section",
+   "fieldtype": "Section Break",
+   "label": "Production"
+  },
+  {
+   "fieldname": "start_date_production",
+   "fieldtype": "Datetime",
+   "label": "Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_date_production",
+   "fieldtype": "Datetime",
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_hours_production",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_production",
+   "fieldtype": "Float",
+   "label": "Setup Weight",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_quantity_production",
+   "fieldtype": "Float",
+   "label": "Setup Quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "input",
+   "fieldtype": "Float",
+   "label": "Input",
+   "read_only": 1
+  },
+  {
+   "fieldname": "output",
+   "fieldtype": "Float",
+   "label": "Output",
+   "read_only": 1
+  },
+  {
+   "fieldname": "scrap",
+   "fieldtype": "Float",
+   "label": "Scrap",
+   "read_only": 1
+  },
+  {
+   "fieldname": "units__hour",
+   "fieldtype": "Float",
+   "label": "Units / Hour",
+   "read_only": 1
+  },
+  {
+   "fieldname": "yield",
+   "fieldtype": "Float",
+   "label": "Yield",
+   "read_only": 1
+  },
+  {
+   "fieldname": "yield_with_setup",
+   "fieldtype": "Float",
+   "label": "Yield with Setup",
+   "read_only": 1
+  },
+  {
+   "fieldname": "scrap_items_sample",
+   "fieldtype": "Table",
+   "label": "Scrap Items",
+   "options": "Job Card Scrap Item"
+  },
+  {
+   "fieldname": "defects_section",
+   "fieldtype": "Section Break",
+   "label": "Defects"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-30 16:26:20.191459",
+ "modified": "2024-10-30 18:03:14.571854",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Sample Record",

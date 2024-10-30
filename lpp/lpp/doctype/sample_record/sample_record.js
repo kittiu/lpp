@@ -24,6 +24,13 @@ frappe.ui.form.on("Sample Record", {
             clearCustomerItemSelection(frm);
         }
     },
+    item_code: function(frm) {
+        if (frm.doc.item_code) {
+            fetchFilteredWorkOrders(frm);
+        } else {
+            frm.set_value('work_order', null);
+        }
+    },
     set_table_parameters: function (frm) {
         const set_parameters = [
             { sample_parameters: 'Planned Date' },
@@ -83,7 +90,7 @@ function fetchCustomerItems(frm) {
 }
 
 function clearCustomerItemSelection(frm) {
-    frm.set_value({ 'item_code': null, 'item_name': null });
+    frm.set_value({ 'item_code': null, 'item_name': null, 'work_order': null });
     frm.set_query('item_code', () => ({}));
 }
 
@@ -156,4 +163,33 @@ function updateSetupHours(frm) {
 function updateProductionHours(frm) {
     updateTotalHours(frm, 'start_date_production_sample', 'end_date_production_sample', 'total_hours_production_sample');
     updateUnitsPerHour(frm);
+}
+
+function fetchFilteredWorkOrders(frm) {
+    if (frm.doc.item_code && frm.doc.customer) {
+        frappe.call({
+            method: "lpp.lpp.doctype.sample_record.sample_record.get_filtered_work_orders",
+            args: {
+                item_code: frm.doc.item_code,
+                customer_name: frm.doc.customer
+            },
+            callback: function(response) {
+                const work_orders = response.message || [];
+                
+                // Set filter on work_order field and clear invalid selection if necessary
+                frm.set_query('work_order', () => ({ filters: [['Work Order', 'name', 'in', work_orders]] }));
+                clearInvalidWorkOrder(frm, work_orders);
+            }
+        });
+    } else {
+        // Reset work_order and remove filters if item_code or customer is missing
+        frm.set_value('work_order', null);
+        frm.set_query('work_order', () => ({}));
+    }
+}
+
+function clearInvalidWorkOrder(frm, validWorkOrders) {
+    if (frm.doc.work_order && !validWorkOrders.includes(frm.doc.work_order)) {
+        frm.set_value('work_order', null);
+    }
 }

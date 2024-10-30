@@ -18,3 +18,18 @@ def get_customer_items(customer_name):
     
     # Return a list of item codes (parent field)
     return [item['parent'] for item in items]
+
+
+@frappe.whitelist()
+def get_filtered_work_orders(item_code, customer_name):
+    # Query Work Order based on item_code and customer_name
+    work_orders = frappe.get_all("Work Order", 
+        filters={
+            "production_item": item_code,
+            "custom_customer": customer_name
+        },
+        fields=["name"]
+    )
+    
+    # Return only the list of work order names
+    return [wo["name"] for wo in work_orders]
