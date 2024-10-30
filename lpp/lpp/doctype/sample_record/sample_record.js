@@ -29,6 +29,7 @@ frappe.ui.form.on("Sample Record", {
             fetchFilteredWorkOrders(frm);
         } else {
             frm.set_value('work_order', null);
+            clearValuesIfNoWorkOrderOrJobCards(frm);
         }
     },
     set_table_parameters: function (frm) {
@@ -66,7 +67,10 @@ frappe.ui.form.on("Sample Record", {
     output_sample: function(frm) {
         updateScrap(frm);
         calculateYieldWithSetup(frm);
-    }
+    },
+    work_order: function(frm) {
+        fetchJobCardsForWorkOrder(frm);
+    },
 });
 
 frappe.ui.form.on('Sample Parameters', {
@@ -105,7 +109,7 @@ function updateStatus(frm, targetField, dateField) {
 }
 
 function updateTotalHours(frm, startField, endField, outputField) {
-    const startDate = frm.doc[startField], endDate = frm.doc[endField];
+    const startDate = frm.doc[startField], endDate = frm.doc[endField];    
     frm.set_value(outputField, startDate && endDate ? 
         ((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60)).toFixed(2) : null
     );
@@ -192,4 +196,113 @@ function clearInvalidWorkOrder(frm, validWorkOrders) {
     if (frm.doc.work_order && !validWorkOrders.includes(frm.doc.work_order)) {
         frm.set_value('work_order', null);
     }
+}
+
+function fetchJobCardsForWorkOrder(frm) {
+    if (frm.doc.work_order) {
+        frappe.call({
+            method: "lpp.lpp.doctype.sample_record.sample_record.get_job_cards_for_work_order",
+            args: {
+                work_order: frm.doc.work_order
+            },
+            callback: function(response) {
+                const jobCards = response.message || [];
+                
+                // เคลียร์ค่าหากไม่มี Job Cards
+                if (!jobCards.length) {
+                    clearValuesIfNoWorkOrderOrJobCards(frm);
+                    return;
+                }
+                
+                console.log("Job Cards for Work Order:", jobCards);
+
+                const firstJobCard = jobCards[0];
+                const lastJobCard = jobCards[jobCards.length - 1];
+
+                // ตั้งค่าเริ่มต้นจาก Job Card
+                if (firstJobCard) {
+                    frm.set_value({
+                        'start_date_setup': firstJobCard.custom_start_date_setup || null,
+                        'start_date_production': firstJobCard.custom_start_date_production || null,
+                    });
+                }
+
+                if (lastJobCard) {
+                    frm.set_value({
+                        'end_date_setup': lastJobCard.custom_end_date_setup || null,
+                        'end_date_production': lastJobCard.custom_end_date_production || null
+                    });
+
+                    // คำนวณชั่วโมงรวม
+                    if (firstJobCard) {
+                        frm.set_value({
+                            'total_hours_setup': calculateHoursDifference(firstJobCard.custom_start_date_setup, lastJobCard.custom_end_date_setup),
+                            'total_hours_production': calculateHoursDifference(firstJobCard.custom_start_date_production, lastJobCard.custom_end_date_production)
+                        });
+                    }
+                }
+
+                // คำนวณค่าเฉลี่ยและค่าต่าง ๆ
+                const avgUnitQuantitySetup = calculateAverage(jobCards, 'custom_as_unit_quantity_setup');
+                const avgWeightSetup = calculateAverage(jobCards, 'custom_as_weight_setup');
+                const avgUnitQuantityProduction = calculateAverage(jobCards, 'custom_as_unit_quantity_production');
+                const avgWeightProduction = calculateAverage(jobCards, 'custom_as_weight_production');
+                const avgInputProduction = calculateAverage(jobCards, 'custom_input_production');
+                const avgOutputProduction = calculateAverage(jobCards, 'custom_output_production');
+                
+                const scrap = avgInputProduction - avgOutputProduction || 0; // Default to 0 if undefined
+                const hoursDifference = calculateHoursDifference(firstJobCard.custom_start_date_production, lastJobCard.custom_end_date_production) || 1; // Prevent division by zero
+
+                // ตั้งค่าผลลัพธ์ในฟอร์ม
+                frm.set_value({
+                    'setup_weight_setup': avgUnitQuantitySetup || null,
+                    'setup_quantity_setup': avgWeightSetup || null,
+                    'setup_weight_production': avgUnitQuantityProduction || null,
+                    'setup_quantity_production': avgWeightProduction || null,
+                    'input': avgInputProduction || null,
+                    'output': avgOutputProduction || null,
+                    'scrap': scrap,
+                    'units__hour': hoursDifference === 0 ? null : (avgOutputProduction / hoursDifference).toFixed(2),
+                    'yield': avgInputProduction ? ((avgOutputProduction / avgInputProduction) * 100).toFixed(2) : null,
+                    'yield_with_setup': (avgInputProduction + avgWeightSetup + avgWeightProduction) === 0
+                        ? null
+                        : ((avgOutputProduction / (avgInputProduction + avgWeightSetup + avgWeightProduction)) * 100).toFixed(2),
+                });                                    
+            }
+        });
+    } else {
+        clearValuesIfNoWorkOrderOrJobCards(frm);
+    }
+}
+
+function calculateHoursDifference(startDate, endDate) {
+    return ((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60)).toFixed(2);
+}
+
+function calculateAverage(jobCards, fieldName) {
+    if (!jobCards || jobCards.length === 0) return 0;
+
+    const total = jobCards.reduce((sum, jobCard) => sum + (jobCard[fieldName] || 0), 0);
+    return (total / jobCards.length).toFixed(2);
+}
+
+function clearValuesIfNoWorkOrderOrJobCards(frm,) {
+    frm.set_value({
+        'start_date_setup': null,
+        'start_date_production': null,
+        'end_date_setup': null,
+        'end_date_production': null,
+        'total_hours_setup': null,
+        'total_hours_production': null,
+        'setup_weight_setup': null,
+        'setup_quantity_setup': null,
+        'setup_weight_production': null,
+        'setup_quantity_production': null,
+        'input': null,
+        'output': null,
+        'scrap': null,
+        'units__hour': null,
+        'yield': null,
+        'yield_with_setup': null
+    });
 }

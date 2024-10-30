@@ -33,3 +33,15 @@ def get_filtered_work_orders(item_code, customer_name):
     
     # Return only the list of work order names
     return [wo["name"] for wo in work_orders]
+
+
+@frappe.whitelist()
+def get_job_cards_for_work_order(work_order):
+    # Query Job Card records linked to the specified Work Order
+    job_cards = frappe.get_all("Job Card", 
+        filters={"work_order": work_order},
+        fields="*",
+        order_by="name asc"
+    )
+    
+    return job_cards
