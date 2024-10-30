@@ -40,7 +40,32 @@
   "mold_recipt",
   "mold_picture",
   "sample_production_tab",
-  "workstation"
+  "workstation",
+  "setup_section",
+  "start_date_setup",
+  "end_date_setup",
+  "total_hours_setup",
+  "setup_weight_setup",
+  "setup_quantity_setup",
+  "production_section",
+  "start_date_production",
+  "end_date_production",
+  "total_hours_production",
+  "setup_weight_production",
+  "setup_quantity_production",
+  "details_section",
+  "input",
+  "output",
+  "scrap",
+  "units__hour",
+  "yield",
+  "yield_with_setup",
+  "defects_section",
+  "scrap_items",
+  "section_break_mrwy",
+  "problem",
+  "action",
+  "lesson_learned"
  ],
  "fields": [
   {
@@ -140,8 +165,7 @@
    "fieldname": "item",
    "fieldtype": "Link",
    "label": "Item",
-   "options": "Item",
-   "reqd": 1
+   "options": "Item"
   },
   {
    "fieldname": "section_break_ogvq",
@@ -201,8 +225,7 @@
    "fieldname": "workstation",
    "fieldtype": "Link",
    "label": "Workstation",
-   "options": "Workstation",
-   "reqd": 1
+   "options": "Workstation"
   },
   {
    "fieldname": "section_break_rdfi",
@@ -263,11 +286,142 @@
    "fieldtype": "Data",
    "label": "Customer Delivery Status",
    "read_only": 1
+  },
+  {
+   "fieldname": "setup_section",
+   "fieldtype": "Section Break",
+   "label": "Setup"
+  },
+  {
+   "fieldname": "production_section",
+   "fieldtype": "Section Break",
+   "label": "Production"
+  },
+  {
+   "fieldname": "start_date_production",
+   "fieldtype": "Datetime",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date_production",
+   "fieldtype": "Datetime",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "total_hours_production",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_production",
+   "fieldtype": "Float",
+   "label": "Setup Weight"
+  },
+  {
+   "fieldname": "setup_quantity_production",
+   "fieldtype": "Float",
+   "label": "Setup Quantity"
+  },
+  {
+   "fieldname": "start_date_setup",
+   "fieldtype": "Datetime",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date_setup",
+   "fieldtype": "Datetime",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "total_hours_setup",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_setup",
+   "fieldtype": "Float",
+   "label": "Setup Weight"
+  },
+  {
+   "fieldname": "setup_quantity_setup",
+   "fieldtype": "Float",
+   "label": "Setup Quantity"
+  },
+  {
+   "fieldname": "section_break_mrwy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "problem",
+   "fieldtype": "Long Text",
+   "label": "Problem"
+  },
+  {
+   "fieldname": "action",
+   "fieldtype": "Long Text",
+   "label": "Action"
+  },
+  {
+   "fieldname": "lesson_learned",
+   "fieldtype": "Long Text",
+   "label": "Lesson Learned"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "input",
+   "fieldtype": "Float",
+   "label": "Input"
+  },
+  {
+   "fieldname": "output",
+   "fieldtype": "Float",
+   "label": "Output"
+  },
+  {
+   "fieldname": "scrap",
+   "fieldtype": "Float",
+   "label": "Scrap",
+   "read_only": 1
+  },
+  {
+   "fieldname": "units__hour",
+   "fieldtype": "Float",
+   "label": "Units / Hour",
+   "read_only": 1
+  },
+  {
+   "fieldname": "yield",
+   "fieldtype": "Float",
+   "label": "Yield",
+   "read_only": 1
+  },
+  {
+   "fieldname": "yield_with_setup",
+   "fieldtype": "Float",
+   "label": "Yield with Setup",
+   "read_only": 1
+  },
+  {
+   "fieldname": "defects_section",
+   "fieldtype": "Section Break",
+   "label": "Defects"
+  },
+  {
+   "fieldname": "scrap_items",
+   "fieldtype": "Table",
+   "label": "Scrap Items",
+   "options": "Job Card Scrap Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-10-29 17:35:52.906763",
+ "modified": "2024-10-30 13:19:24.275754",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Sample Record",
