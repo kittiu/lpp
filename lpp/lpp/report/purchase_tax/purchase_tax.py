@@ -83,6 +83,8 @@ def get_data(filters):
     report_data = []
     target_data = []
 
+    company_tax_id = get_company_tax_id(filters['company'])
+
     # Initialize row number
     row_number = 1
 
@@ -100,7 +102,8 @@ def get_data(filters):
                 "address_line2": address_line2,
                 "net_total": dt.get('net_total', 0.0),
                 "total_tax": dt.get('total_tax', 0.0),
-                "grand_total": dt.get('grand_total', 0.0)
+                "grand_total": dt.get('grand_total', 0.0),
+                "company_tax_id": company_tax_id
             })
         
         # Group data by 'address_line2'
@@ -117,6 +120,8 @@ def get_data(filters):
             group_total_net = 0
             group_total_tax = 0
             group_total_balance = 0
+
+            
             
             # Add the summary row for the group
             target_data.append({
@@ -128,7 +133,8 @@ def get_data(filters):
                 "address_line2": None,
                 "net_total": None,
                 "total_tax": None,
-                "grand_total": None
+                "grand_total": None,
+                "company_tax_id" : company_tax_id
             })
             
             # Add numbered items for each group
@@ -148,7 +154,8 @@ def get_data(filters):
                     "address_line2": item['address_line2'],
                     "net_total": item['net_total'],
                     "total_tax": item['total_tax'],
-                    "grand_total": item['grand_total']
+                    "grand_total": item['grand_total'],
+                    "company_tax_id" : company_tax_id
                 })
 
             # Add the group total row
@@ -161,7 +168,8 @@ def get_data(filters):
                 "address_line2": None,
                 "net_total": group_total_net,
                 "total_tax": group_total_tax,
-                "grand_total": group_total_balance
+                "grand_total": group_total_balance,
+                "company_tax_id" : company_tax_id
             })
             
         target_data.append({
@@ -173,7 +181,8 @@ def get_data(filters):
 			"address_line2": None,
 			"net_total": grand_total_net,
 			"total_tax": grand_total_tax,
-			"grand_total": grand_total_balance
+			"grand_total": grand_total_balance,
+            "company_tax_id" : company_tax_id
 		})
 
     return target_data
@@ -193,3 +202,8 @@ def get_customer_address_line2(customer_name):
         return address[0].get('address_line2', "-")
     else:
         return "-"
+    
+def get_company_tax_id(company_name):
+    # Fetch the tax ID of the company
+    tax_id = frappe.get_value('Company', company_name, 'tax_id')
+    return tax_id
