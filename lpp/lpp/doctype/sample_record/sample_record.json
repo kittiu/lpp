@@ -1,0 +1,639 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-10-28 10:13:09.207649",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "customer",
+  "item_code",
+  "item_name",
+  "weight__unit",
+  "material",
+  "drawing",
+  "sample_quantity",
+  "column_break_iiol",
+  "sales_order",
+  "customer_po_no",
+  "priority",
+  "overall_status",
+  "status_remark",
+  "section_break_krxl",
+  "sample_parameters",
+  "mold_creation_status",
+  "sample_production_status",
+  "customer_delivery_status",
+  "section_break_rdfi",
+  "operated_by",
+  "column_break_syvo",
+  "mkt_acknowledgement",
+  "qa_acknowledgement",
+  "mold_tab",
+  "item",
+  "mold_base_width_mm",
+  "mold_base_length_mm",
+  "mold_base_higth_mm",
+  "mold_quantity",
+  "cavity__mold",
+  "section_break_ogvq",
+  "mold_recipt",
+  "mold_picture",
+  "sample_production_tab",
+  "workstation",
+  "setup_sample_section",
+  "start_date_setup_sample",
+  "end_date_setup_sample",
+  "total_hours_setup_sample",
+  "setup_weight_setup_sample",
+  "setup_quantity_setup_sample",
+  "production_sample_section",
+  "start_date_production_sample",
+  "end_date_production_sample",
+  "total_hours_production_sample",
+  "setup_weight_production_sample",
+  "setup_quantity_production_sample",
+  "details_sample_section",
+  "input_sample",
+  "output_sample",
+  "scrap_sample",
+  "units__hour_sample",
+  "yield_sample",
+  "yield_with_setup_sample",
+  "defects_sample_section",
+  "scrap_items_sample",
+  "section_break_mrwy",
+  "problem_sample",
+  "action_sample",
+  "lesson_learned_sample",
+  "1st_mass_production_tab",
+  "work_order",
+  "setup_section",
+  "start_date_setup",
+  "end_date_setup",
+  "total_hours_setup",
+  "setup_weight_setup",
+  "setup_quantity_setup",
+  "production_section",
+  "start_date_production",
+  "end_date_production",
+  "total_hours_production",
+  "setup_weight_production",
+  "setup_quantity_production",
+  "details_section",
+  "input",
+  "output",
+  "scrap",
+  "units__hour",
+  "yield",
+  "yield_with_setup",
+  "defects_section",
+  "scrap_items",
+  "section_break_jvnh",
+  "problem",
+  "action",
+  "lesson_learned"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_filter": 1,
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "ID",
+   "no_copy": 1,
+   "options": "SR.YY..MM.-.####.",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "item.custom_material",
+   "fieldname": "material",
+   "fieldtype": "Data",
+   "label": "Material",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_drawing__buildsheet_no",
+   "fieldname": "drawing",
+   "fieldtype": "Data",
+   "label": "Drawing",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sample_quantity",
+   "fieldtype": "Float",
+   "label": "Sample Quantity"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code ",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_iiol",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "label": "Sales Order",
+   "options": "Sales Order",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "sales_order.po_no",
+   "fieldname": "customer_po_no",
+   "fieldtype": "Data",
+   "label": "Customer PO No.",
+   "read_only": 1
+  },
+  {
+   "default": "Flexible",
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "label": "Priority",
+   "options": "Flexible\nHigh"
+  },
+  {
+   "fieldname": "overall_status",
+   "fieldtype": "Select",
+   "label": "Overall Status",
+   "options": "Not Started\nMolding\nProducing\nDelivered"
+  },
+  {
+   "fieldname": "status_remark",
+   "fieldtype": "Long Text",
+   "label": "Status Remark"
+  },
+  {
+   "fieldname": "mold_tab",
+   "fieldtype": "Tab Break",
+   "label": "Mold"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "section_break_ogvq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "mold_recipt",
+   "fieldtype": "Attach",
+   "label": "Mold Recipt"
+  },
+  {
+   "fieldname": "mold_picture",
+   "fieldtype": "Attach",
+   "label": "Mold Picture"
+  },
+  {
+   "fetch_from": "item.custom_mold_base_width",
+   "fieldname": "mold_base_width_mm",
+   "fieldtype": "Float",
+   "label": "Mold Base Width (mm)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_mold_base_length",
+   "fieldname": "mold_base_length_mm",
+   "fieldtype": "Float",
+   "label": "Mold Base Length (mm)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_mold_base_height",
+   "fieldname": "mold_base_higth_mm",
+   "fieldtype": "Float",
+   "label": "Mold Base Higth (mm)",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_mold_quantity",
+   "fieldname": "mold_quantity",
+   "fieldtype": "Float",
+   "label": "Mold Quantity",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item.custom_cavities",
+   "fieldname": "cavity__mold",
+   "fieldtype": "Float",
+   "label": "Cavity / Mold",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sample_production_tab",
+   "fieldtype": "Tab Break",
+   "label": "Sample Production"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "section_break_rdfi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "For Design & Engineering employees only.",
+   "fieldname": "operated_by",
+   "fieldtype": "Link",
+   "label": "Operated By ",
+   "link_filters": "[[\"Employee\",\"department\",\"=\",\"Design & Engineering\"]]",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_syvo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "For Marketing employees only.",
+   "fieldname": "mkt_acknowledgement",
+   "fieldtype": "Link",
+   "label": "MKT Acknowledgement ",
+   "link_filters": "[[\"Employee\",\"department\",\"=\",\"Marketing\"]]",
+   "options": "Employee"
+  },
+  {
+   "description": "For QA employees only.",
+   "fieldname": "qa_acknowledgement",
+   "fieldtype": "Link",
+   "label": "QA Acknowledgement",
+   "link_filters": "[[\"Employee\",\"department\",\"=\",\"QA\"]]",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "section_break_krxl",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sample_parameters",
+   "fieldtype": "Table",
+   "label": "Sample Parameters",
+   "options": "Sample Parameters"
+  },
+  {
+   "fieldname": "mold_creation_status",
+   "fieldtype": "Data",
+   "label": "Mold Creation Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sample_production_status",
+   "fieldtype": "Data",
+   "label": "Sample Production Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer_delivery_status",
+   "fieldtype": "Data",
+   "label": "Customer Delivery Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_section",
+   "fieldtype": "Section Break",
+   "label": "Setup"
+  },
+  {
+   "fieldname": "section_break_mrwy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "problem",
+   "fieldtype": "Long Text",
+   "label": "Problem"
+  },
+  {
+   "fieldname": "scrap_items",
+   "fieldtype": "Table",
+   "label": "Scrap Items",
+   "options": "Job Card Scrap Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "1st_mass_production_tab",
+   "fieldtype": "Tab Break",
+   "label": "1st Mass Production"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order",
+   "reqd": 1
+  },
+  {
+   "fieldname": "problem_sample",
+   "fieldtype": "Long Text",
+   "label": "Problem"
+  },
+  {
+   "fieldname": "action_sample",
+   "fieldtype": "Long Text",
+   "label": "Action"
+  },
+  {
+   "fieldname": "lesson_learned_sample",
+   "fieldtype": "Long Text",
+   "label": "Lesson Learned"
+  },
+  {
+   "fieldname": "section_break_jvnh",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "action",
+   "fieldtype": "Long Text",
+   "label": "Action"
+  },
+  {
+   "fieldname": "lesson_learned",
+   "fieldtype": "Long Text",
+   "label": "Lesson Learned"
+  },
+  {
+   "fieldname": "start_date_setup_sample",
+   "fieldtype": "Datetime",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date_setup_sample",
+   "fieldtype": "Datetime",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "total_hours_setup_sample",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_setup_sample",
+   "fieldtype": "Float",
+   "label": "Setup Weight"
+  },
+  {
+   "fieldname": "setup_quantity_setup_sample",
+   "fieldtype": "Float",
+   "label": "Setup Quantity"
+  },
+  {
+   "fieldname": "start_date_production_sample",
+   "fieldtype": "Datetime",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date_production_sample",
+   "fieldtype": "Datetime",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "total_hours_production_sample",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_production_sample",
+   "fieldtype": "Float",
+   "label": "Setup Weight"
+  },
+  {
+   "fieldname": "setup_quantity_production_sample",
+   "fieldtype": "Float",
+   "label": "Setup Quantity"
+  },
+  {
+   "fieldname": "input_sample",
+   "fieldtype": "Float",
+   "label": "Input"
+  },
+  {
+   "fieldname": "output_sample",
+   "fieldtype": "Float",
+   "label": "Output"
+  },
+  {
+   "fieldname": "scrap_sample",
+   "fieldtype": "Float",
+   "label": "Scrap",
+   "read_only": 1
+  },
+  {
+   "fieldname": "units__hour_sample",
+   "fieldtype": "Float",
+   "label": "Units / Hour",
+   "read_only": 1
+  },
+  {
+   "fieldname": "yield_sample",
+   "fieldtype": "Float",
+   "label": "Yield",
+   "read_only": 1
+  },
+  {
+   "fieldname": "yield_with_setup_sample",
+   "fieldtype": "Float",
+   "label": "Yield with Setup",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_code.weight_per_unit",
+   "fieldname": "weight__unit",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Weight / Unit",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_sample_section",
+   "fieldtype": "Section Break",
+   "label": "Setup"
+  },
+  {
+   "fieldname": "production_sample_section",
+   "fieldtype": "Section Break",
+   "label": "Production"
+  },
+  {
+   "fieldname": "details_sample_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "defects_sample_section",
+   "fieldtype": "Section Break",
+   "label": "Defects"
+  },
+  {
+   "fieldname": "start_date_setup",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_date_setup",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_hours_setup",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_setup",
+   "fieldtype": "Float",
+   "label": "Setup Weight",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_quantity_setup",
+   "fieldtype": "Float",
+   "label": "Setup Quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "production_section",
+   "fieldtype": "Section Break",
+   "label": "Production"
+  },
+  {
+   "fieldname": "start_date_production",
+   "fieldtype": "Datetime",
+   "label": "Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "end_date_production",
+   "fieldtype": "Datetime",
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_hours_production",
+   "fieldtype": "Data",
+   "label": "Total Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_weight_production",
+   "fieldtype": "Float",
+   "label": "Setup Weight",
+   "read_only": 1
+  },
+  {
+   "fieldname": "setup_quantity_production",
+   "fieldtype": "Float",
+   "label": "Setup Quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "input",
+   "fieldtype": "Float",
+   "label": "Input",
+   "read_only": 1
+  },
+  {
+   "fieldname": "output",
+   "fieldtype": "Float",
+   "label": "Output",
+   "read_only": 1
+  },
+  {
+   "fieldname": "scrap",
+   "fieldtype": "Float",
+   "label": "Scrap",
+   "read_only": 1
+  },
+  {
+   "fieldname": "units__hour",
+   "fieldtype": "Float",
+   "label": "Units / Hour",
+   "read_only": 1
+  },
+  {
+   "fieldname": "yield",
+   "fieldtype": "Float",
+   "label": "Yield",
+   "read_only": 1
+  },
+  {
+   "fieldname": "yield_with_setup",
+   "fieldtype": "Float",
+   "label": "Yield with Setup",
+   "read_only": 1
+  },
+  {
+   "fieldname": "scrap_items_sample",
+   "fieldtype": "Table",
+   "label": "Scrap Items",
+   "options": "Job Card Scrap Item"
+  },
+  {
+   "fieldname": "defects_section",
+   "fieldtype": "Section Break",
+   "label": "Defects"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-10-31 03:03:15.905056",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "Sample Record",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

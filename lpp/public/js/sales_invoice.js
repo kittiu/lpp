@@ -1,4 +1,9 @@
 frappe.ui.form.on("Sales Invoice", {
+    onload: function(frm) {
+        // Set the 'title' field as not mandatory
+        frm.toggle_reqd('title', false); // Make 'title' not mandatory
+    },
+    
     customer: function(frm) {
         // เคลียร์ตาราง items เมื่อเปลี่ยน Customer
         // clearSalesInvoiceItems(frm);
