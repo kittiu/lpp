@@ -76,6 +76,12 @@ frappe.ui.form.on("Material Request", {
         }else{
             frm.toggle_reqd('customer', false);
         }
+        
+        if(frm.doc.material_request_type === 'Material Issue'){
+            frm.set_value('naming_series', 'MI.YY.MM.-.####');
+        }else{
+            frm.set_value('naming_series', 'PR.YY.MM.-.####');
+        }
     }
 });
 
