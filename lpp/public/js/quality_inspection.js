@@ -1,11 +1,32 @@
 frappe.ui.form.on("Quality Inspection", {
-    onload: function(frm) {
+    onload: function (frm) {
         if (!frm.doc.custom_date_inspected_by) {
             frm.set_value('custom_date_inspected_by', frappe.datetime.now_datetime());
         }
-        if (!frm.doc.custom_date_approved_by) {            
+        if (!frm.doc.custom_date_approved_by) {
             frm.set_value('custom_date_approved_by', frappe.datetime.now_datetime());
         }
+
+        if (frm.doc.custom_inspection_progress) {
+            let inspection_progress_value = frm.doc.custom_inspection_progress;
+
+            // Define the options based on the selected Inspection Progress value
+            let type_options = [];
+
+            if (inspection_progress_value === 'IMQA') {
+                type_options = ['IMQA - Plastic Sheet', 'IMQA - Plastic Pellets', 'IMQA - Agent & Others'];
+            } else if (inspection_progress_value === 'Buyoff') {
+                type_options = ['Buyoff - Tray (VAC)', 'Buyoff - Tray (CUT)', 'Buyoff - Reel'];
+            } else if (inspection_progress_value === 'Roving') {
+                type_options = ['Roving - Tray', 'Roving - Reel'];
+            } else if (inspection_progress_value === 'Final Inspection') {
+                type_options = ['Final Inspection - Tray', 'Final Inspection - Reel'];
+            }
+            frm.set_df_property('custom_type', 'options', type_options.join('\n'));
+
+
+        }
+
     },
     setup: function (frm) {
 
@@ -27,45 +48,39 @@ frappe.ui.form.on("Quality Inspection", {
         const custom_quality_inspection_order_table_2 = frm.doc.custom_quality_inspection_order_table_2;
         const custom_quality_inspection_order_table_3 = frm.doc.custom_quality_inspection_order_table_3;
 
+        if (frm.doc.sample_size < 1 || frm.doc.sample_size > 32) {
+            frappe.msgprint({
+                title: __('Validation Error'),
+                message: __('Sample size  must be between 1 and 32.'),
+                indicator: 'red'
+            });
+            frm.doc.sample_size = 1
+            frm.refresh_field("sample_size");
+            return false;
+        }
+
+
+
         for (let i = 0; i < custom_quality_inspection_order_table_1.length; i++) {
-            const row = custom_quality_inspection_order_table_1[i];            
-            calculate_average_value(frm, "Quality Inspection Order", row.name );
-            count_accepted_rejected(frm, "Quality Inspection Order", row.name );
+            const row = custom_quality_inspection_order_table_1[i];
+            calculate_average_value(frm, "Quality Inspection Order", row.name);
+            count_accepted_rejected(frm, "Quality Inspection Order", row.name);
         }
 
         for (let i = 0; i < custom_quality_inspection_order_table_2.length; i++) {
-            const row = custom_quality_inspection_order_table_2[i];            
-            calculate_average_value(frm, "Quality Inspection Order", row.name );
-            count_accepted_rejected(frm, "Quality Inspection Order", row.name );
+            const row = custom_quality_inspection_order_table_2[i];
+            calculate_average_value(frm, "Quality Inspection Order", row.name);
+            count_accepted_rejected(frm, "Quality Inspection Order", row.name);
         }
 
         for (let i = 0; i < custom_quality_inspection_order_table_3.length; i++) {
-            const row = custom_quality_inspection_order_table_3[i];            
-            calculate_average_value(frm, "Quality Inspection Order", row.name );
-            count_accepted_rejected(frm, "Quality Inspection Order", row.name );
+            const row = custom_quality_inspection_order_table_3[i];
+            calculate_average_value(frm, "Quality Inspection Order", row.name);
+            count_accepted_rejected(frm, "Quality Inspection Order", row.name);
         }
 
     },
     custom_inspection_progress: function (frm) {
-        if (frm.doc.custom_inspection_progress === 'Buyoff') {
-            frm.set_value('custom_buyoff_inspect_date', frappe.datetime.now_datetime());
-            frm.set_value('custom_roving_inspect_date', null);
-            frm.set_value('custom_final_inspection_inspect_date', null);
-        } else if (frm.doc.custom_inspection_progress === 'Roving') {
-            frm.set_value('custom_buyoff_inspect_date', null);
-            frm.set_value('custom_roving_inspect_date', frappe.datetime.now_datetime());
-            frm.set_value('custom_final_inspection_inspect_date', null);
-        } else if (frm.doc.custom_inspection_progress === 'Final Inspection') {
-            frm.set_value('custom_buyoff_inspect_date', null);
-            frm.set_value('custom_roving_inspect_date', null);
-            frm.set_value('custom_final_inspection_inspect_date', frappe.datetime.now_datetime());
-        } else {
-            frm.set_value('custom_buyoff_inspect_date', null);
-            frm.set_value('custom_roving_inspect_date', null);
-            frm.set_value('custom_final_inspection_inspect_date', null);
-        }
-
-
         // Get the selected value of Inspection Progress
         let inspection_progress_value = frm.doc.custom_inspection_progress;
 
@@ -92,12 +107,18 @@ frappe.ui.form.on("Quality Inspection", {
     custom_type: function (frm) {
         if (frm.doc.custom_type) {
             // ** IMQA
+            // Clear the tables and reset values for links
             frm.set_value('custom_quality_inspection_template_link_1', "");
             frm.toggle_display('custom_quality_inspection_order_table_1', false);
+            frm.clear_table('custom_quality_inspection_order_table_1'); // Clear all rows in the first table
+
             frm.set_value('custom_quality_inspection_template_link_2', "");
             frm.toggle_display('custom_quality_inspection_order_table_2', false);
+            frm.clear_table('custom_quality_inspection_order_table_2'); // Clear all rows in the second table
+
             frm.set_value('custom_quality_inspection_template_link_3', "");
             frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            frm.clear_table('custom_quality_inspection_order_table_3'); // Clear all rows in the third table
 
             if (frm.doc.custom_type === 'IMQA - Plastic Sheet') {
                 frm.set_value('custom_quality_inspection_template_link_1', "IMQA - Plastic Sheet - (1) Visual Inspection");
@@ -166,6 +187,11 @@ frappe.ui.form.on("Quality Inspection", {
                 frm.toggle_display('custom_quality_inspection_order_table_2', true);
             }
 
+            // Refresh the form to show changes
+            frm.refresh_field('custom_quality_inspection_order_table_1');
+            frm.refresh_field('custom_quality_inspection_order_table_2');
+            frm.refresh_field('custom_quality_inspection_order_table_3');
+
 
         }
     },
@@ -231,63 +257,113 @@ frappe.ui.form.on("Quality Inspection", {
     },
     custom_quality_inspection_template_link_1: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_1) {
+            frm.clear_table("custom_quality_inspection_order_table_1");
+            // Call the server-side method and populate the child table
 
-            return frm.call({
+
+            frappe.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
+                    item_code: frm.doc.item_code,
                     template_key: "custom_quality_inspection_template_link_1",
                     table_key: "custom_quality_inspection_order_table_1"
                 },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_order_table_1");
-                },
-            });
+                callback: function (response) {
+                    const table_data = response.message;
+                    // Populate the child table with returned data
+                    if (table_data && Array.isArray(table_data)) {
+                        table_data.forEach(row => {
+                            setTimeout(
+                                () => {
+                                    const child = frm.add_child("custom_quality_inspection_order_table_1"); // Replace 'table_key' with your actual table fieldname
+                                    frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                                    frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                                    frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                                    frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                                    frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                                    frm.refresh_field("custom_quality_inspection_order_table_1"); 
+                                }
+                                , 1000);
+                        });
+
+                    }
+                }
+            })
+
+
+
         }
     },
     custom_quality_inspection_template_link_2: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_2) {
-
-            return frm.call({
+            frm.clear_table("custom_quality_inspection_order_table_2");
+            // Call the server-side method and populate the child table
+            frappe.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
+                    item_code: frm.doc.item_code,
                     template_key: "custom_quality_inspection_template_link_2",
                     table_key: "custom_quality_inspection_order_table_2"
                 },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_order_table_2");
-                },
+                callback: function (response) {
+                    const table_data = response.message;
+                    // Populate the child table with returned data
+                    if (table_data && Array.isArray(table_data)) {
+                        table_data.forEach(row => {
+                            setTimeout(
+                                () => {
+                                    const child = frm.add_child("custom_quality_inspection_order_table_2"); // Replace 'table_key' with your actual table fieldname
+                                    frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                                    frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                                    frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                                    frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                                    frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                                    frm.refresh_field("custom_quality_inspection_order_table_2"); 
+                                }
+                                , 1000);
+                        });
+                    }
+                }
             });
         }
     },
     custom_quality_inspection_template_link_3: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_3) {
-
-            return frm.call({
+            frm.clear_table("custom_quality_inspection_order_table_3");
+            // Call the server-side method and populate the child table
+            frappe.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
+                    item_code: frm.doc.item_code,
                     template_key: "custom_quality_inspection_template_link_3",
                     table_key: "custom_quality_inspection_order_table_3"
                 },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_order_table_3");
-                },
+                callback: function (response) {
+                    const table_data = response.message;
+                    // Populate the child table with returned data
+                    if (table_data && Array.isArray(table_data)) {                        
+                        table_data.forEach(row => {
+                        setTimeout(
+                            () => {
+                                const child = frm.add_child("custom_quality_inspection_order_table_3"); // Replace 'table_key' with your actual table fieldname
+                                frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                                frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                                frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                                frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                                frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                                frm.refresh_field("custom_quality_inspection_order_table_3"); 
+                            }
+                            , 1000);
+                        });
+                    }
+                }
             });
         }
     },
-    quality_inspection_template: function (frm) {
-        if (frm.doc.quality_inspection_template) {
-            return frm.call({
-                method: "get_item_specification_details",
-                doc: frm.doc,
-                callback: function () {
-                    refresh_field("readings");
-                },
-            });
-        }
-    }
+
 });
 
 frappe.ui.form.on("Quality Inspection Order", {
@@ -306,17 +382,17 @@ frappe.ui.form.on("Quality Inspection Order", {
         calculate_average_value(frm, cdt, cdn);
         count_accepted_rejected(frm, cdt, cdn);
 
-    }, 
+    },
 });
 
 for (let i = 1; i <= 32; i++) {
     frappe.ui.form.on("Quality Inspection Order", "inspected_value_" + i, function (frm, cdt, cdn) {
-        validate_inspected_value(frm, cdt, cdn , "inspected_value_" + i)
-        calculate_average_value(frm, cdt, cdn );
+        validate_inspected_value(frm, cdt, cdn, "inspected_value_" + i)
+        calculate_average_value(frm, cdt, cdn);
     });
 
     frappe.ui.form.on("Quality Inspection Order", "approval_" + i, function (frm, cdt, cdn) {
-        count_accepted_rejected(frm, cdt, cdn );
+        count_accepted_rejected(frm, cdt, cdn);
     });
 }
 
@@ -344,7 +420,7 @@ function count_accepted_rejected(frm, cdt, cdn) {
 }
 
 
-function calculate_average_value(frm, cdt, cdn) {    
+function calculate_average_value(frm, cdt, cdn) {
     const sample_size = frm.doc.sample_size;
     const row = locals[cdt][cdn];
 
@@ -364,41 +440,41 @@ function calculate_average_value(frm, cdt, cdn) {
 
 }
 
-function validate_inspected_value(frm, cdt, cdn , inspected_value_name) {
+function validate_inspected_value(frm, cdt, cdn, inspected_value_name) {
 
-        const row = locals[cdt][cdn];
-        let nominal_value = row.nominal_value;
-        let tolerance_max = Number(row.tolerance_max);
-        let tolerance_min = Number(row.tolerance_min);
-        let inspected_value = row[inspected_value_name];
+    const row = locals[cdt][cdn];
+    let nominal_value = row.nominal_value;
+    let tolerance_max = Number(row.tolerance_max);
+    let tolerance_min = Number(row.tolerance_min);
+    let inspected_value = row[inspected_value_name];
 
-        // ตรวจสอบว่ามีการระบุ tolerance_max และ tolerance_min หรือไม่
-        if (!!tolerance_max) {
-            // คำนวณช่วงค่าที่อนุญาต
-            let max_value = nominal_value + tolerance_max;
-            
-            // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
-            if (inspected_value > max_value) {
-                frappe.show_alert({
-                    message: __('Inspected Value should be less than {0} ', [max_value]),
-                    indicator: 'orange'
-                },60);
-                row[inspected_value_name] = inspected_value
-            }
+    // ตรวจสอบว่ามีการระบุ tolerance_max และ tolerance_min หรือไม่
+    if (!!tolerance_max) {
+        // คำนวณช่วงค่าที่อนุญาต
+        let max_value = nominal_value + tolerance_max;
+
+        // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
+        if (inspected_value > max_value) {
+            frappe.show_alert({
+                message: __('Inspected Value should be less than {0} ', [max_value]),
+                indicator: 'orange'
+            }, 60);
+            row[inspected_value_name] = inspected_value
         }
+    }
 
-        if (!!tolerance_min) {
-            // คำนวณช่วงค่าที่อนุญาต
-            let min_value = nominal_value - tolerance_min;
+    if (!!tolerance_min) {
+        // คำนวณช่วงค่าที่อนุญาต
+        let min_value = nominal_value - tolerance_min;
 
-            // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
-            if (inspected_value < min_value) {
-                frappe.show_alert({
-                    message: __('Inspected Value should be more than {0}', [min_value]),
-                    indicator: 'orange'
-                },60);
-                row[inspected_value_name] = inspected_value 
-            }
+        // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
+        if (inspected_value < min_value) {
+            frappe.show_alert({
+                message: __('Inspected Value should be more than {0}', [min_value]),
+                indicator: 'orange'
+            }, 60);
+            row[inspected_value_name] = inspected_value
         }
-    
+    }
+
 }

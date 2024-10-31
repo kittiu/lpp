@@ -2,6 +2,9 @@ frappe.ui.form.on("Sales Invoice", {
     onload: function(frm) {
         // Set the 'title' field as not mandatory
         frm.toggle_reqd('title', false); // Make 'title' not mandatory
+        if(frm.doc.select_print_heading && frm.doc.select_print_heading === 'Credit Note'){
+            frm.set_value('naming_series', 'CN.YY.MM.-.####');
+        }
     },
     
     customer: function(frm) {
