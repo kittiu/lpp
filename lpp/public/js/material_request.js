@@ -69,6 +69,19 @@ frappe.ui.form.on("Material Request", {
     custom_cost_center : function(frm) {
         frm.doc.custom_department = frm.doc.custom_cost_center
         frm.refresh_field('custom_department');
+    },
+    material_request_type: function(frm) {
+        if(frm.doc.material_request_type === 'Material Issue' || frm.doc.material_request_type === 'Customer Provided'){
+            frm.toggle_reqd('customer', true);
+        }else{
+            frm.toggle_reqd('customer', false);
+        }
+        
+        if(frm.doc.material_request_type === 'Material Issue'){
+            frm.set_value('naming_series', 'MI.YY.MM.-.####');
+        }else{
+            frm.set_value('naming_series', 'PR.YY.MM.-.####');
+        }
     }
 });
 
