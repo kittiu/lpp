@@ -6,6 +6,11 @@ frappe.ui.form.on("Quality Inspection", {
         if (!frm.doc.custom_date_approved_by) {            
             frm.set_value('custom_date_approved_by', frappe.datetime.now_datetime());
         }
+
+        if (frm.doc.custom_inspection_progress){
+            frm.events.custom_inspection_progress(frm)
+        }
+
     },
     setup: function (frm) {
 
@@ -281,14 +286,16 @@ frappe.ui.form.on("Quality Inspection", {
                     // Populate the child table with returned data
                     if (table_data && Array.isArray(table_data)) {
                         table_data.forEach(row => {
-                            const child = frm.add_child("custom_quality_inspection_order_table_2"); // Replace 'table_key' with your actual table fieldname
-                            frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
-                            frappe.model.set_value(child.doctype, child.name, "status", row.status);
-                            frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
-                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
-                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                            const child = frm.add_child("custom_quality_inspection_order_table_2",{
+                                "defects" : row.defects,
+                                "status" : row.status,
+                                "nominal_value" : row.nominal_value,
+                                "tolerance_max" : row.tolerance_max,
+                                "tolerance_min" : row.tolerance_min
+
+                            }); 
+                            frm.refresh_field("custom_quality_inspection_order_table_2"); 
                         });
-                        frm.refresh_field("custom_quality_inspection_order_table_2"); // Replace 'table_key' with your actual table fieldname
                     }
                 }
             });
