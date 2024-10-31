@@ -27,6 +27,19 @@ frappe.ui.form.on("Quality Inspection", {
         const custom_quality_inspection_order_table_2 = frm.doc.custom_quality_inspection_order_table_2;
         const custom_quality_inspection_order_table_3 = frm.doc.custom_quality_inspection_order_table_3;
 
+        if (frm.doc.sample_size < 1 || frm.doc.sample_size > 32) {
+            frappe.msgprint({
+                title: __('Validation Error'),
+                message: __('Sample size  must be between 1 and 32.'),
+                indicator: 'red'
+            });
+            frm.doc.sample_size = 1 
+            frm.refresh_field("sample_size"); 
+            return false;
+        }
+
+
+
         for (let i = 0; i < custom_quality_inspection_order_table_1.length; i++) {
             const row = custom_quality_inspection_order_table_1[i];            
             calculate_average_value(frm, "Quality Inspection Order", row.name );
@@ -47,25 +60,6 @@ frappe.ui.form.on("Quality Inspection", {
 
     },
     custom_inspection_progress: function (frm) {
-        if (frm.doc.custom_inspection_progress === 'Buyoff') {
-            frm.set_value('custom_buyoff_inspect_date', frappe.datetime.now_datetime());
-            frm.set_value('custom_roving_inspect_date', null);
-            frm.set_value('custom_final_inspection_inspect_date', null);
-        } else if (frm.doc.custom_inspection_progress === 'Roving') {
-            frm.set_value('custom_buyoff_inspect_date', null);
-            frm.set_value('custom_roving_inspect_date', frappe.datetime.now_datetime());
-            frm.set_value('custom_final_inspection_inspect_date', null);
-        } else if (frm.doc.custom_inspection_progress === 'Final Inspection') {
-            frm.set_value('custom_buyoff_inspect_date', null);
-            frm.set_value('custom_roving_inspect_date', null);
-            frm.set_value('custom_final_inspection_inspect_date', frappe.datetime.now_datetime());
-        } else {
-            frm.set_value('custom_buyoff_inspect_date', null);
-            frm.set_value('custom_roving_inspect_date', null);
-            frm.set_value('custom_final_inspection_inspect_date', null);
-        }
-
-
         // Get the selected value of Inspection Progress
         let inspection_progress_value = frm.doc.custom_inspection_progress;
 
@@ -92,12 +86,18 @@ frappe.ui.form.on("Quality Inspection", {
     custom_type: function (frm) {
         if (frm.doc.custom_type) {
             // ** IMQA
+            // Clear the tables and reset values for links
             frm.set_value('custom_quality_inspection_template_link_1', "");
             frm.toggle_display('custom_quality_inspection_order_table_1', false);
+            frm.clear_table('custom_quality_inspection_order_table_1'); // Clear all rows in the first table
+
             frm.set_value('custom_quality_inspection_template_link_2', "");
             frm.toggle_display('custom_quality_inspection_order_table_2', false);
+            frm.clear_table('custom_quality_inspection_order_table_2'); // Clear all rows in the second table
+
             frm.set_value('custom_quality_inspection_template_link_3', "");
             frm.toggle_display('custom_quality_inspection_order_table_3', false);
+            frm.clear_table('custom_quality_inspection_order_table_3'); // Clear all rows in the third table
 
             if (frm.doc.custom_type === 'IMQA - Plastic Sheet') {
                 frm.set_value('custom_quality_inspection_template_link_1', "IMQA - Plastic Sheet - (1) Visual Inspection");
@@ -166,6 +166,11 @@ frappe.ui.form.on("Quality Inspection", {
                 frm.toggle_display('custom_quality_inspection_order_table_2', true);
             }
 
+            // Refresh the form to show changes
+            frm.refresh_field('custom_quality_inspection_order_table_1');
+            frm.refresh_field('custom_quality_inspection_order_table_2');
+            frm.refresh_field('custom_quality_inspection_order_table_3');
+
 
         }
     },
@@ -231,63 +236,95 @@ frappe.ui.form.on("Quality Inspection", {
     },
     custom_quality_inspection_template_link_1: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_1) {
-
-            return frm.call({
+            frm.clear_table("custom_quality_inspection_order_table_1");
+            // Call the server-side method and populate the child table
+            frappe.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
-                    template_key: "custom_quality_inspection_template_link_1",
+                    item_code: frm.doc.item_code,
+                    template_key: "custom_quality_inspection_template_link_1", 
                     table_key: "custom_quality_inspection_order_table_1"
                 },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_order_table_1");
-                },
+                callback: function(response) {
+                    const table_data = response.message;
+                    // Populate the child table with returned data
+                    if (table_data && Array.isArray(table_data)) {
+                        table_data.forEach(row => {
+                            const child = frm.add_child("custom_quality_inspection_order_table_1"); // Replace 'table_key' with your actual table fieldname
+                            frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                            frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                            frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                        });
+                        frm.refresh_field("custom_quality_inspection_order_table_1"); // Replace 'table_key' with your actual table fieldname
+                    }
+                }
             });
         }
     },
     custom_quality_inspection_template_link_2: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_2) {
-
-            return frm.call({
+            frm.clear_table("custom_quality_inspection_order_table_2");
+            // Call the server-side method and populate the child table
+            frappe.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
-                    template_key: "custom_quality_inspection_template_link_2",
+                    item_code: frm.doc.item_code,
+                    template_key: "custom_quality_inspection_template_link_2", 
                     table_key: "custom_quality_inspection_order_table_2"
                 },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_order_table_2");
-                },
+                callback: function(response) {
+                    const table_data = response.message;
+                    // Populate the child table with returned data
+                    if (table_data && Array.isArray(table_data)) {
+                        table_data.forEach(row => {
+                            const child = frm.add_child("custom_quality_inspection_order_table_2"); // Replace 'table_key' with your actual table fieldname
+                            frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                            frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                            frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                        });
+                        frm.refresh_field("custom_quality_inspection_order_table_2"); // Replace 'table_key' with your actual table fieldname
+                    }
+                }
             });
         }
     },
     custom_quality_inspection_template_link_3: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_3) {
-
-            return frm.call({
+            frm.clear_table("custom_quality_inspection_order_table_3");
+            // Call the server-side method and populate the child table
+            frappe.call({
                 method: "custom_get_item_specification_details",
                 doc: frm.doc,
                 args: {
-                    template_key: "custom_quality_inspection_template_link_3",
+                    item_code: frm.doc.item_code,
+                    template_key: "custom_quality_inspection_template_link_3", 
                     table_key: "custom_quality_inspection_order_table_3"
                 },
-                callback: function () {
-                    refresh_field("custom_quality_inspection_order_table_3");
-                },
+                callback: function(response) {
+                    const table_data = response.message;
+                    // Populate the child table with returned data
+                    if (table_data && Array.isArray(table_data)) {
+                        table_data.forEach(row => {
+                            const child = frm.add_child("custom_quality_inspection_order_table_3"); // Replace 'table_key' with your actual table fieldname
+                            frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                            frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                            frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                        });
+                        frm.refresh_field("custom_quality_inspection_order_table_3"); // Replace 'table_key' with your actual table fieldname
+                    }
+                }
             });
         }
     },
-    quality_inspection_template: function (frm) {
-        if (frm.doc.quality_inspection_template) {
-            return frm.call({
-                method: "get_item_specification_details",
-                doc: frm.doc,
-                callback: function () {
-                    refresh_field("readings");
-                },
-            });
-        }
-    }
+
 });
 
 frappe.ui.form.on("Quality Inspection Order", {

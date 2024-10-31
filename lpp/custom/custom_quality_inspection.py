@@ -7,12 +7,7 @@ import json
 from frappe import _
 from frappe.utils import flt
 
-class CustomQualityInspection(QualityInspection):
-                        
-    @frappe.whitelist()
-    def custom_get_item_specification_details(self, template_key="", table_key=""):
-        # Define specifications mapping
-        specs = {
+specs = {
             'A0 (mm)': {'valueField': 'custom_a0_tolerance', 'toleranceFieldMax': 'custom_a0_max', 'toleranceFieldMin': 'custom_a0_min'},
             'B0 (mm)': {'valueField': 'custom_b0_tolerance', 'toleranceFieldMax': 'custom_b0_max', 'toleranceFieldMin': 'custom_b0_min'},
             'K0 (mm)': {'valueField': 'custom_k0_tolerance', 'toleranceFieldMax': 'custom_k0_max', 'toleranceFieldMin': 'custom_k0_min'},
@@ -43,33 +38,39 @@ class CustomQualityInspection(QualityInspection):
             'Surface Resistivity (ohms/sq)': {'valueField': 'custom_surface_resistivity_ohmssq', 'toleranceFieldMax': 'custom_surface_resistivity_ohmssq_max', 'toleranceFieldMin': 'custom_surface_resistivity_ohmssq_min'},
             'Length (mm)': {'valueField': 'custom_length_tolerance', 'toleranceFieldMax': 'custom_length_max', 'toleranceFieldMin': 'custom_length_min'},
             'Height (mm)': {'valueField': 'custom_height_tolerance', 'toleranceFieldMax': 'custom_height_max', 'toleranceFieldMin': 'custom_height_min'},
-        }
+}
 
-        # Retrieve template value and reset the table
+class CustomQualityInspection(QualityInspection):
+    
+    @frappe.whitelist()  # Allow the method to be called from client side
+    def custom_get_item_specification_details(self,item_code, template_key, table_key):
+        # Define specifications mapping
         template_value = getattr(self, template_key, None)
-        self.set(table_key, [])
-
-        # Fetch all item data once
-        item_data = frappe.db.get_value('Item', {'item_code': self.item_code}, "*")
-
-        # Get specifications from the template
         parameters = get_template_details(template_value)
 
+        # Prepare a list to hold table data
+        table_data = []
+
+        # Fetch all item data
+        item_data = frappe.db.get_value('Item', {'item_code': item_code}, "*")
+
+        # Process each specification
         for param in parameters:
             spec_name = param["specification"]
             spec_fields = specs.get(spec_name)
-
-            # Append new row to the table
-            child = self.append(table_key, {})
-            child.defects = spec_name
-            child.status = "Accepted"
-
+            
+            row = {"defects": spec_name, "status": "Accepted"}
+            
             if spec_fields:
-                # Proceed if the specification is defined in specs
-                child.nominal_value = item_data.get(spec_fields["valueField"])
-                child.tolerance_max = item_data.get(spec_fields["toleranceFieldMax"])
-                child.tolerance_min = item_data.get(spec_fields["toleranceFieldMin"])
+                row["nominal_value"] = item_data.get(spec_fields["valueField"])
+                row["tolerance_max"] = item_data.get(spec_fields["toleranceFieldMax"])
+                row["tolerance_min"] = item_data.get(spec_fields["toleranceFieldMin"])
+            
+            table_data.append(row)
 
+        # Return the table data
+        return table_data
+                        
 @frappe.whitelist()
 def trigger_notification(docname):
     try:
