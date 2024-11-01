@@ -7,6 +7,13 @@ class MaterialRequestLPP(MaterialRequest):
         if self.workflow_state == 'Approved':
             self.custom_approver = self.modified_by if self.modified_by else None
         super().validate()
+        
+    def validate_material_request_type(self):
+        print('validate_material_request_type customer')
+        """Validate fields in accordance with selected type"""
+
+        if self.material_request_type != "Customer Provided" and self.material_request_type != "Material Issue":
+            self.customer = None
 
 @frappe.whitelist()
 def trigger_notification(docname):
