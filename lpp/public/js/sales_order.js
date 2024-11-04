@@ -14,8 +14,11 @@ frappe.ui.form.on("Sales Order", {
     delivery_date: update_items,
     customer: function(frm) {
         // เคลียร์ตาราง items เมื่อเปลี่ยน Customer
-        clearSalesOrderItems(frm);
-        
+        // clearSalesOrderItems(frm);
+        // Loop through each row in the child table 'items'
+        frm.doc.items.forEach(item => {
+            frappe.model.set_value(item.doctype, item.name, 'customer_item_code', frm.doc.customer);
+        });
         // เคลียร์ตาราง Sales Taxes and Charges
         clearSalesTaxes(frm);
     }

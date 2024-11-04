@@ -26,8 +26,12 @@ frappe.ui.form.on("Purchase Invoice", {
         }, 10); // ใช้ setTimeout เพื่อให้แน่ใจว่าปุ่มจะถูกเพิ่มหลังจากการเรนเดอร์
     },
     supplier(frm) {
+         // Loop through each row in the child table 'items'
+         frm.doc.items.forEach(item => {
+            setCustomSupplierItemCode(frm, item.doctype, item.name);
+        });
         // เคลียร์ตาราง items เมื่อเปลี่ยน Supplier
-        clearPurchaseInvoiceItems(frm);
+        // clearPurchaseInvoiceItems(frm);
     }
 });
 

@@ -1,7 +1,8 @@
+const showButtonSendToMD = false
 frappe.ui.form.on("Purchase Order", {
     refresh: function (frm) {
         // ตรวจสอบว่าผู้ใช้มีบทบาท "Managing Director" หรือไม่
-        if (!frappe.user.has_role('Managing Director') && !frm.is_new()) {
+        if (!frappe.user.has_role('Managing Director') && !frm.is_new() && showButtonSendToMD) {
             // เพิ่มปุ่มที่กำหนดเองชื่อว่า "Send to MD"
             frm.add_custom_button(__('Send to MD'), function () {
                 // เรียกใช้เมธอดเซิร์ฟเวอร์
