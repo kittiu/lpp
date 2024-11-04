@@ -217,11 +217,9 @@ frappe.ui.form.on("Quality Inspection", {
         else if (frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name) {
             try {
                 // Use frappe.get_doc to fetch the full document, including child tables
-                const { message } = await frappe.db.get_value('Purchase Receipt', frm.doc.reference_name, '*');                
                 const doc = await frappe.db.get_doc('Purchase Receipt', frm.doc.reference_name);
                 if (doc && doc.items && doc.items.length > 0) {
                     const item = doc.items[0];
-                    console.log("item",item)
                     frm.set_value({
                         item_code: item.item_code,
                         batch_no : item.batch_no
