@@ -9,7 +9,13 @@ frappe.ui.form.on("Sales Invoice", {
     
     customer: function(frm) {
         // เคลียร์ตาราง items เมื่อเปลี่ยน Customer
-        clearSalesInvoiceItems(frm);
+        // clearSalesInvoiceItems(frm);
+
+        // Loop through each row in the child table 'items'
+        frm.doc.items.forEach(item => {
+            setCustomerItemCode(frm, item.doctype, item.name);
+        });
+
     }
 });
 

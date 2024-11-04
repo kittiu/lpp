@@ -22,8 +22,8 @@ frappe.ui.form.on("Quotation", {
         if (frm.doc.party_name === frm.party_name_old) return;
         frm.party_name_old = frm.doc.party_name;
 
-        resetAndAddRowInQuotationItems(frm); // เรียกฟังก์ชันจัดการตาราง items
-
+        // resetAndAddRowInQuotationItems(frm); // เรียกฟังก์ชันจัดการตาราง items
+        loopSetFieldQuotationItem(frm)
         // ตรวจสอบว่า party_name มีข้อมูล และ quotation_to เป็น "Customer"
         if (frm.doc.party_name && frm.doc.quotation_to === "Customer") {
             // เรียกข้อมูลจาก Customer ว่ามี custom_sales_tax_and_charge หรือไม่
