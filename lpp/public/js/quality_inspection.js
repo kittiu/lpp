@@ -106,7 +106,7 @@ frappe.ui.form.on("Quality Inspection", {
     },
     custom_type: async function (frm) {
         if (!frm.doc.custom_type) return;
-    
+
         // Define configurations for different types
         const config = {
             'IMQA - Plastic Sheet': [
@@ -151,7 +151,7 @@ frappe.ui.form.on("Quality Inspection", {
                 ["custom_quality_inspection_template_link_2", "Final Inspection - Reel - (2) Specification Inspection", "custom_quality_inspection_order_table_2"]
             ]
         };
-    
+
         // Clear all values and tables first
         await Promise.all([
             frm.set_value('custom_quality_inspection_template_link_1', ""),
@@ -161,13 +161,13 @@ frappe.ui.form.on("Quality Inspection", {
             frm.toggle_display('custom_quality_inspection_order_table_2', false),
             frm.toggle_display('custom_quality_inspection_order_table_3', false)
         ]);
-    
+
         await Promise.all([
             frm.clear_table('custom_quality_inspection_order_table_1'),
             frm.clear_table('custom_quality_inspection_order_table_2'),
             frm.clear_table('custom_quality_inspection_order_table_3')
         ]);
-    
+
         // Set values based on type
         const settings = config[frm.doc.custom_type];
         if (settings) {
@@ -176,10 +176,10 @@ frappe.ui.form.on("Quality Inspection", {
                 frm.toggle_display(tableField, true);
             }
         }
-    
+
         // Refresh fields
         ['custom_quality_inspection_order_table_1', 'custom_quality_inspection_order_table_2', 'custom_quality_inspection_order_table_3'].forEach(field => frm.refresh_field(field));
-    },    
+    },
     reference_type: function (frm) {
         if (frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier) {
             frm.events.get_supplier(frm);
@@ -198,7 +198,23 @@ frappe.ui.form.on("Quality Inspection", {
             } catch (err) {
                 console.error('Error fetching production item:', err);
             }
-        } else if (frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier) {
+        }
+        else if (frm.doc.reference_type === 'Purchase Receipt' && frm.doc.reference_name) {
+            try {
+                // Use frappe.get_doc to fetch the full document, including child tables
+                const doc = await frappe.db.get_doc('Purchase Receipt', frm.doc.reference_name);
+                if (doc && doc.items && doc.items.length > 0) {
+                    const item = doc.items[0];
+                    frm.set_value({
+                        item_code: item.item_code,
+                        batch_no: item.batch_no
+                    });
+                }
+            } catch (err) {
+                console.error('Error fetching Purchase Receipt items:', err);
+            }
+        }
+        else if (frm.doc.reference_type && frm.doc.reference_name && !frm.doc.custom_supplier) {
             frm.events.get_supplier(frm);
         }
     },
@@ -243,6 +259,9 @@ frappe.ui.form.on("Quality Inspection", {
     custom_quality_inspection_template_link_1: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_1) {
             frm.clear_table("custom_quality_inspection_order_table_1");
+            frm.set_value('custom_quality_inspection_order_table_1', []);
+            frappe.model.clear_table(frm.doc, 'custom_quality_inspection_order_table_1');
+
             // Call the server-side method and populate the child table
 
 
@@ -259,17 +278,15 @@ frappe.ui.form.on("Quality Inspection", {
                     // Populate the child table with returned data
                     if (table_data && Array.isArray(table_data)) {
                         table_data.forEach(row => {
-                            // setTimeout(
-                            //     () => {
-                                    const child = frm.add_child("custom_quality_inspection_order_table_1"); // Replace 'table_key' with your actual table fieldname
-                                    frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
-                                    frappe.model.set_value(child.doctype, child.name, "status", row.status);
-                                    frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
-                                    frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
-                                    frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
-                                    frm.refresh_field("custom_quality_inspection_order_table_1"); 
-                                // }
-                                // , 1000);
+
+                            const child = frm.add_child("custom_quality_inspection_order_table_1"); 
+                            frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                            frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                            frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                            frm.refresh_field("custom_quality_inspection_order_table_1");
+
                         });
 
                     }
@@ -283,6 +300,8 @@ frappe.ui.form.on("Quality Inspection", {
     custom_quality_inspection_template_link_2: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_2) {
             frm.clear_table("custom_quality_inspection_order_table_2");
+            frm.set_value('custom_quality_inspection_order_table_2', []);
+            frappe.model.clear_table(frm.doc, 'custom_quality_inspection_order_table_2');
             // Call the server-side method and populate the child table
             frappe.call({
                 method: "custom_get_item_specification_details",
@@ -297,17 +316,15 @@ frappe.ui.form.on("Quality Inspection", {
                     // Populate the child table with returned data
                     if (table_data && Array.isArray(table_data)) {
                         table_data.forEach(row => {
-                            // setTimeout(
-                            //     () => {
-                                    const child = frm.add_child("custom_quality_inspection_order_table_2"); // Replace 'table_key' with your actual table fieldname
-                                    frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
-                                    frappe.model.set_value(child.doctype, child.name, "status", row.status);
-                                    frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
-                                    frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
-                                    frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
-                                    frm.refresh_field("custom_quality_inspection_order_table_2"); 
-                                // }
-                                // , 1000);
+
+                            const child = frm.add_child("custom_quality_inspection_order_table_2"); 
+                            frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                            frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                            frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                            frm.refresh_field("custom_quality_inspection_order_table_2");
+
                         });
                     }
                 }
@@ -317,6 +334,8 @@ frappe.ui.form.on("Quality Inspection", {
     custom_quality_inspection_template_link_3: function (frm) {
         if (frm.doc.custom_quality_inspection_template_link_3) {
             frm.clear_table("custom_quality_inspection_order_table_3");
+            frm.set_value('custom_quality_inspection_order_table_3', []);
+            frappe.model.clear_table(frm.doc, 'custom_quality_inspection_order_table_3');
             // Call the server-side method and populate the child table
             frappe.call({
                 method: "custom_get_item_specification_details",
@@ -329,19 +348,17 @@ frappe.ui.form.on("Quality Inspection", {
                 callback: function (response) {
                     const table_data = response.message;
                     // Populate the child table with returned data
-                    if (table_data && Array.isArray(table_data)) {                        
+                    if (table_data && Array.isArray(table_data)) {
                         table_data.forEach(row => {
-                        // setTimeout(
-                        //     () => {
-                                const child = frm.add_child("custom_quality_inspection_order_table_3"); // Replace 'table_key' with your actual table fieldname
-                                frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
-                                frappe.model.set_value(child.doctype, child.name, "status", row.status);
-                                frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
-                                frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
-                                frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
-                                frm.refresh_field("custom_quality_inspection_order_table_3"); 
-                            // }
-                            // , 1000);
+
+                            const child = frm.add_child("custom_quality_inspection_order_table_3"); 
+                            frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
+                            frappe.model.set_value(child.doctype, child.name, "status", row.status);
+                            frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                            frm.refresh_field("custom_quality_inspection_order_table_3");
+
                         });
                     }
                 }
