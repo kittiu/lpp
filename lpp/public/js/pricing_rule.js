@@ -14,6 +14,22 @@ frappe.ui.form.on("Pricing Rule", {
 });
 
 frappe.ui.form.on("Pricing Rule Item Code", {
+
+    items_add: function(frm, cdt, cdn) {
+        var row = locals[cdt][cdn];
+        // Check if there is already one row in the "items" child table
+        if (frm.doc.items && frm.doc.items.length > 1) {
+            frappe.msgprint(__('Only one row is allowed in the Material Request Item table.'));
+            
+            if (frm.doc.items.length > 1) {
+                if(row.idx > 0) {
+                    frm.get_field('items').grid.grid_rows[row.idx - 1].remove();
+                }
+                frm.refresh_field('items'); // Refresh the field to reflect changes
+            }
+           
+        }
+    },
     item_code: function(frm, cdt, cdn) {
         let row = locals[cdt][cdn];  // Get the child table row
         if (row.item_code) {
@@ -34,3 +50,5 @@ frappe.ui.form.on("Pricing Rule Item Code", {
         }
     }
 });
+
+
