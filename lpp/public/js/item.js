@@ -28,39 +28,70 @@ frappe.ui.form.on("Item", {
         frm.events.reset_specifications_tolerance(frm);
     },
 
-    reset_specifications_tolerance: function (frm) {
-
-        const fields_to_reset = [
-            'custom_thickness_tolerance', 'custom_thickness_max', 'custom_thickness_min',
-            'custom_width_tolerance', 'custom_width_max', 'custom_width_min',
-            'custom_a0_tolerance', 'custom_a0_max', 'custom_a0_min',
-            'custom_b0_tolerance', 'custom_b0_max', 'custom_b0_min',
-            'custom_k0_tolerance', 'custom_k0_max', 'custom_k0_min',
-            'custom_p1_tolerance', 'custom_p1_max', 'custom_p1_min',
-            'custom_length__reel_tolerance', 'custom_length__reel_max', 'custom_length__reel_min',
-            'custom_cavities',
-            'custom_a_tolerance', 'custom_a_max', 'custom_a_min',
-            'custom_n_tolerance', 'custom_n_max', 'custom_n_min',
-            'custom_b_tolerance', 'custom_b_max', 'custom_b_min',
-            'custom_c_tolerance', 'custom_c_max', 'custom_c_min',
-            'custom_d_tolerance', 'custom_d_max', 'custom_d_min',
-            'custom_e_tolerance', 'custom_e_max', 'custom_e_min',
-            'custom_f_tolerance', 'custom_f_max', 'custom_f_min',
-            'custom_t1_tolerance', 'custom_t1_max', 'custom_t1_min',
-            'custom_t2_tolerance', 'custom_t2_max', 'custom_t2_min',
-            'custom_w1_tolerance', 'custom_w1_max', 'custom_w1_min',
-            'custom_w2_tolerance', 'custom_w2_max', 'custom_w2_min',
-            'custom_surface_resistivity_ohmssq', 'custom_surface_resistivity_ohmssq_max', 'custom_surface_resistivity_ohmssq_min'
-        ];
+    reset_specifications_tolerance: function(frm) {
+        const fieldsToReset = {
+            'thermoformed_tray': [
+                'custom_thickness_thermoformed_tray', 'custom_thickness_max_thermoformed_tray', 'custom_thickness_min_thermoformed_tray',
+                'custom_width_in_thermoformed_tray', 'custom_width_in_max_thermoformed_tray', 'custom_width_in_min_thermoformed_tray',
+                'custom_a_basic', 'custom_a_basic_max', 'custom_a_basic_min',
+                'custom_b_thermoformed_tray', 'custom_b_max_thermoformed_tray', 'custom_b_min_thermoformed_tray',
+                'custom_c_basic', 'custom_c_basic_max', 'custom_c_basic_min',
+                'custom_d_basic', 'custom_d_basic_max', 'custom_d_basic_min',
+                'custom_e_thermoformed_tray', 'custom_e_max_thermoformed_tray', 'custom_e_min_thermoformed_tray',
+                'custom_f_thermoformed_tray', 'custom_f_max_thermoformed_tray', 'custom_f_min_thermoformed_tray',
+                'custom_g_tolerance', 'custom_g_max', 'custom_g_min',
+                'custom_h_tolerance', 'custom_h_max', 'custom_h_min',
+                'custom_i_tolerance', 'custom_i_max', 'custom_i_min',
+                'custom_j_tolerance', 'custom_j_max', 'custom_j_min',
+                'custom_k_tolerance', 'custom_k_max', 'custom_k_min',
+                'custom_surface_resistance_ohms_thermoformed_tray', 'custom_surface_resistance_ohms_thermoformed_tray_max', 'custom_surface_resistance_ohms_thermoformed_tray_min'
+            ],
+            'carrier_tape': [
+                "custom_a0_tolerance", "custom_a0_max", "custom_a0_min",
+                "custom_b0_tolerance", "custom_b0_max", "custom_b0_min",
+                "custom_k0_tolerance", "custom_k0_max", "custom_k0_min",
+                "custom_p1_tolerance", "custom_p1_max", "custom_p1_min",
+                "custom_thickness_tolerance_carrier_tape", "custom_thickness_max_carrier_tape", "custom_thickness_min_carrier_tape",
+                "custom_width_in_carrier_tape", "custom_width_in_max_carrier_tape", "custom_width_in_min_carrier_tape",
+                "custom_length__reel_tolerance", "custom_length__reel_max", "custom_length__reel_min",
+                "custom_surface_resistance_ohms_carrier_tape", "custom_surface_resistance_ohms_carrier_tape_max", "custom_surface_resistance_ohms_carrier_tape_min",
+                "custom_step_in_pocket"
+            ],
+            'plastic_reel': [
+                "custom_a_tolerance", "custom_a_max", "custom_a_min",
+                "custom_n_tolerance", "custom_n_max", "custom_n_min",
+                "custom_b_plastic_reel", "custom_b_max_plastic_reel", "custom_b_min_plastic_reel",
+                "custom_c_tolerance", "custom_c_max", "custom_c_min",
+                "custom_d_tolerance", "custom_d_max", "custom_d_min",
+                "custom_e_plastic_reel", "custom_e_max_plastic_reel", "custom_e_min_plastic_reel",
+                "custom_f_plastic_reel", "custom_f_max_plastic_reel", "custom_f_min_plastic_reel",
+                "custom_t1_tolerance", "custom_t1_max", "custom_t1_min",
+                "custom_t2_tolerance", "custom_t2_max", "custom_t2_min",
+                "custom_w1_tolerance", "custom_w1_max", "custom_w1_min",
+                "custom_w2_tolerance", "custom_w2_max", "custom_w2_min",
+                "custom_delta_e_tolerance", "custom_delta_e_max", "custom_delta_e_min",
+                "custom_surface_resistance_ohms_plastic_reel", "custom_surface_resistance_ohms_plastic_reel_max", "custom_surface_resistance_ohms_plastic_reel_min"
+            ],
+            'engineering': [
+                "custom_mold_base_width",
+                "custom_mold_base_length",
+                "custom_mold_base_height",
+                "custom_mold_quantity",
+                "custom_cavities"
+            ],
+            'text': [
+                "custom_pockets_thermoformed_tray",
+                "custom_pockets_carrier_tape",
+                "custom_sample_color"
+            ]
+        };
     
-        // Loop through each field and reset its value to 0
-        fields_to_reset.forEach(function(field) {
-            frm.set_value(field, 0);
+        Object.values(fieldsToReset).flat().forEach(field => {
+            const resetValue = fieldsToReset['text'].includes(field) ? null : 0;
+            frm.set_value(field, resetValue);
         });
     
-        // Optionally, update the form after all values are set
         frm.refresh();
-
     },
     // Add a helper function to generate mold_id
     generate_mold_ids: function(frm) {
