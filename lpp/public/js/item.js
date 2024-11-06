@@ -104,9 +104,8 @@ frappe.ui.form.on("Item", {
                 if (row.item_code) {
                     // Generate the mold_id for the current row
                     let mold_id = `MOLD-${frm.doc.item_code}-${String(mold_count).padStart(2, '0')}`;
-                    
                     // Set the mold_id in the current row
-                    frappe.model.set_value(row.doctype, row.name, 'mold_id', mold_id);
+                    frappe.model.set_value(row.doctype, row.name, 'mold_id', row.mold_id ?? mold_id);
                     
                     mold_count++;  // Increment the mold count for the next row
                 }
