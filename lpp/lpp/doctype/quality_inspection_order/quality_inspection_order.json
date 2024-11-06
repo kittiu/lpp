@@ -8,8 +8,8 @@
  "field_order": [
   "defects",
   "nominal_value",
-  "tolerance_max",
-  "tolerance_min",
+  "tolerance_upper",
+  "tolerance_lower",
   "accepted",
   "rejected",
   "remark",
@@ -129,20 +129,6 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Nominal Value"
-  },
-  {
-   "columns": 1,
-   "fieldname": "tolerance_max",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Tolerance (+)"
-  },
-  {
-   "columns": 1,
-   "fieldname": "tolerance_min",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Tolerance (-)"
   },
   {
    "columns": 1,
@@ -693,12 +679,22 @@
    "fieldname": "remark_32",
    "fieldtype": "Data",
    "label": "Remark 32"
+  },
+  {
+   "fieldname": "tolerance_lower",
+   "fieldtype": "Float",
+   "label": "Tolerance (-)"
+  },
+  {
+   "fieldname": "tolerance_upper",
+   "fieldtype": "Float",
+   "label": "Tolerance (+)"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-28 11:24:51.101464",
+ "modified": "2024-11-06 17:40:53.303957",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Quality Inspection Order",
