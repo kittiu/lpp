@@ -683,18 +683,20 @@
   {
    "fieldname": "tolerance_lower",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Tolerance (-)"
   },
   {
    "fieldname": "tolerance_upper",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Tolerance (+)"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-11-06 17:40:53.303957",
+ "modified": "2024-11-06 18:01:26.978150",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Quality Inspection Order",

@@ -285,8 +285,8 @@ frappe.ui.form.on("Quality Inspection", {
                             frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
                             frappe.model.set_value(child.doctype, child.name, "status", row.status);
                             frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
-                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
-                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_upper", row.tolerance_upper);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_lower", row.tolerance_lower);
                             frm.refresh_field("custom_quality_inspection_order_table_1");
 
                         });
@@ -323,8 +323,8 @@ frappe.ui.form.on("Quality Inspection", {
                             frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
                             frappe.model.set_value(child.doctype, child.name, "status", row.status);
                             frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
-                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
-                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_upper", row.tolerance_upper);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_lower", row.tolerance_lower);
                             frm.refresh_field("custom_quality_inspection_order_table_2");
 
                         });
@@ -357,8 +357,8 @@ frappe.ui.form.on("Quality Inspection", {
                             frappe.model.set_value(child.doctype, child.name, "defects", row.defects);
                             frappe.model.set_value(child.doctype, child.name, "status", row.status);
                             frappe.model.set_value(child.doctype, child.name, "nominal_value", row.nominal_value);
-                            frappe.model.set_value(child.doctype, child.name, "tolerance_max", row.tolerance_max);
-                            frappe.model.set_value(child.doctype, child.name, "tolerance_min", row.tolerance_min);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_upper", row.tolerance_upper);
+                            frappe.model.set_value(child.doctype, child.name, "tolerance_lower", row.tolerance_lower);
                             frm.refresh_field("custom_quality_inspection_order_table_3");
 
                         });
@@ -448,14 +448,14 @@ function validate_inspected_value(frm, cdt, cdn, inspected_value_name) {
 
     const row = locals[cdt][cdn];
     let nominal_value = row.nominal_value;
-    let tolerance_max = Number(row.tolerance_max);
-    let tolerance_min = Number(row.tolerance_min);
+    let tolerance_upper = Number(row.tolerance_upper);
+    let tolerance_lower = Number(row.tolerance_lower);
     let inspected_value = row[inspected_value_name];
 
-    // ตรวจสอบว่ามีการระบุ tolerance_max และ tolerance_min หรือไม่
-    if (row.tolerance_max < 99) {
+    // ตรวจสอบว่ามีการระบุ tolerance_upper และ tolerance_lower หรือไม่
+    if (row.tolerance_upper < 99) {
         // คำนวณช่วงค่าที่อนุญาต
-        let max_value = nominal_value + tolerance_max;        
+        let max_value = nominal_value + tolerance_upper;        
         // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
         if (inspected_value > max_value) {
             frappe.show_alert({
@@ -466,9 +466,9 @@ function validate_inspected_value(frm, cdt, cdn, inspected_value_name) {
         }
     }
 
-    if (row.tolerance_min < 99 ) {
+    if (row.tolerance_lower < 99 ) {
         // คำนวณช่วงค่าที่อนุญาต
-        let min_value = nominal_value - tolerance_min;
+        let min_value = nominal_value - tolerance_lower;
         // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
         if (inspected_value < min_value) {
             frappe.show_alert({
