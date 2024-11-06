@@ -63,7 +63,7 @@ class CustomQualityInspection(QualityInspection):
             
             if spec_fields:
                 row["nominal_value"] = item_data.get(spec_fields["valueField"])
-                row["tolerance_max"] = item_data.get(spec_fields["toleranceFieldMax"])
+                row["tolerance_upper"] = item_data.get(spec_fields["toleranceFieldMax"])
                 row["tolerance_min"] = item_data.get(spec_fields["toleranceFieldMin"])
             
             table_data.append(row)
