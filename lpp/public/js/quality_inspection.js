@@ -453,7 +453,7 @@ function validate_inspected_value(frm, cdt, cdn, inspected_value_name) {
     let inspected_value = row[inspected_value_name];
 
     // ตรวจสอบว่ามีการระบุ tolerance_max และ tolerance_min หรือไม่
-    if (row.tolerance_max != "") {
+    if (row.tolerance_max < 99) {
         // คำนวณช่วงค่าที่อนุญาต
         let max_value = nominal_value + tolerance_max;        
         // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
@@ -466,7 +466,7 @@ function validate_inspected_value(frm, cdt, cdn, inspected_value_name) {
         }
     }
 
-    if (row.tolerance_min != "") {
+    if (row.tolerance_min < 99 ) {
         // คำนวณช่วงค่าที่อนุญาต
         let min_value = nominal_value - tolerance_min;
         // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่

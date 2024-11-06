@@ -17,7 +17,7 @@ class CustomBOM(BOM):
 			index = 1
 
 		prefix = self.doctype
-		suffix = "%.2i" % index  # convert index to string (1 -> "001")
+		suffix = "%.2i" % index  # convert index to string (1 -> "01")
 		bom_name = f"{prefix}-{self.item}-{suffix}"
 
 		if len(bom_name) <= 140:
