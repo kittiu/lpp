@@ -42,7 +42,7 @@ frappe.ui.form.on("Job Card", {
         }
 
         // Calculate custom_yield_with_setup_production if all required fields are available
-        if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production && !frm.doc.custom_yield_with_setup_production) {
+        if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_unit_quantity_setup && frm.doc.custom_as_unit_quantity_production && !frm.doc.custom_yield_with_setup_production) {
             calculate_yield_with_setup(frm);
         }
 
@@ -198,17 +198,17 @@ frappe.ui.form.on("Job Card", {
     },
     custom_as_unit_quantity_setup: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_unit_quantity_setup', 'custom_as_weight_setup', true)
+        calculate_yield_with_setup(frm);
     },
     custom_as_weight_setup: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_weight_setup', 'custom_as_unit_quantity_setup', false)
-        calculate_yield_with_setup(frm);
     },
     custom_as_unit_quantity_production: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_unit_quantity_production', 'custom_as_weight_production', true)
+        calculate_yield_with_setup(frm);
     },
     custom_as_weight_production: (frm) => {
         calculate_weight_or_unit(frm, 'custom_as_weight_production', 'custom_as_unit_quantity_production', false)
-        calculate_yield_with_setup(frm);
     }
 });
 
@@ -329,8 +329,8 @@ function calculate_yield(frm, output_field, output_value_field, input_value_fiel
 }
 
 function calculate_yield_with_setup(frm) {
-    if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_weight_setup && frm.doc.custom_as_weight_production) {
-        let total_weight = Number(frm.doc.custom_as_weight_setup) + Number(frm.doc.custom_as_weight_production);
+    if (frm.doc.custom_input_production && frm.doc.custom_output_production && frm.doc.custom_as_unit_quantity_setup && frm.doc.custom_as_unit_quantity_production) {
+        let total_weight = Number(frm.doc.custom_as_unit_quantity_setup) + Number(frm.doc.custom_as_unit_quantity_production);
         frm.set_value('custom_yield_with_setup_production', (frm.doc.custom_output_production / (frm.doc.custom_input_production + total_weight)) * 100);
     }
 }
