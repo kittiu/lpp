@@ -23,7 +23,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Item Code",
-   "link_filters": "[[\"Item\",\"item_name\",\"like\",\"%mold%\"]]",
+   "link_filters": "[[\"Item\",\"item_group\",\"=\",\"Assets\"],[\"Item\",\"custom_item_group_2\",\"=\",\"Engineering\"],[\"Item\",\"custom_item_group_3\",\"=\",\"Mold & Tooling\"]]",
    "options": "Item"
   },
   {
@@ -55,7 +55,7 @@
  ],
  "istable": 1,
  "links": [],
- "modified": "2024-10-18 11:36:34.259368",
+ "modified": "2024-11-06 17:20:38.877880",
  "modified_by": "Administrator",
  "module": "LPP",
  "name": "Item Molds Detail",
