@@ -188,11 +188,12 @@ frappe.ui.form.on("Quality Inspection", {
     reference_name: async function (frm) {
         if (frm.doc.reference_type === 'Job Card' && frm.doc.reference_name) {
             try {
-                const { message } = await frappe.db.get_value('Job Card', frm.doc.reference_name, ['production_item', 'custom_lot_no']);
+                const { message } = await frappe.db.get_value('Job Card', frm.doc.reference_name, ['production_item', 'custom_lot_no','custom_production_item_name']);
                 if (message) {
                     frm.set_value({
                         item_code: message.production_item,
-                        batch_no: message.custom_lot_no
+                        batch_no: message.custom_lot_no,
+                        item_name : message.custom_production_item_name,
                     });
                 }
             } catch (err) {
@@ -207,6 +208,7 @@ frappe.ui.form.on("Quality Inspection", {
                     const item = doc.items[0];
                     frm.set_value({
                         item_code: item.item_code,
+                        item_name : item.item_name,
                         batch_no: item.batch_no
                     });
                 }
@@ -451,10 +453,9 @@ function validate_inspected_value(frm, cdt, cdn, inspected_value_name) {
     let inspected_value = row[inspected_value_name];
 
     // ตรวจสอบว่ามีการระบุ tolerance_max และ tolerance_min หรือไม่
-    if (!!tolerance_max) {
+    if (row.tolerance_max < 99) {
         // คำนวณช่วงค่าที่อนุญาต
-        let max_value = nominal_value + tolerance_max;
-
+        let max_value = nominal_value + tolerance_max;        
         // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
         if (inspected_value > max_value) {
             frappe.show_alert({
@@ -465,10 +466,9 @@ function validate_inspected_value(frm, cdt, cdn, inspected_value_name) {
         }
     }
 
-    if (!!tolerance_min) {
+    if (row.tolerance_min < 99 ) {
         // คำนวณช่วงค่าที่อนุญาต
         let min_value = nominal_value - tolerance_min;
-
         // ตรวจสอบว่า Inspected Value  อยู่ในช่วงที่กำหนดหรือไม่
         if (inspected_value < min_value) {
             frappe.show_alert({
