@@ -1,5 +1,8 @@
 frappe.ui.form.on("Work Order", {
     refresh(frm) {
+        frm.set_df_property('status', 'hidden', 0);
+        frm.set_df_property('company', 'hidden', 0);
+
         // Get today's date
         let today = frappe.datetime.nowdate();
         if (frm.is_new()) {
