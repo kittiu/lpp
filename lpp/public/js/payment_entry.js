@@ -1,4 +1,7 @@
 frappe.ui.form.on("Payment Entry", {
+    onload(frm){
+        frm.events.payment_type(frm);
+    },
     refresh(frm) {
         frm.set_query("reference_doctype", "references", function () {
             let doctypes = ["Journal Entry"];
@@ -25,6 +28,16 @@ frappe.ui.form.on("Payment Entry", {
         });
         }
     },
+    payment_type(frm){
+        if (frm.doc.payment_type == "Pay") {
+            frm.set_value('naming_series', 'PV.YY.MM.-.####');
+        }
+        else if (frm.doc.payment_type == "Receive"){
+            frm.set_value('naming_series','RC.YY.MM.-.####');
+        }else{
+            frm.set_value('naming_series','')
+        }
+    }
 });
 
 frappe.ui.form.on("Payment Entry","setup", function(frm) {
