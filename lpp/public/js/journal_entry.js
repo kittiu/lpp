@@ -72,7 +72,7 @@ frappe.ui.form.on('Journal Entry Tax Invoice Detail', {
         calculate_custom_total(frm)
     },
     custom_tax_base_amount_custom: async function(frm){
-        await update_custom_tax_amount_custom(frm);
+        update_custom_tax_amount_custom(frm);
         calculate_custom_total(frm);
     }
 });
@@ -126,4 +126,14 @@ function calculate_custom_total(frm) {
     });
     // // อัพเดตค่าในฟิลด์ custom_total ด้วยผลรวม
     frm.set_value('custom_total', total);
+}
+
+function update_custom_tax_amount_custom(frm) {
+    const tax_rate = 0.07;
+    frm.doc.tax_invoice_details.forEach(row => {
+        if (row.custom_tax_base_amount_custom) {
+            row.custom_tax_amount_custom = row.custom_tax_base_amount_custom * tax_rate
+        }
+    });
+    frm.refresh_field('tax_invoice_details');
 }
