@@ -153,8 +153,8 @@ function calculateYield(frm, outputField, outputValueField, inputValueField) {
 }
 
 function calculateYieldWithSetup(frm) {
-    if (frm.doc.input_sample && frm.doc.output_sample && frm.doc.setup_weight_setup_sample && frm.doc.setup_weight_production_sample) {
-        const totalWeight = Number(frm.doc.setup_weight_setup_sample) + Number(frm.doc.setup_weight_production_sample);
+    if (frm.doc.input_sample && frm.doc.output_sample && frm.doc.setup_quantity_setup_sample && frm.doc.setup_quantity_production_sample) {
+        const totalWeight = Number(frm.doc.setup_quantity_setup_sample) + Number(frm.doc.setup_quantity_production_sample);
         frm.set_value('yield_with_setup_sample', (frm.doc.output_sample / (frm.doc.input_sample + totalWeight)) * 100);
     }
 }
