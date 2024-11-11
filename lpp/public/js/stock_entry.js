@@ -1,11 +1,13 @@
 frappe.ui.form.on("Stock Entry", {
+    onload: function(frm) {
+        frm.events.stock_entry_type(frm);
+    },
     work_order(frm){
         if (frm.doc.work_order){
             frm.events.set_custom_lot_no(frm);
         }
     },
-    stock_entry_type: function(frm) {
-        
+    stock_entry_type: function(frm) {        
         switch(frm.doc.stock_entry_type) {
             case 'Manufacture':
                 frm.set_value('naming_series', 'PT.YY..MM.-.####.');
