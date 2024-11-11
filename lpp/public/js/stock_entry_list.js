@@ -1,7 +1,7 @@
 frappe.listview_settings['Stock Entry'] = {
     onload: function(listview) {
         // เพิ่มปุ่มที่กำหนดเองด้านบนขวา
-        listview.page.add_action_item(__('Already Printed'), async function() {
+        listview.page.add_action_item(__('Is Transfer'), async function() {
             let selected_docs = listview.get_checked_items();  // ดึงรายการที่เลือกทั้งหมด
 
             // กรองเฉพาะ Stock Entries ที่มีสถานะเป็น "Draft"
