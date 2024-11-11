@@ -1,5 +1,13 @@
 frappe.ui.form.on("Purchase Invoice", {
     refresh(frm) {
+        if(frm.doc.custom_supplier_invoice && frm.doc.custom_supplier_invoice !== frm.doc.tax_invoice_number){
+            frm.set_value("tax_invoice_number", frm.doc.custom_supplier_invoice);
+        }
+        if(frm.doc.custom_supplier_delivery_date && frm.doc.custom_supplier_delivery_date !== frm.doc.tax_invoice_date){
+            frm.set_value("tax_invoice_date", frm.doc.custom_supplier_delivery_date);
+        }
+        frm.set_df_property('custom_supplier_invoice', 'hidden', true);
+        frm.set_df_property('custom_supplier_delivery_date', 'hidden', true);
         setTimeout(() => {
             // ลบปุ่ม "Get Items From" ถ้าเอกสารมีสถานะเอกสารเป็น 0 (ร่าง)
             frm.remove_custom_button('Purchase Order', 'Get Items From');
@@ -32,6 +40,18 @@ frappe.ui.form.on("Purchase Invoice", {
         });
         // เคลียร์ตาราง items เมื่อเปลี่ยน Supplier
         // clearPurchaseInvoiceItems(frm);
+    },
+    custom_supplier_invoice(frm){
+        console.log('Hello');
+        
+        if(frm.doc.custom_supplier_invoice){
+            frm.set_value("tax_invoice_number", frm.doc.custom_supplier_invoice);
+        }
+    },
+    custom_supplier_delivery_date(frm){
+        if(frm.doc.custom_supplier_delivery_date){
+            frm.set_value("tax_invoice_date", frm.doc.custom_supplier_delivery_date);
+        }
     }
 });
 
