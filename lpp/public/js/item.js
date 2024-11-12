@@ -28,7 +28,7 @@ frappe.ui.form.on("Item", {
         frm.events.reset_specifications_tolerance(frm);
     },
 
-    reset_specifications_tolerance: function(frm) {
+    reset_specifications_tolerance: function (frm) {
         const fieldsToReset = {
             'thermoformed_tray': [
                 'custom_thickness_thermoformed_tray', 'custom_thickness_max_thermoformed_tray', 'custom_thickness_min_thermoformed_tray',
@@ -85,38 +85,77 @@ frappe.ui.form.on("Item", {
                 "custom_sample_color"
             ]
         };
-    
+
         Object.values(fieldsToReset).flat().forEach(field => {
             const resetValue = fieldsToReset['text'].includes(field) ? null : 0;
             frm.set_value(field, resetValue);
         });
-    
+
         frm.refresh();
     },
     // Add a helper function to generate mold_id
-    generate_mold_ids: function(frm) {
+    generate_mold_ids: function (frm) {
         let child_table = frm.doc.custom_molds_items || [];
         if (child_table.length > 0) {
             let mold_count = 1;  // Initialize the running count for mold_id
-            
+
             // Loop through each row in the child table
-            child_table.forEach(function(row) {
+            child_table.forEach(function (row) {
                 if (row.item_code) {
                     // Generate the mold_id for the current row
                     let mold_id = `MOLD-${frm.doc.item_code}-${String(mold_count).padStart(2, '0')}`;
                     // Set the mold_id in the current row
                     frappe.model.set_value(row.doctype, row.name, 'mold_id', row.mold_id ?? mold_id);
-                    
+
                     mold_count++;  // Increment the mold count for the next row
                 }
             });
         }
+    },
+    asset_category: function (frm) {
+        if (frm.doc.is_fixed_asset === 1 && frm.doc.auto_create_assets === 1) {
+            switch (frm.doc.asset_category) {
+                case 'Land':
+                    frm.set_value('asset_naming_series', 'FLAN.YY.MM.####.');
+                    break;
+                case 'Building':
+                    frm.set_value('asset_naming_series', 'FBUD.YY.MM.####.');
+                    break;
+                case 'Vehicle':
+                    frm.set_value('asset_naming_series', 'FVEH.YY.MM.####.');
+                    break;
+                case 'Machine & Mold':
+                    frm.set_value('asset_naming_series', 'FMAC.YY.MM.####.');
+                    break;
+                case 'Tools & Equipment':
+                    frm.set_value('asset_naming_series', 'FEQU.YY.MM.####.');
+                    break;
+                case 'Interior & Furniture':
+                    frm.set_value('asset_naming_series', 'FFUR.YY.MM.####.');
+                    break;
+                case 'Electrical Appliances':
+                    frm.set_value('asset_naming_series', 'FELC.YY.MM.####.');
+                    break;
+                case 'Computer Equipment':
+                    frm.set_value('asset_naming_series', 'FCOM.YY.MM.####.');
+                    break;
+                case 'Build Insurance':
+                    frm.set_value('asset_naming_series', 'FBIN.YY.MM.####.');
+                    break;
+                case 'Vehicle Insurance':
+                    frm.set_value('asset_naming_series', 'FVIN.YY.MM.####.');
+                    break;
+                default:
+                    frm.set_value('asset_naming_series', '');
+            }
+        }
+
     }
 });
 frappe.ui.form.on('Item Customer Detail', {
-    customer_name: function(frm, cdt, cdn) {
+    customer_name: function (frm, cdt, cdn) {
         let row = locals[cdt][cdn];
-        
+
         // Fetch the customer_code based on the selected customer_name
         if (row.customer_name) {
             frappe.call({
@@ -126,7 +165,7 @@ frappe.ui.form.on('Item Customer Detail', {
                     filters: { name: row.customer_name },
                     fieldname: "name"
                 },
-                callback: function(response) {
+                callback: function (response) {
                     if (response.message) {
                         // Set the ref_code based on the fetched customer_code
                         frappe.model.set_value(cdt, cdn, 'ref_code', response.message.name);
@@ -140,23 +179,23 @@ frappe.ui.form.on('Item Customer Detail', {
 });
 
 frappe.ui.form.on('Item Molds Detail', {
-    custom_molds_items_move: function(frm, cdt, cdn) {
+    custom_molds_items_move: function (frm, cdt, cdn) {
         frm.events.generate_mold_ids(frm);
     },
-    custom_molds_items_add: function(frm, cdt, cdn) {
+    custom_molds_items_add: function (frm, cdt, cdn) {
         frm.events.generate_mold_ids(frm);
     },
-    custom_molds_items_remove: function(frm, cdt, cdn) {
+    custom_molds_items_remove: function (frm, cdt, cdn) {
         frm.events.generate_mold_ids(frm);
     },
-    item_code: function(frm, cdt, cdn) {
+    item_code: function (frm, cdt, cdn) {
         frm.events.generate_mold_ids(frm);
     }
 });
 
 frappe.ui.form.on('Item Default', {
     item_defaults_add(frm, cdt, cdn) {
-          // default warehouse in table item_defaults
+        // default warehouse in table item_defaults
         setDefaultWarehouse(frm, cdt, cdn);
     }
 });
