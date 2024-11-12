@@ -15,7 +15,7 @@ frappe.ui.form.on("Purchase Receipt", {
 	},
 
 	async make_quality_inspection_new  (frm) {
-
+//
 		let data = [];
 		const fields = [
 			{
@@ -104,7 +104,14 @@ frappe.ui.form.on("Purchase Receipt", {
 					freeze: true,
 					callback: function (r) {
 						if (r.message.length > 0) {
-
+							r.message.forEach(name => {
+								frappe.call({
+									method: 'lpp.custom.custom_quality_inspection.trigger_notification',
+									args: { docname: name },
+									callback: function(r) {
+									}
+								});
+							});	
 							if (r.message.length === 1) {
 								frappe.set_route("Form", "Quality Inspection", r.message[0]);
 							} else {
