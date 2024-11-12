@@ -180,7 +180,7 @@ frappe.ui.form.on("Work Order", {
 					dialog.fields_dict.operations.df.data.push({
 						name: data.name,
 						operation: data.operation,
-						workstation: data.operation === 'Packing' ? frm.doc.operations[0].workstation : data.workstation ,
+						workstation: data.workstation,
 						batch_size: data.batch_size,
 						qty: pending_qty,
 						pending_qty: pending_qty,
