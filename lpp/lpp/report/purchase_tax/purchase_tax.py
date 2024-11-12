@@ -95,7 +95,6 @@ def get_data(filters):
         for dt in filtered_data:
             # Get supplier's address_line2 from linked address
             address_line2 = get_customer_address_line2(dt.get('supplier_id', ''))
-            print(dt.get('total_tax', 0))
             # Append to report_data
             report_data.append({
                 "posting_date": dt.get('posting_date', ''),
