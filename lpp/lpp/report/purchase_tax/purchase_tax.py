@@ -89,10 +89,12 @@ def get_data(filters):
     row_number = 1
 
     if purchase_register_data and len(purchase_register_data) > 1:
-        for dt in purchase_register_data[1]:
+        filtered_data = [
+            dt for dt in purchase_register_data[1] if dt.get('total_tax', 0.0)
+        ]
+        for dt in filtered_data:
             # Get supplier's address_line2 from linked address
             address_line2 = get_customer_address_line2(dt.get('supplier_id', ''))
-            
             # Append to report_data
             report_data.append({
                 "posting_date": dt.get('posting_date', ''),

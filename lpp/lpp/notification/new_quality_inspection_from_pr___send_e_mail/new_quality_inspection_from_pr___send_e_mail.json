@@ -1,0 +1,31 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "creation": "2024-11-12 17:24:43.878722",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Quality Inspection",
+ "enabled": 1,
+ "event": "Custom",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>Quality Inspection {{doc.name}} created from Purchase Receipt. Please review.</p>\n",
+ "message_type": "Markdown",
+ "modified": "2024-11-12 17:35:03.538634",
+ "modified_by": "Administrator",
+ "module": "LPP",
+ "name": "New Quality Inspection from PR - Send E-mail",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "cc": "qa@lplastpack.com",
+   "condition": "1==1"
+  }
+ ],
+ "send_system_notification": 0,
+ "send_to_all_assignees": 0,
+ "sender": "Ecosoft",
+ "sender_email": "mail@ecosoft.co.th",
+ "subject": "New {{ doc.name }}"
+}
