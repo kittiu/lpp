@@ -33,6 +33,13 @@ frappe.ui.form.on("Purchase Invoice", {
             }
         }, 10); // ใช้ setTimeout เพื่อให้แน่ใจว่าปุ่มจะถูกเพิ่มหลังจากการเรนเดอร์
     },
+    is_return(frm){
+        if(frm?.doc?.is_return){
+            frm.set_value("naming_series", 'CNS.YY..MM.-.####.');
+        }else{
+            frm.set_value("naming_series", null);
+        }
+    },
     supplier(frm) {
          // Loop through each row in the child table 'items'
          frm.doc.items.forEach(item => {
@@ -42,7 +49,6 @@ frappe.ui.form.on("Purchase Invoice", {
         // clearPurchaseInvoiceItems(frm);
     },
     custom_supplier_invoice(frm){
-        console.log('Hello');
         
         if(frm.doc.custom_supplier_invoice){
             frm.set_value("tax_invoice_number", frm.doc.custom_supplier_invoice);
