@@ -71,51 +71,53 @@ def get_data(filters):
 	grand_total_amount = 0
 	grand_total_tax_amount = 0
 	result_grand_total = 0
-	from_date = None
-	to_date = None
+
+	from_date = filters.get('from_date', date.today())
+	to_date = filters.get('to_date', date.today())
 
 	if sales_analytics_data and len(sales_analytics_data) > 1:
-
-		if filters:
-			from_date = filters['from_date']
-			to_date = filters['to_date']
-		else: 
-			# Get the current date
-			from_date = date.today()
-			to_date = date.today()
-
 		for dt in sales_analytics_data[1]:
 			query_data = frappe.db.sql(
-                f"""SELECT tc.name , tc.customer_group
-					, SUM(tsoi.amount) AS sum_amount
-					, SUM(tstac.tax_amount) AS sum_tax_amount
-					, SUM(tso.grand_total) AS sum_grand_total
-					FROM `tabCustomer`  tc
-					LEFT JOIN `tabSales Order` tso ON tc.name = tso.customer  
-					LEFT JOIN `tabSales Order Item` tsoi ON tso.name = tsoi.parent 
-					LEFT JOIN `tabSales Taxes and Charges` tstac ON tso.name = tstac.parent 
-					WHERE tc.name = '{dt["entity"]}'
-					AND tso.docstatus = 1
-					AND tso.transaction_date BETWEEN '{from_date}' AND '{to_date}'
-                    """,
+                f"""
+                SELECT 
+                    tc.name, 
+                    tc.customer_group,
+                    COALESCE(SUM(tsoi.amount), 0) AS sum_amount,
+                    COALESCE(SUM(tstac.tax_amount), 0) AS sum_tax_amount,
+                    COALESCE(SUM(tso.grand_total), 0) AS sum_grand_total
+                FROM 
+                    `tabCustomer` tc
+                LEFT JOIN 
+                    `tabSales Order` tso ON tc.name = tso.customer  
+                LEFT JOIN 
+                    `tabSales Order Item` tsoi ON tso.name = tsoi.parent 
+                LEFT JOIN 
+                    `tabSales Taxes and Charges` tstac ON tso.name = tstac.parent 
+                WHERE 
+                    tc.name = %s
+                    AND tso.docstatus = 1
+                    AND tso.transaction_date BETWEEN %s AND %s
+                """,
+                (dt["entity"], from_date, to_date),
                 as_dict=True,
             )
 
 			for qr in query_data:
 				json_data = {
-					"group": qr['customer_group'],
-					"entity" : dt["entity"],
-					"entity_name" : dt["entity_name"],
-					"disc" : 0,
-					"deposit" : 0,
-					"before_vat" : qr['sum_amount'],
-					"vat" : qr['sum_tax_amount'],
-					"net_amt" : qr['sum_grand_total']
+					"group": qr['customer_group'] or '',
+					"entity": dt["entity"],
+					"entity_name": dt["entity_name"],
+					"disc": 0,
+					"deposit": 0,
+					"before_vat": qr.get('sum_amount', 0) or 0,
+					"vat": qr.get('sum_tax_amount', 0) or 0,
+					"net_amt": qr.get('sum_grand_total', 0) or 0
 				}
 
-				grand_total_amount += qr.get('sum_amount', 0)
-				grand_total_tax_amount += qr.get('sum_tax_amount', 0)
-				result_grand_total += qr.get('sum_grand_total', 0)
+				grand_total_amount += qr.get('sum_amount', 0) or 0
+				grand_total_tax_amount += qr.get('sum_tax_amount', 0) or 0
+				result_grand_total += qr.get('sum_grand_total', 0) or 0
+
 				report_data.append(json_data)
 
 		grouped_data = defaultdict(list)
@@ -126,52 +128,53 @@ def get_data(filters):
 			group_total_before_vat = 0
 			group_total_vat = 0
 			group_total_net_amt = 0
-			# Add the summary row for the group
+
+			# Add group header
 			target_data.append({
-				"entity" : group,
-				"entity_name" : "",
-				"disc" : None,
-				"deposit" : None,
-				"before_vat" : None,
-				"vat" : None,
-				"net_amt" : None
+				"entity": group,
+				"entity_name": "",
+				"disc": None,
+				"deposit": None,
+				"before_vat": None,
+				"vat": None,
+				"net_amt": None
 			})
 
-			# Add numbered items for each group
+			# Add each item and accumulate group totals
 			for item in items:
 				group_total_before_vat += item.get('before_vat', 0)
 				group_total_vat += item.get('vat', 0)
 				group_total_net_amt += item.get('net_amt', 0)
 				target_data.append({
-					"entity" : item['entity'],
-					"entity_name" : item['entity_name'],
-					"disc" : 0,
-					"deposit" : 0,
-					"before_vat" : item['before_vat'],
-					"vat" : item['vat'],
-					"net_amt" : item['net_amt']
+					"entity": item['entity'],
+					"entity_name": item['entity_name'],
+					"disc": 0,
+					"deposit": 0,
+					"before_vat": item.get('before_vat', 0),
+					"vat": item.get('vat', 0),
+					"net_amt": item.get('net_amt', 0)
 				})
 
-			# Add total row for the group
+			# Add group total row
 			target_data.append({
-				"entity" : "GROUP TOTAL",
-				"entity_name" : "",
-				"disc" : 0,
-				"deposit" : 0,
-				"before_vat" : group_total_before_vat,
-				"vat" : group_total_vat,
-				"net_amt" : group_total_net_amt
+				"entity": "GROUP TOTAL",
+				"entity_name": "",
+				"disc": 0,
+				"deposit": 0,
+				"before_vat": group_total_before_vat,
+				"vat": group_total_vat,
+				"net_amt": group_total_net_amt
 			})
 
-		# grand total
+		# Add grand total row
 		target_data.append({
-			"entity" : "GRAND TOTAL",
-			"entity_name" : "",
-			"disc" : 0,
-			"deposit" : 0,
-			"before_vat" : grand_total_amount,
-			"vat" : grand_total_tax_amount,
-			"net_amt" : result_grand_total
+			"entity": "GRAND TOTAL",
+			"entity_name": "",
+			"disc": 0,
+			"deposit": 0,
+			"before_vat": grand_total_amount,
+			"vat": grand_total_tax_amount,
+			"net_amt": result_grand_total
 		})
 
 	return target_data
