@@ -3,6 +3,18 @@ frappe.ui.form.on("Payment Entry", {
         frm.events.payment_type(frm);
     },
     refresh(frm) {
+        try {
+            // Check if the form is new and custom_bill_no exists
+            if (frm.is_new() && frm.doc.custom_bill_no) {
+                // Call appropriate function based on payment_type
+                const billing_type = frm.doc.payment_type === "Pay" ? "purchase" : "sales";
+                frm.events[`get_documents_from_${billing_type}_billing`](frm, { [`${billing_type}_billing`]: frm.doc.custom_bill_no });
+            }
+        } catch (error) {
+            console.error("Error in retrieving documents:", error);
+            frappe.msgprint(__("An error occurred while retrieving documents. Please try again."));
+        }
+
         frm.set_query("reference_doctype", "references", function () {
             let doctypes = ["Journal Entry"];
             if (frm.doc.party_type == "Customer") {
