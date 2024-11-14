@@ -3,6 +3,7 @@ frappe.ui.form.on("Payment Entry", {
         frm.events.payment_type(frm);
     },
     refresh(frm) {
+        frm.set_df_property('purchase_billing', 'read_only', 1);
         try {
             // Check if the form is new and custom_bill_no exists
             if (frm.is_new() && frm.doc.custom_bill_no) {
