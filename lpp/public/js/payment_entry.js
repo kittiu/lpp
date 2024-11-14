@@ -1,5 +1,20 @@
 frappe.ui.form.on("Payment Entry", {
+    onload(frm){
+        frm.events.payment_type(frm);
+    },
     refresh(frm) {
+        try {
+            // Check if the form is new and custom_bill_no exists
+            if (frm.is_new() && frm.doc.custom_bill_no) {
+                // Call appropriate function based on payment_type
+                const billing_type = frm.doc.payment_type === "Pay" ? "purchase" : "sales";
+                frm.events[`get_documents_from_${billing_type}_billing`](frm, { [`${billing_type}_billing`]: frm.doc.custom_bill_no });
+            }
+        } catch (error) {
+            console.error("Error in retrieving documents:", error);
+            frappe.msgprint(__("An error occurred while retrieving documents. Please try again."));
+        }
+
         frm.set_query("reference_doctype", "references", function () {
             let doctypes = ["Journal Entry"];
             if (frm.doc.party_type == "Customer") {
@@ -13,6 +28,24 @@ frappe.ui.form.on("Payment Entry", {
             };
         });
     },
+    // Field change events to re-evaluate the condition
+    docstatus: function(frm) { frm.trigger('set_field_visibility'); },
+    payment_type: function(frm) { frm.trigger('set_field_visibility'); },
+    party_type: function(frm) { frm.trigger('set_field_visibility'); },
+    party: function(frm) { frm.trigger('set_field_visibility'); },
+    purchase_billing: function(frm) { frm.trigger('set_field_visibility'); },
+    // Define the custom trigger for setting field visibility
+    set_field_visibility: function(frm) {
+        // Define the condition
+        let condition = frm.doc.docstatus === 0 
+                        && frm.doc.payment_type === "Pay" 
+                        && frm.doc.party_type === "Supplier" 
+                        && frm.doc.party;
+
+        // Show or hide the field based on the condition
+        frm.toggle_display('get_invoices_from_purchase_billing', condition);
+        frm.toggle_display('purchase_billing', condition && frm.doc.purchase_billing);
+    },
     validate(frm) {  
         if (frm.doc.references){              
         // วนลูปตรวจสอบแต่ละรายการใน frm.doc.references
@@ -25,6 +58,16 @@ frappe.ui.form.on("Payment Entry", {
         });
         }
     },
+    payment_type(frm){
+        if (frm.doc.payment_type == "Pay") {
+            frm.set_value('naming_series', 'PV.YY.MM.-.####');
+        }
+        else if (frm.doc.payment_type == "Receive"){
+            frm.set_value('naming_series','RC.YY.MM.-.####');
+        }else{
+            frm.set_value('naming_series','')
+        }
+    }
 });
 
 frappe.ui.form.on("Payment Entry","setup", function(frm) {

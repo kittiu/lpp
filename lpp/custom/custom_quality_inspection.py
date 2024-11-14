@@ -97,7 +97,7 @@ def trigger_notification(docname):
         # Retrieve the Material Request document using the given docname
         doc = frappe.get_doc("Quality Inspection", docname)
         # Fetch the Notification document by its name
-        notification = frappe.get_doc("Notification", "New Quality Inspection from PR")
+        notification = frappe.get_doc("Notification", "New Quality Inspection from PR - Send E-mail")
         
         # Check if the notification is enabled before sending
         if notification.enabled:

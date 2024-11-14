@@ -68,4 +68,4 @@ frappe.query_reports["Purchase Tax"] = {
 	],
 };
 
-erpnext.utils.add_dimensions("Purchase Register", 7);
+erpnext.utils.add_dimensions("Purchase Tax", 7);

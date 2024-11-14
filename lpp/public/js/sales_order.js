@@ -7,6 +7,41 @@ frappe.ui.form.on("Sales Order", {
     onload: function(frm) {
         // ซ่อนฟิลด์ item_name ในตาราง items
         frm.fields_dict.items.grid.toggle_display("item_name", false);
+        
+            if (frm.doc.docstatus === 0 && frappe.model.can_read("Quotation")) {
+
+                    frm.remove_custom_button(__('Quotation'))
+                    frm.add_custom_button(
+                        __("Quotation"),
+                        function () {
+                            let d = erpnext.utils.map_current_doc({
+                                method: "lpp.custom.quotation.make_sales_order",
+                                source_doctype: "Quotation",
+                                target: frm,
+                                setters: [
+                                    {
+                                        label: "Customer",
+                                        fieldname: "party_name",
+                                        fieldtype: "Link",
+                                        options: "Customer",
+                                        default: frm.doc.customer || undefined,
+                                    },
+                                ],
+                                get_query_filters: {
+                                    company: frm.doc.company,
+                                    docstatus: 1,
+                                    status: ["!=", "Lost"],
+                                },
+                            });
+                            
+                        },
+                        __("Get Items From")
+                    );
+
+
+            }
+
+
     },
     // อัปเดตฟิลด์เมื่อมีการเปลี่ยนแปลงใน po_no, po_date, delivery_date
     po_no: update_items,

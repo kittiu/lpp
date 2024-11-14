@@ -1,5 +1,8 @@
 frappe.ui.form.on("Work Order", {
     refresh(frm) {
+        frm.set_df_property('status', 'hidden', 0);
+        frm.set_df_property('company', 'hidden', 0);
+
         // Get today's date
         let today = frappe.datetime.nowdate();
         if (frm.is_new()) {
@@ -177,7 +180,7 @@ frappe.ui.form.on("Work Order", {
 					dialog.fields_dict.operations.df.data.push({
 						name: data.name,
 						operation: data.operation,
-						workstation: data.operation === 'Packing' ? frm.doc.operations[0].workstation : data.workstation ,
+						workstation: data.workstation,
 						batch_size: data.batch_size,
 						qty: pending_qty,
 						pending_qty: pending_qty,
