@@ -28,6 +28,24 @@ frappe.ui.form.on("Payment Entry", {
             };
         });
     },
+    // Field change events to re-evaluate the condition
+    docstatus: function(frm) { frm.trigger('set_field_visibility'); },
+    payment_type: function(frm) { frm.trigger('set_field_visibility'); },
+    party_type: function(frm) { frm.trigger('set_field_visibility'); },
+    party: function(frm) { frm.trigger('set_field_visibility'); },
+    purchase_billing: function(frm) { frm.trigger('set_field_visibility'); },
+    // Define the custom trigger for setting field visibility
+    set_field_visibility: function(frm) {
+        // Define the condition
+        let condition = frm.doc.docstatus === 0 
+                        && frm.doc.payment_type === "Pay" 
+                        && frm.doc.party_type === "Supplier" 
+                        && frm.doc.party;
+
+        // Show or hide the field based on the condition
+        frm.toggle_display('get_invoices_from_purchase_billing', condition);
+        frm.toggle_display('purchase_billing', condition && frm.doc.purchase_billing);
+    },
     validate(frm) {  
         if (frm.doc.references){              
         // วนลูปตรวจสอบแต่ละรายการใน frm.doc.references
