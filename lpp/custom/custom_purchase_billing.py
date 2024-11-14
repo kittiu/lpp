@@ -33,12 +33,12 @@ class CustomPurchaseBilling(PurchaseBilling):
         payment_entry.custom_bill_date = purchase_billing.date
 
         # สร้าง Payment Entry Reference
-        payment_entry_reference = frappe.new_doc("Payment Entry Reference")
-        payment_entry_reference.reference_doctype = "Purchase Billing"
-        payment_entry_reference.reference_name = purchase_billing.name
-        payment_entry_reference.total_amount = purchase_billing.total_billing_amount
-        payment_entry_reference.outstanding_amount = purchase_billing.total_outstanding_amount
-        payment_entry.append("references", payment_entry_reference)
+        # payment_entry_reference = frappe.new_doc("Payment Entry Reference")
+        # payment_entry_reference.reference_doctype = "Purchase Billing"
+        # payment_entry_reference.reference_name = purchase_billing.name
+        # payment_entry_reference.total_amount = purchase_billing.total_billing_amount
+        # payment_entry_reference.outstanding_amount = purchase_billing.total_outstanding_amount
+        # payment_entry.append("references", payment_entry_reference)
 
         return payment_entry
     
