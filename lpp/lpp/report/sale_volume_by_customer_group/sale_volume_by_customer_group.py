@@ -113,9 +113,9 @@ def get_data(filters):
 					"net_amt" : qr['sum_grand_total']
 				}
 
-				grand_total_amount += qr['sum_amount']
-				grand_total_tax_amount += qr['sum_tax_amount']
-				result_grand_total += qr['sum_grand_total']
+				grand_total_amount += qr.get('sum_amount', 0)
+				grand_total_tax_amount += qr.get('sum_tax_amount', 0)
+				result_grand_total += qr.get('sum_grand_total', 0)
 				report_data.append(json_data)
 
 		grouped_data = defaultdict(list)
@@ -139,9 +139,9 @@ def get_data(filters):
 
 			# Add numbered items for each group
 			for item in items:
-				group_total_before_vat += item['before_vat']
-				group_total_vat += item['vat']
-				group_total_net_amt += item['net_amt']
+				group_total_before_vat += item.get('before_vat', 0)
+				group_total_vat += item.get('vat', 0)
+				group_total_net_amt += item.get('net_amt', 0)
 				target_data.append({
 					"entity" : item['entity'],
 					"entity_name" : item['entity_name'],

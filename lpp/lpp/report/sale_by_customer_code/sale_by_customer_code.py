@@ -110,9 +110,9 @@ def get_data(filters):
 					"net_amt" : qr['sum_grand_total']
 				}
 
-				grand_total_amount += qr['sum_amount']
-				grand_total_tax_amount += qr['sum_tax_amount']
-				result_grand_total += qr['sum_grand_total']
+				grand_total_amount += qr.get('sum_amount', 0)
+				grand_total_tax_amount += qr.get('sum_tax_amount', 0)
+				result_grand_total += qr.get('sum_grand_total', 0)
 				report_data.append(json_data)
 
 		# grand total

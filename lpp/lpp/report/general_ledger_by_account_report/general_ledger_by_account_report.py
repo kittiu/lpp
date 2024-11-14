@@ -111,9 +111,9 @@ def get_data(filters):
             
             # Iterate through the items for this group
             for item in items:
-                debit_group_total += item['debit']
-                credit_group_total += item['credit']
-                balance_group_total += item['balance']
+                debit_group_total += item.get('debit', 0)
+                credit_group_total += item.get('credit', 0)
+                balance_group_total += item.get('balance', 0)
                 
 				# get remarks by voucher_code on voucher_type
                 item['description'] = get_remark_by_voucher_code(item['voucher_type'] , item['voucher_code']) or item['description']
