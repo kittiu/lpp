@@ -71,7 +71,7 @@ def convert_none_or_zero(value):
 
 def replace_none(value, to_value="-"):
     try:
-        if value is None:
+        if value is None or value == "":
             return to_value
         else:
             # Ensure the value is a string before attempting to replace newlines
