@@ -27,6 +27,8 @@ frappe.ui.form.on("Work Order", {
 
         update_invoice_portion(frm);
 
+        setup_custom_fields(frm);
+
         setTimeout(() => {
             if (frm.custom_buttons && frm.custom_buttons[('Create Job Card')]) {
                 // Remove Original Button
@@ -36,29 +38,6 @@ frappe.ui.form.on("Work Order", {
                 }).addClass("btn-primary");
             }
         }, 10);
-    },
-    setup: async function(frm) {
-        try {
-            // เช็คว่า Sales Order มีค่าและฟิลด์ customer ยังไม่มีข้อมูล
-            if (frm.doc.sales_order && !frm.doc.custom_customer) {
-                const { message } = await frappe.db.get_value("Sales Order", frm.doc.sales_order, "customer");
-                if (message && message.customer) {
-                    frm.set_value("custom_customer", message.customer);
-                }
-            }
-    
-            // ตั้งค่า custom_required_quantity ถ้ายังไม่มีค่า แต่มีค่า custom_ordered_quantity และ Sales Order มีค่า
-            if (frm.doc.sales_order && !frm.doc.custom_required_quantity && frm.doc.custom_ordered_quantity) {
-                frm.set_value("custom_required_quantity", frm.doc.custom_ordered_quantity);
-            }
-        } catch (err) {
-            console.error("Error fetching customer:", err);
-            frappe.msgprint({
-                title: __('Error'),
-                indicator: 'red',
-                message: __('Unable to fetch customer.')
-            });
-        }
     },
     
     custom_customer(frm) {
@@ -307,5 +286,21 @@ function update_custom_jobcard_remaining(frm) {
         });
     } else {
         frm.set_value("custom_jobcard_remaining", 0);
+    }
+}
+
+async function setup_custom_fields(frm) {
+    // เช็คว่า Sales Order มีค่าและฟิลด์ customer ยังไม่มีข้อมูล
+    if (frm.doc.sales_order && !frm.doc.custom_customer) {
+        const { message } = await frappe.db.get_value("Sales Order", frm.doc.sales_order, "customer");
+        if (message && message.customer) {
+            frm.set_value("custom_customer", message.customer);
+        }
+    }
+
+    // ตั้งค่า custom_required_quantity, custom_ordered_quantity ถ้ายังไม่มีค่า แต่มีค่า Sales Order
+    if (frm.doc.sales_order && frm.doc.custom_required_quantity === 0 && frm.doc.custom_ordered_quantity === 1) {                
+        frm.set_value("custom_required_quantity", frm.doc.qty);
+        frm.set_value("custom_ordered_quantity", frm.doc.qty);
     }
 }
