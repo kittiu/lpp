@@ -4,7 +4,13 @@ frappe.ui.form.on("Quotation", {
         if (frm.is_new()) {
             // ถ้า custom_proposer ว่างอยู่ ให้เซ็ตเป็นผู้ใช้ที่สร้างเอกสาร
             if (!frm.doc.custom_proposer) {
-                frm.set_value('custom_proposer', frappe.session.user);
+                frappe.db.get_value('Employee', {'user_id': frappe.session.user}, 'name', (r) => {
+                    if (r && r.name) {
+                        frm.set_value('custom_proposer', r.name);
+                    } else {
+                        frm.set_value('custom_proposer', null);
+                    }
+                })
             }
         }
     },
