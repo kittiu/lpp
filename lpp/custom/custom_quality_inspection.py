@@ -9,7 +9,7 @@ from frappe.utils import flt
 
 specs_thermoformed_tray = {
             'Thickness (mm)': {'valueField': 'custom_thickness_thermoformed_tray', 'toleranceFieldMax': 'custom_thickness_max_thermoformed_tray', 'toleranceFieldMin': 'custom_thickness_min_thermoformed_tray'},
-            'Width (in)': {'valueField': 'custom_width_in_thermoformed_tray', 'toleranceFieldMax': 'custom_width_in_max_thermoformed_tray', 'toleranceFieldMin': 'custom_width_in_min_thermoformed_tray'},
+            'Width (mm)': {'valueField': 'custom_width_in_thermoformed_tray', 'toleranceFieldMax': 'custom_width_in_max_thermoformed_tray', 'toleranceFieldMin': 'custom_width_in_min_thermoformed_tray'},
             'A (mm)': {'valueField': 'custom_a_basic', 'toleranceFieldMax': 'custom_a_basic_max', 'toleranceFieldMin': 'custom_a_basic_min'},
             'B (mm)': {'valueField': 'custom_b_thermoformed_tray', 'toleranceFieldMax': 'custom_b_max_thermoformed_tray', 'toleranceFieldMin': 'custom_b_min_thermoformed_tray'},
             'C (mm)': {'valueField': 'custom_c_basic', 'toleranceFieldMax': 'custom_c_basic_max', 'toleranceFieldMin': 'custom_c_basic_min'},
@@ -30,7 +30,7 @@ specs_carrier_tape = {
             'K0 (mm)': {'valueField': 'custom_k0_tolerance', 'toleranceFieldMax': 'custom_k0_max', 'toleranceFieldMin': 'custom_k0_min'},
             'P1 (mm)': {'valueField': 'custom_p1_tolerance', 'toleranceFieldMax': 'custom_p1_max', 'toleranceFieldMin': 'custom_p1_min'},
             'Thickness (mm)': {'valueField': 'custom_thickness_tolerance_carrier_tape', 'toleranceFieldMax': 'custom_thickness_max_carrier_tape', 'toleranceFieldMin': 'custom_thickness_min_carrier_tape'},
-            'Width (in)': {'valueField': 'custom_width_tolerance', 'toleranceFieldMax': 'custom_width_max', 'toleranceFieldMin': 'custom_width_min'},
+            'Width (mm)': {'valueField': 'custom_width_tolerance', 'toleranceFieldMax': 'custom_width_max', 'toleranceFieldMin': 'custom_width_min'},
             'Length / Reel (m)': {'valueField': 'custom_length__reel_tolerance', 'toleranceFieldMax': 'custom_length__reel_max', 'toleranceFieldMin': 'custom_length__reel_min'},
             'Surface Resistivity (ohms/sq)': {'valueField': 'custom_surface_resistance_ohms_carrier_tape', 'toleranceFieldMax': 'custom_surface_resistance_ohms_carrier_tape_max', 'toleranceFieldMin': 'custom_surface_resistance_ohms_carrier_tape_min'},
 }
