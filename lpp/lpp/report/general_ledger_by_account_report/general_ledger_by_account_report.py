@@ -111,9 +111,9 @@ def get_data(filters):
             
             # Iterate through the items for this group
             for item in items:
-                debit_group_total += item['debit']
-                credit_group_total += item['credit']
-                balance_group_total += item['balance']
+                debit_group_total += item.get('debit', 0)
+                credit_group_total += item.get('credit', 0)
+                balance_group_total += item.get('balance', 0)
                 
 				# get remarks by voucher_code on voucher_type
                 item['description'] = get_remark_by_voucher_code(item['voucher_type'] , item['voucher_code']) or item['description']
@@ -157,6 +157,14 @@ def get_data(filters):
     return target_data
 
 def get_remark_by_voucher_code(doc_type, voucher_code):
-    # Fetch the remark from the Payment Entry doctype by voucher_code
-    remark = frappe.db.get_value(doc_type, {"name": voucher_code}, "remarks")
-    return remark
+    try:
+        # Fetch the remark from the database
+        remark = frappe.db.get_value(doc_type, {"name": voucher_code}, "remarks")
+        
+        # Return the remark or a default message if not found
+        return remark if remark else "No remarks found"
+    
+    except Exception as e:
+        # Handle and log any error
+        frappe.log_error(f"Error fetching remark for {doc_type} - {voucher_code}: {str(e)}", "Remark Fetch Error")
+        return "Error fetching remark"  # Default error message
