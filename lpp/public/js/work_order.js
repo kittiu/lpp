@@ -72,104 +72,160 @@ frappe.ui.form.on("Work Order", {
         set_custom_item_molds_query(frm)
     },
 
-    make_job_card_custom: function (frm) {
-		let qty = 0;
-		let operations_data = [];
-		const dialog = frappe.prompt(
-			{
-				fieldname: "operations",
-				fieldtype: "Table",
-				label: __("Operations"),
-				fields: [
-					{
-						fieldtype: "Link",
-						fieldname: "operation",
-						label: __("Workstation"),
-						read_only: 1,
-						in_list_view: 1,
-					},
-					{
-						fieldtype: "Link",
-						fieldname: "workstation",
-						label: __("Machine"),
-						read_only: 1,
-						in_list_view: 1,
-					},
-					{
-						fieldtype: "Data",
-						fieldname: "name",
-						label: __("Operation Id"),
-					},
-					{
-						fieldtype: "Float",
-						fieldname: "pending_qty",
-						label: __("Pending Qty"),
-					},
-					{
-						fieldtype: "Float",
-						fieldname: "qty",
-						label: __("Quantity to Manufacture"),
-						read_only: 0,
-						in_list_view: 1,
-					},
-					{
-						fieldtype: "Float",
-						fieldname: "batch_size",
-						label: __("Batch Size"),
-						read_only: 1,
-					},
-					{
-						fieldtype: "Int",
-						fieldname: "sequence_id",
-						label: __("Sequence Id"),
-						read_only: 1,
-					},
-				],
-				data: operations_data,
-				in_place_edit: true,
-				get_data: function () {
-					return operations_data;
-				},
-			},            
-			function (data) {
-				frappe.call({
-					method: "lpp.custom.work_order.make_job_card",
-					freeze: true,
-					args: {
-						work_order: frm.doc,
-						operations: data.operations,
-					},
-					callback: function () {
-						frm.reload_doc();
-					},
-				});
-			},
-			__("Job Card"),
-			__("Create")
-		);
+    make_job_card_custom: async function (frm) {
+        let operations_data = [];
+        const dialog = frappe.prompt(
+            {
+                fieldname: "operations",
+                fieldtype: "Table",
+                label: __("Operations"),
+                fields: [
+                    {
+                        fieldtype: "Link",
+                        fieldname: "operation",
+                        label: __("Workstation"),
+                        read_only: 1,
+                        in_list_view: 1,
+                    },
+                    {
+                        fieldtype: "Link",
+                        fieldname: "workstation",
+                        label: __("Machine"),
+                        read_only: 1,
+                        in_list_view: 1,
+                    },
+                    {
+                        fieldtype: "Data",
+                        fieldname: "name",
+                        label: __("Operation Id"),
+                    },
+                    {
+                        fieldtype: "Float",
+                        fieldname: "pending_qty",
+                        label: __("Pending Qty"),
+                    },
+                    {
+                        fieldtype: "Float",
+                        fieldname: "qty",
+                        label: __("Quantity to Manufacture"),
+                        read_only: 0,
+                        in_list_view: 1,
+                    },
+                    {
+                        fieldtype: "Float",
+                        fieldname: "batch_size",
+                        label: __("Batch Size"),
+                        read_only: 1,
+                    },
+                    {
+                        fieldtype: "Int",
+                        fieldname: "sequence_id",
+                        label: __("Sequence Id"),
+                        read_only: 1,
+                    },
+                ],
+                data: operations_data,
+                in_place_edit: true,
+                get_data: function () {
+                    return operations_data;
+                },
+            },
+            function (data) {
+                frappe.call({
+                    method: "lpp.custom.work_order.make_job_card",
+                    freeze: true,
+                    args: {
+                        work_order: frm.doc,
+                        operations: data.operations,
+                    },
+                    callback: function () {
+                        frm.reload_doc();
+                    },
+                });
+            },
+            __("Job Card"),
+            __("Create")
+        );
+    
+        dialog.fields_dict["operations"].grid.wrapper.find(".grid-add-row").hide();
+    
+        let quantity__run_card = parseInt(frm.doc.custom_quantity__run_card);
+    
+        // Fetch all Job Card data upfront
+        const job_cards_response = await frappe.call({
+            method: "frappe.client.get_list",
+            args: {
+                doctype: "Job Card",
+                filters: { work_order: frm.doc.name },
+                fields: [
+                    "operation",
+                    "custom_runcard_no",
+                    "for_quantity",
+                    "status",
+                    "total_completed_qty"
+                ],
+            },
+        });
 
-		dialog.fields_dict["operations"].grid.wrapper.find(".grid-add-row").hide();
+        const job_cards = job_cards_response.message || [];        
 
-		var pending_qty = 0;
-		frm.doc.operations.forEach((data) => {
-			if (data.completed_qty + data.process_loss_qty != frm.doc.qty) {
-				pending_qty = frm.doc.qty - flt(data.completed_qty) - flt(data.process_loss_qty);
+        // Iterate through operations
+        for (let index = 0; index < frm.doc.operations.length; index++) {
+            const data = frm.doc.operations[index];
+            let qty = 0;
 
-				if (pending_qty) {
-					dialog.fields_dict.operations.df.data.push({
-						name: data.name,
-						operation: data.operation,
-						workstation: data.workstation,
-						batch_size: data.batch_size,
-						qty: pending_qty,
-						pending_qty: pending_qty,
-						sequence_id: data.sequence_id,
-					});
-				}
-			}
-		});
-		dialog.fields_dict.operations.grid.refresh();
-	},
+            if (index > 0) {
+                // Fetch job cards for the previous operation
+                const prev_operation = frm.doc.operations[index - 1];
+                const related_cards = job_cards.filter(
+                    (card) => card.operation === prev_operation.operation
+                );
+                
+                // Determine qty based on related cards
+                for (const card of related_cards) {
+                    const current_related_cards = job_cards.filter(
+                        (c) =>
+                            c.operation === data.operation && c.custom_runcard_no === card.custom_runcard_no
+                    );
+                    
+                    if (current_related_cards.length) {
+                        const matched_result = current_related_cards[0];
+                        
+                        if (matched_result.status === "Completed") {
+                            if (card.total_completed_qty !== matched_result.for_quantity) {
+                                qty = card.total_completed_qty;
+                                break;
+                            }
+                        } else {
+                            qty = card.total_completed_qty - matched_result.for_quantity;
+                            break;
+                        }
+                    } else {
+                        qty = card.total_completed_qty;
+                        break;
+                    }
+                }
+            } else {
+                // First operation logic
+                const sum_operation = getSumOfMaxRuncard(job_cards, data.operation);                
+                qty = sum_operation !== quantity__run_card ? quantity__run_card - sum_operation : quantity__run_card;
+            }
+
+            // Push operation data
+            operations_data.push({
+                name: data.name,
+                operation: data.operation,
+                workstation: data.workstation,
+                batch_size: data.batch_size,
+                qty: qty,
+                pending_qty: qty,
+                sequence_id: data.sequence_id,
+            });
+        }
+    
+        dialog.fields_dict.operations.grid.refresh();
+    },
+    
 });
 
 
@@ -303,4 +359,24 @@ async function setup_custom_fields(frm) {
         frm.set_value("custom_required_quantity", frm.doc.qty);
         frm.set_value("custom_ordered_quantity", frm.doc.qty);
     }
+}
+
+function getSumOfMaxRuncard(job_cards, operation) {
+    // Group by custom_runcard_no and calculate sum of for_quantity
+    const grouped = job_cards
+        .filter(c => c.operation === operation)
+        .reduce((acc, { custom_runcard_no, for_quantity }) => {
+        acc[custom_runcard_no] = (acc[custom_runcard_no] || 0) + for_quantity;
+        return acc;
+    }, {});
+
+    // Find the maximum custom_runcard_no
+    const maxRuncard = Object.keys(grouped).reduce((max, runcard) => {
+        const current = parseInt(runcard.split("/")[0], 10);
+        const maxVal = parseInt(max.split("/")[0], 10);
+        return current > maxVal ? runcard : max;
+    });
+
+    // Return the sum for the maximum custom_runcard_no
+    return grouped[maxRuncard];
 }
