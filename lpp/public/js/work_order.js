@@ -1,5 +1,5 @@
 frappe.ui.form.on("Work Order", {
-    refresh(frm) {
+    refresh(frm) {        
         frm.set_df_property('status', 'hidden', 0);
         frm.set_df_property('company', 'hidden', 0);
 
@@ -157,60 +157,59 @@ frappe.ui.form.on("Work Order", {
             args: {
                 doctype: "Job Card",
                 filters: { work_order: frm.doc.name },
-                fields: [
-                    "operation",
-                    "custom_runcard_no",
-                    "for_quantity",
-                    "status",
-                    "total_completed_qty"
-                ],
+                fields: ["operation", "custom_runcard_no", "for_quantity", "total_completed_qty"],
             },
         });
 
-        const job_cards = job_cards_response.message || [];        
-
+        const job_cards = job_cards_response.message || [];
+        
         // Iterate through operations
         for (let index = 0; index < frm.doc.operations.length; index++) {
             const data = frm.doc.operations[index];
             let qty = 0;
 
+            // Group job cards by operation
+            const filter_operation_cards = job_cards.filter(card => card.operation === data.operation);
+            const operation_cards = aggregateJobCards(filter_operation_cards);
+
             if (index > 0) {
-                // Fetch job cards for the previous operation
                 const prev_operation = frm.doc.operations[index - 1];
-                const related_cards = job_cards.filter(
+                const filter_prev_operation_cards = job_cards.filter(
                     (card) => card.operation === prev_operation.operation
                 );
-                
-                // Determine qty based on related cards
-                for (const card of related_cards) {
-                    const current_related_cards = job_cards.filter(
-                        (c) =>
-                            c.operation === data.operation && c.custom_runcard_no === card.custom_runcard_no
-                    );
-                    
-                    if (current_related_cards.length) {
-                        const matched_result = current_related_cards[0];
-                        
-                        if (matched_result.status === "Completed") {
-                            if (card.total_completed_qty !== matched_result.for_quantity) {
-                                qty = card.total_completed_qty;
-                                break;
+                const prev_operation_cards = aggregateJobCards(filter_prev_operation_cards);
+                const prev_card_map = prev_operation_cards?.reduce((map, card) => {
+                    map[card.custom_runcard_no] = card;
+                    return map;
+                }, {});
+
+                if(prev_operation_cards?.length > operation_cards?.length){                    
+                    qty = getSumOfMaxRuncard(prev_operation_cards, prev_operation.operation, "total_completed_qty")
+                }
+
+                else { 
+                    operation_cards.forEach(runcard => {
+                        const prev_card = prev_card_map[runcard.custom_runcard_no];
+                            
+                        if (prev_card) {
+                            if (prev_card.total_completed_qty !== runcard.for_quantity) {                            
+                                // Calculate sums
+                                const prev_operation_completed_qty = getSumOfMaxRuncard(prev_operation_cards, prev_operation.operation, "total_completed_qty", runcard.custom_runcard_no);
+                                const current_operation_for_qty = getSumOfMaxRuncard(operation_cards, data.operation, "for_quantity", runcard.custom_runcard_no);
+
+                                // Calculate qty
+                                qty = prev_operation_completed_qty == 0 ? current_operation_for_qty : prev_operation_completed_qty - current_operation_for_qty;
+                                return
                             }
-                        } else {
-                            qty = card.total_completed_qty - matched_result.for_quantity;
-                            break;
                         }
-                    } else {
-                        qty = card.total_completed_qty;
-                        break;
-                    }
+                    });
                 }
             } else {
                 // First operation logic
-                const sum_operation = getSumOfMaxRuncard(job_cards, data.operation);                
+                const sum_operation = getSumOfMaxRuncard(operation_cards, data.operation, "for_quantity");
                 qty = sum_operation !== quantity__run_card ? quantity__run_card - sum_operation : quantity__run_card;
             }
-
+            
             // Push operation data
             operations_data.push({
                 name: data.name,
@@ -361,22 +360,44 @@ async function setup_custom_fields(frm) {
     }
 }
 
-function getSumOfMaxRuncard(job_cards, operation) {
-    // Group by custom_runcard_no and calculate sum of for_quantity
-    const grouped = job_cards
-        .filter(c => c.operation === operation)
-        .reduce((acc, { custom_runcard_no, for_quantity }) => {
-        acc[custom_runcard_no] = (acc[custom_runcard_no] || 0) + for_quantity;
+function getSumOfMaxRuncard(jobCards, operation, key, maxRuncard) {
+    if (!jobCards || !jobCards.length) {
+        return 0; // Fallback value
+    }
+
+    // Group by custom_runcard_no and calculate sum of the given key
+    const grouped = jobCards
+        ?.filter(c => c.operation === operation)
+        ?.reduce((acc, { custom_runcard_no, [key]: value }) => {
+            if (!custom_runcard_no || value == null) return acc; // Handle invalid data
+            acc[custom_runcard_no] = (acc[custom_runcard_no] || 0) + value;
+            return acc;
+        }, {}); // Provide an empty object as the initial value
+
+    // If maxRuncard is provided, use it directly; otherwise, calculate it
+    if (!maxRuncard) {
+        maxRuncard = Object.keys(grouped)?.reduce((max, runcard) => {
+            const current = parseInt(runcard.split("/")[0], 10);
+            const maxVal = parseInt(max.split("/")[0], 10);
+            return current > maxVal ? runcard : max;
+        });
+    }
+
+    // Return the sum for the given maxRuncard
+    return grouped[maxRuncard];
+}
+
+function aggregateJobCards(jobCards) {
+    const aggregated = jobCards?.reduce((acc, card) => {
+        const key = `${card.operation}_${card.custom_runcard_no}`;
+        if (!acc[key]) {
+            acc[key] = { ...card };
+        } else {
+            acc[key].for_quantity += card.for_quantity;
+            acc[key].total_completed_qty += card.total_completed_qty;
+        }
         return acc;
     }, {});
 
-    // Find the maximum custom_runcard_no
-    const maxRuncard = Object.keys(grouped).reduce((max, runcard) => {
-        const current = parseInt(runcard.split("/")[0], 10);
-        const maxVal = parseInt(max.split("/")[0], 10);
-        return current > maxVal ? runcard : max;
-    });
-
-    // Return the sum for the maximum custom_runcard_no
-    return grouped[maxRuncard];
+    return Object.values(aggregated);
 }
