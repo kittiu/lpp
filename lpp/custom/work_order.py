@@ -60,6 +60,11 @@ def make_job_card(work_order, operations):
     work_order = ensure_json(work_order)
     operations = ensure_json(operations)
     
+    # Check if operations has more than one entry
+    if len(operations) > 1:
+        msgprint(_("Only one row is allowed in the Operations table."))
+        return
+
     if work_order['custom_jobcard_remaining'] and work_order['custom_total_run_cards']:
 
         amount = work_order['custom_total_run_cards']
