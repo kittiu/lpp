@@ -1,19 +1,11 @@
 frappe.ui.form.on("Payment Entry", {
     onload(frm){
-        frm.events.payment_type(frm);
+        frm.script_manager.trigger("payment_type");
     },
     refresh(frm) {
         frm.set_df_property('purchase_billing', 'read_only', 1);
-        try {
-            // Check if the form is new and custom_bill_no exists
-            if (frm.is_new() && frm.doc.custom_bill_no) {
-                // Call appropriate function based on payment_type
-                const billing_type = frm.doc.payment_type === "Pay" ? "purchase" : "sales";
-                frm.events[`get_documents_from_${billing_type}_billing`](frm, { [`${billing_type}_billing`]: frm.doc.custom_bill_no });
-            }
-        } catch (error) {
-            console.error("Error in retrieving documents:", error);
-            frappe.msgprint(__("An error occurred while retrieving documents. Please try again."));
+        if(frm.doc.party && frm.is_new()){
+            frm.script_manager.trigger("party");
         }
 
         frm.set_query("reference_doctype", "references", function () {
@@ -32,9 +24,11 @@ frappe.ui.form.on("Payment Entry", {
     // Field change events to re-evaluate the condition
     docstatus: function(frm) { frm.trigger('set_field_visibility'); },
     payment_type: function(frm) { frm.trigger('set_field_visibility'); },
-    party_type: function(frm) { frm.trigger('set_field_visibility'); },
     party: function(frm) { frm.trigger('set_field_visibility'); },
     purchase_billing: function(frm) { frm.trigger('set_field_visibility'); },
+    paid_from: function(frm) {
+        retrieve_documents_based_on_payment_type(frm)
+    },
     // Define the custom trigger for setting field visibility
     set_field_visibility: function(frm) {
         // Define the condition
@@ -60,6 +54,7 @@ frappe.ui.form.on("Payment Entry", {
         }
     },
     payment_type(frm){
+        frm.trigger('set_field_vis ibility');
         if (frm.doc.payment_type == "Pay") {
             frm.set_value('naming_series', 'PV.YY.MM.-.####');
         }
@@ -277,6 +272,26 @@ frappe.ui.form.on("Payment Entry","validate_reference_document",function (frm, r
         $.each(frm.doc.vouchers || [], _validate);
     }
 })
+function retrieve_documents_based_on_payment_type(frm) {
+    try {
+        // Check if the form is new and required fields are set
+        if (frm.is_new() && frm.doc.custom_bill_no ) {
+                // Determine billing type based on payment_type
+                const billing_type = frm.doc.payment_type === "Pay" ? "purchase" : "sales";
+
+                // Dynamically call the appropriate function
+                const event_name = `get_documents_from_${billing_type}_billing`;
+                if (typeof frm.events[event_name] === "function") {
+                    frm.events[event_name](frm, { [`${billing_type}_billing`]: frm.doc.custom_bill_no, allocate_payment_amount: 1 });
+                } else {
+                    console.warn(`Event method '${event_name}' not found.`);
+                }
+        }
+    } catch (error) {
+        frappe.msgprint(__("An error occurred while retrieving documents. Please try again."));
+    }
+}
+
 
 function get_total_no_vat(frm) {
     // ดึงข้อมูล reference_doctype และ reference_name จาก reference ที่ถูกส่งมา
