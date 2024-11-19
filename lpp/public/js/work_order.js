@@ -207,7 +207,7 @@ frappe.ui.form.on("Work Order", {
             } else {
                 // First operation logic
                 const sum_operation = getSumOfMaxRuncard(operation_cards, data.operation, "for_quantity");
-                qty = sum_operation !== quantity__run_card ? quantity__run_card - sum_operation : quantity__run_card;
+                qty = sum_operation !== quantity__run_card ? sum_operation > quantity__run_card ? 0 : quantity__run_card - sum_operation : quantity__run_card;
             }
             
             // Push operation data

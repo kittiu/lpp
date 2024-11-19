@@ -74,7 +74,7 @@ def make_job_card(work_order, operations):
 
         for row in operations:
             row = frappe._dict(row)
-            validate_operation_data(row)
+            # validate_operation_data(row)
             qty = row.get("qty")
             if not qty:
                 continue
@@ -103,6 +103,7 @@ def make_job_card(work_order, operations):
             # Determine max run card number and initialize runcard_no
             max_runcard_no = count_distinct_runcard_no(job_cards)
             runcard_no = f"{max_runcard_no or 1}/{amount}"
+            final_runcard_no = f"{amount}/{amount}"
 
             # Filter job cards to get only those matching the current runcard_no
             filtered_job_cards = [job_card for job_card in get_job_cards if job_card['custom_runcard_no'] == runcard_no]
@@ -130,9 +131,12 @@ def make_job_card(work_order, operations):
             
             # Validate the job card and prepare for creation
             total = sum(card['for_quantity'] for card in filtered_job_cards)
+
             if custom_quantity__run_card == total and custom_quantity__run_card >= qty:
                 # Prepare for the next run card
                 runcard_no = f"{max_runcard_no + 1}/{amount}"
+                if runcard_no != final_runcard_no:
+                    validate_operation_data(row)
                 sequence = 1
                 job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations_in_work_order), operation_no))
             
@@ -140,11 +144,21 @@ def make_job_card(work_order, operations):
                 # Prepare for the next run card if previous total matches
                 runcard_no = f"{max_runcard_no + 1}/{amount}"
                 sequence = 1
+                if runcard_no != final_runcard_no:
+                    validate_operation_data(row)
                 job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations_in_work_order), operation_no))
 
             elif custom_quantity__run_card >= (total + qty):
                 # Add data for the current run card
                 sequence = len(filtered_job_cards) + 1
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations_in_work_order), operation_no))
+            
+            elif (runcard_no == final_runcard_no or f"{max_runcard_no + 1}/{amount}" == final_runcard_no) and custom_quantity__run_card == total and qty >= custom_quantity__run_card:
+                # Prepare for the next run card
+                runcard_no = f"{max_runcard_no + 1}/{amount}"
+                if runcard_no != final_runcard_no:
+                    validate_operation_data(row)
+                sequence = 1
                 job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations_in_work_order), operation_no))
             
             else:
