@@ -54,68 +54,113 @@ def get_item_molds(item_code):
     fields=['item_code', 'item_name', 'mold_id'])  # Adjust fields to match your child table fields
     return molds
 
-
 @frappe.whitelist()
 def make_job_card(work_order, operations):
     work_order = ensure_json(work_order)
     operations = ensure_json(operations)
     
+    if len(operations) > 1:
+        msgprint(_("Only one row is allowed in the Operations table."))
+        return
+
     if work_order['custom_jobcard_remaining'] and work_order['custom_total_run_cards']:
-
+        operations_in_work_order = work_order['operations']
         amount = work_order['custom_total_run_cards']
-
         work_order = frappe.get_doc("Work Order", work_order['name'])
-
         custom_quantity__run_card = int(work_order.custom_quantity__run_card)
 
-        # Initialize list and validation flag
         job_card_creation_list = []  
         validation_failed = False
 
         for row in operations:
             row = frappe._dict(row)
-
-            # Validate operation data and skip if qty is not valid
-            validate_operation_data(row)
+            # validate_operation_data(row)
             qty = row.get("qty")
             if not qty:
                 continue
-
-            # Fetch job cards related to the operation
-            job_cards = frappe.db.get_all(
+            
+            # Fetch existing job cards related to the operation
+            get_job_cards = frappe.db.get_all(
                 'Job Card', 
                 filters={
                     'work_order': work_order.name, 
                     'operation': row.operation,
-                    'custom_runcard_no': ['!=', None],  # เพิ่มเงื่อนไข where เพื่อกรองค่า None
+                    'custom_runcard_no': ['!=', None],
                 },
-                fields=['custom_runcard_no', 'SUM(for_quantity) as for_quantity'],
-                group_by='custom_runcard_no'
+                fields=['custom_runcard_no', 'for_quantity'],
             )
+
+            # Aggregate job cards by runcard number
+            aggregated_results = {}
+            for card in get_job_cards:
+                card_key = card['custom_runcard_no']
+                record = aggregated_results.setdefault(card_key, {'custom_runcard_no': card_key, 'for_quantity': 0, 'number': 0})
+                record['for_quantity'] += card['for_quantity']
+                record['number'] += 1
+
+            job_cards = list(aggregated_results.values())
 
             # Determine max run card number and initialize runcard_no
             max_runcard_no = count_distinct_runcard_no(job_cards)
             runcard_no = f"{max_runcard_no or 1}/{amount}"
+            final_runcard_no = f"{amount}/{amount}"
 
-            # Create a dictionary for job cards and calculate total for current runcard_no
-            job_card_dict = {item['custom_runcard_no']: item['for_quantity'] for item in job_cards}
-            total = job_card_dict.get(runcard_no, 0)  # Defaults to 0 if runcard_no not found
+            # Filter job cards to get only those matching the current runcard_no
+            filtered_job_cards = [job_card for job_card in get_job_cards if job_card['custom_runcard_no'] == runcard_no]
 
-            # กรอง job_cards ให้เหลือเฉพาะที่ custom_runcard_no ตรงกับ runcard_no
-            filtered_job_cards = [job_card for job_card in job_cards if job_card['custom_runcard_no'] == runcard_no]
+            # Find the current operation's index
+            operation_no = next((op['idx'] for op in operations_in_work_order if op['name'] == row['name']), None)
 
-            # Validate and prepare data for job card creation
+            prev_total = 0
+            if operation_no and operation_no > 1:
+                prev_operation_name = next(
+                    (op['operation'] for op in operations_in_work_order if op['idx'] == operation_no - 1), None
+                )
+                if prev_operation_name:
+                    prev_operation = frappe.db.get_all(
+                        'Job Card',
+                        filters={
+                            'work_order': 'WO2411-0006',  # Consider dynamic filter here
+                            'operation': prev_operation_name,
+                            'custom_runcard_no': runcard_no,
+                        },
+                        fields=['custom_runcard_no', 'SUM(total_completed_qty) as total_completed_qty'],
+                        group_by='custom_runcard_no'
+                    )
+                    prev_total = prev_operation[0]['total_completed_qty'] if prev_operation else 0
+            
+            # Validate the job card and prepare for creation
+            total = sum(card['for_quantity'] for card in filtered_job_cards)
+
             if custom_quantity__run_card == total and custom_quantity__run_card >= qty:
                 # Prepare for the next run card
                 runcard_no = f"{max_runcard_no + 1}/{amount}"
+                if runcard_no != final_runcard_no:
+                    validate_operation_data(row)
                 sequence = 1
-                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations)))
-                
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations_in_work_order), operation_no))
+            
+            elif prev_total == total and custom_quantity__run_card >= qty:
+                # Prepare for the next run card if previous total matches
+                runcard_no = f"{max_runcard_no + 1}/{amount}"
+                sequence = 1
+                if runcard_no != final_runcard_no:
+                    validate_operation_data(row)
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations_in_work_order), operation_no))
+
             elif custom_quantity__run_card >= (total + qty):
                 # Add data for the current run card
                 sequence = len(filtered_job_cards) + 1
-                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations)))
-                
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations_in_work_order), operation_no))
+            
+            elif (runcard_no == final_runcard_no or f"{max_runcard_no + 1}/{amount}" == final_runcard_no) and custom_quantity__run_card == total and qty >= custom_quantity__run_card:
+                # Prepare for the next run card
+                runcard_no = f"{max_runcard_no + 1}/{amount}"
+                if runcard_no != final_runcard_no:
+                    validate_operation_data(row)
+                sequence = 1
+                job_card_creation_list.append((work_order, row, qty, runcard_no, sequence, len(operations_in_work_order), operation_no))
+            
             else:
                 # Validation failed
                 msgprint(_(f"จำนวนสั่งผลิตมากเกินกว่าจำนวนต่อ Runcard ({row.operation})"))
@@ -130,14 +175,15 @@ def make_job_card(work_order, operations):
     else:
         msgprint(_('จำนวน Runcard เกินกว่าที่กำหนด'))
 
-def process_job_card_creation(work_order, row, qty, runcard_no, sequence=1, total_operation=1):
+
+def process_job_card_creation(work_order, row, qty, runcard_no, sequence=1, total_operation=1, operation_no=1):
     while qty > 0:
         qty = split_qty_based_on_batch_size(work_order, row, qty)
         if row.job_card_qty > 0:
-            create_job_card(work_order, row, runcard_no, sequence, total_operation, auto_create=True)
+            create_job_card(work_order, row, runcard_no, sequence, total_operation, operation_no, auto_create=True)
 
 
-def create_job_card(work_order, row, runcard_no, sequence, total_operation, enable_capacity_planning=False, auto_create=False):
+def create_job_card(work_order, row, runcard_no, sequence, total_operation, operation_no, enable_capacity_planning=False, auto_create=False):
     doc = frappe.new_doc("Job Card")
     doc.update(
         {
@@ -159,7 +205,7 @@ def create_job_card(work_order, row, runcard_no, sequence, total_operation, enab
             "custom_sequence": sequence,
             "custom_workstation_details": row.get("operation"),
             "custom_machine": row.get("workstation"),
-            "custom_operation_no": int(row.get("idx")),
+            "custom_operation_no": int(operation_no),
             "custom_total_operation": int(total_operation)
         }
     )

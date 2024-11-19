@@ -1,7 +1,7 @@
 
 // Trigger events for the Job Card doctype
 frappe.ui.form.on("Job Card", {
-    refresh(frm) {        
+    refresh(frm) {                
         // Set 'item_code' and 'item_name' fields in 'scrap_items' child table to read-only
         frm.get_field("scrap_items").grid.toggle_enable("item_code", false);
         frm.get_field("scrap_items").grid.toggle_enable("item_name", false);
@@ -97,6 +97,22 @@ frappe.ui.form.on("Job Card", {
                 frappe.throw(__('กรุณาระบุจำนวน Defects ให้ครบถ้วน จำนวน (Process Loss Qty) ชิ้น'));
             }
         }
+
+        // Validate Setup End Date
+        validateEndDate(
+            frm.doc.custom_start_date_setup,
+            frm.doc.custom_end_date_setup,
+            'custom_end_date_setup',
+            'End Date & Time (Setup) ต้องอยู่ระหว่าง Start Date & Time (Setup) และเวลาปัจจุบันเท่านั้น'
+        );
+
+        // Validate Production End Date
+        validateEndDate(
+            frm.doc.custom_start_date_production,
+            frm.doc.custom_end_date_production,
+            'custom_end_date_production',
+            'End Date & Time (Production) ต้องอยู่ระหว่าง Start Date & Time (Production) และเวลาปัจจุบันเท่านั้น'
+        );
     },    
     // Triggered when 'production_item' changes
     production_item(frm) {
@@ -339,5 +355,17 @@ function handle_production_date_update(frm) {
     update_custom_total_hours(frm, 'custom_start_date_production', 'custom_end_date_production', 'custom_total_hours_production');
     if (frm.doc.custom_output_production && frm.doc.custom_total_hours_production) {
         frm.set_value('custom_units__hour_production', frm.doc.custom_output_production / frm.doc.custom_total_hours_production);
+    }
+}
+
+// Function to validate End Date
+function validateEndDate(startDate, endDate, fieldName, message) {
+    const now = frappe.datetime.now_datetime();
+    if (endDate) {
+        if (endDate < startDate || endDate > now) {
+            frappe.msgprint({message: __(message), indicator: 'red'});
+            frm.set_value(fieldName, ''); // Clear invalid date
+            frappe.validated = false;    // Stop saving
+        }
     }
 }
