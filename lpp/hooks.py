@@ -9,6 +9,32 @@ app_license = "mit"
 # Includes in <head>
 # ------------------
 
+fixtures = [
+    # {
+    #     "doctype": "Custom Field",
+    #     "filters": [
+    #         [
+    #             "name",
+    #             "in",
+    #             ()
+    #         ]
+    #     ]
+    # },
+    {
+        "doctype": "Property Setter",
+        "filters": [
+            [
+                "name",
+                "in",
+                (
+                    "Cost Center-main-autoname",
+                    "Cost Center-main-naming_rule",
+                )
+            ]
+        ]
+    }
+]
+
 # include js, css files in header of desk.html
 app_include_css = "/assets/lpp/css/ui-framework.css"
 # app_include_js = "/assets/lpp/js/lpp.js"
