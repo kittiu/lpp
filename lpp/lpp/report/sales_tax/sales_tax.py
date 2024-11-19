@@ -87,7 +87,7 @@ def get_data(filters):
             try:
                 query_data = frappe.db.sql(
                     """
-                    SELECT tsi.company, tsi.company_tax_id, ta.address_line2, tsi.name 
+                    SELECT tsi.company, tsi.company_tax_id, ta.address_line2, tsi.name, ta.custom_branch
                     FROM `tabSales Invoice` tsi
                     INNER JOIN `tabAddress` ta ON tsi.customer_address = ta.name 
                     WHERE tsi.name = %s
@@ -104,7 +104,7 @@ def get_data(filters):
                         "voucher_no": dt['voucher_no'],
                         "customer_name": dt["customer_name"],
                         "tax_id": dt['tax_id'],
-                        "address_line2": dr["address_line2"],
+                        "address_line2": dr["custom_branch"],
                         "net_total": dt["net_total"],
                         "tax_total": dt['tax_total'],
                         "grand_total": dt["grand_total"],
