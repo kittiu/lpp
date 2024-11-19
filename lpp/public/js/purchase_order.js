@@ -27,7 +27,7 @@ frappe.ui.form.on("Purchase Order", {
 
     supplier(frm) {
         // เคลียร์ตาราง items เมื่อเปลี่ยน Supplier
-        clearPurchaseOrderItems(frm);
+        // clearPurchaseOrderItems(frm);
     }
 });
 
