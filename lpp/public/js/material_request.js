@@ -66,10 +66,6 @@ frappe.ui.form.on("Material Request", {
             frm.refresh_field('items');
         }
     },
-    custom_cost_center : function(frm) {
-        frm.doc.custom_department = frm.doc.custom_cost_center
-        frm.refresh_field('custom_department');
-    },
     material_request_type: function(frm) {
         if(frm.doc.material_request_type === 'Material Issue' || frm.doc.material_request_type === 'Customer Provided'){
             frm.toggle_reqd('customer', true);
