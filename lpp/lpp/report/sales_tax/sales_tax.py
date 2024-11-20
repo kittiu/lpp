@@ -9,7 +9,7 @@ from erpnext.accounts.report.sales_register.sales_register import execute as sal
 
 def execute(filters=None):
     columns = get_columns()
-    data = get_data(filters)
+    data = (get_data(filters) * 23)
    
     return columns, data
 
@@ -53,9 +53,15 @@ def get_columns():
 		},
         {
 			"label": _("สาขา"),
-			"fieldname": "address_line2",
+			"fieldname": "custom_branch",
 			"fieldtype": "Data",
 			"width": 160,
+		},
+        {
+			"label": _("จำนวนเงินก่อนภาษีอัตราศูนย์"),
+			"fieldname": "net_total_zero",
+			"fieldtype": "Currency",
+			"width": 210,
 		},
         {
 			"label": _("จำนวนเงินก่อนภาษี"),
@@ -97,6 +103,13 @@ def get_data(filters):
                 )
 
                 for dr in query_data:
+                    net_total_zero = None
+                    net_total = None
+                    if dt["net_total"] == dt["grand_total"]:
+                        net_total_zero = dt["net_total"]
+                    else: 
+                        net_total = dt["net_total"]
+                                   
                     report_data.append({
                         "company": dr['company'],
                         "company_tax_id": dr["company_tax_id"],
@@ -104,9 +117,10 @@ def get_data(filters):
                         "voucher_no": dt['voucher_no'],
                         "customer_name": dt["customer_name"],
                         "tax_id": dt['tax_id'],
-                        "address_line2": dr["custom_branch"],
-                        "net_total": dt["net_total"],
-                        "tax_total": dt['tax_total'],
+                        "custom_branch": dr["custom_branch"],
+                        "net_total_zero": None if net_total_zero == 0 else net_total_zero,
+                        "net_total": None if net_total == 0 else net_total,
+                        "tax_total": None if dt['tax_total'] == 0 else dt['tax_total'],
                         "grand_total": dt["grand_total"],
                     })
 
