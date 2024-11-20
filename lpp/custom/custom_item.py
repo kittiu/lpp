@@ -1,13 +1,7 @@
 from erpnext.stock.doctype.item.item import Item
 from frappe.model.naming import make_autoname
 import frappe
-import json
-from collections import OrderedDict, defaultdict
-from frappe import qb, scrub
-from frappe.desk.reportview import get_filters_cond, get_match_cond
-from frappe.query_builder import Criterion, CustomFunction
-from frappe.query_builder.functions import Concat, Locate, Sum
-from frappe.utils import nowdate
+from frappe.desk.reportview import get_match_cond
 
 
 class CustomItem(Item):
@@ -54,8 +48,8 @@ def get_items_based_on_party_and_groups(doctype, txt, searchfield, start, page_l
                 FROM `tabItem Customer Detail` ci
                 WHERE ci.parent = `tabItem`.name
             )
-            AND item_group = 'Sales Product'
-            AND custom_item_group_2 = 'Other'
+            AND item_group = 'Sale Products'
+            AND custom_item_group_2 = 'Others'
         )
         OR (
             NOT EXISTS (
