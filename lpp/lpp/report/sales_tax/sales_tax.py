@@ -9,7 +9,7 @@ from erpnext.accounts.report.sales_register.sales_register import execute as sal
 
 def execute(filters=None):
     columns = get_columns()
-    data = (get_data(filters) * 23)
+    data = get_data(filters)
    
     return columns, data
 
