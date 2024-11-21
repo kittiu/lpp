@@ -3,6 +3,8 @@ frappe.ui.form.on("Sales Order", {
         // แสดงฟิลด์ po_no และ po_date
         frm.set_df_property('po_no', 'hidden', 0);
         frm.set_df_property('po_date', 'hidden', 0);
+        set_item_code_query(frm);
+        frm.refresh_field("items"); 
     },
     onload: function(frm) {
         // ซ่อนฟิลด์ item_name ในตาราง items
@@ -56,6 +58,10 @@ frappe.ui.form.on("Sales Order", {
         });
         // เคลียร์ตาราง Sales Taxes and Charges
         clearSalesTaxes(frm);
+    },
+    customer_name : function (frm){
+        set_item_code_query(frm);
+        frm.refresh_field("items"); 
     }
 });
 
@@ -118,4 +124,16 @@ function clearSalesOrderItems(frm) {
         // จัดการข้อผิดพลาดกรณีล้างตารางไม่สำเร็จ
         frappe.msgprint(__('Error resetting and adding rows in Sales Items: ') + error.message);
     }
+}
+
+function set_item_code_query(frm) {    
+    frm.set_query("item_code", "items", function (doc, cdt, cdn) {
+        const party_name = frm.doc.customer_name;
+        return {
+            query: "lpp.custom.custom_item.get_items_based_on_party_and_groups",
+            filters: {
+                party_name : party_name
+            }
+        };
+    })
 }

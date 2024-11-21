@@ -6,7 +6,10 @@ frappe.ui.form.on("Sales Invoice", {
             frm.set_value('naming_series', 'CN.YY.MM.-.####');
         }
     },
-    
+    refresh_field: function(frm){
+        set_item_code_query(frm);
+        frm.refresh_field("items"); // รีเฟรช child table เมื่อ customer_name เปลี่ยน
+    },
     customer: function(frm) {
         // เคลียร์ตาราง items เมื่อเปลี่ยน Customer
         // clearSalesInvoiceItems(frm);
@@ -15,6 +18,9 @@ frappe.ui.form.on("Sales Invoice", {
         frm.doc.items.forEach(item => {
             setCustomerItemCode(frm, item.doctype, item.name);
         });
+
+        set_item_code_query(frm);
+        frm.refresh_field("items"); // รีเฟรช child table เมื่อ customer_name เปลี่ยน
 
     }
 });
@@ -47,4 +53,16 @@ function setCustomerItemCode(frm, cdt, cdn) {
         // จัดการข้อผิดพลาดกรณีเซ็ตค่าไม่สำเร็จ
         frappe.msgprint(__('Error setting customer_item_code in Sales Invoice Item: ') + error.message);
     }
+}
+
+function set_item_code_query(frm) {    
+    frm.set_query("item_code", "items", function (doc, cdt, cdn) {
+        const party_name = frm.doc.customer_name;
+        return {
+            query: "lpp.custom.custom_item.get_items_based_on_party_and_groups",
+            filters: {
+                party_name : party_name
+            }
+        };
+    })
 }
