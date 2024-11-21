@@ -10,7 +10,7 @@ from erpnext.accounts.report.purchase_register.purchase_register import execute 
 
 def execute(filters=None):
     columns = get_columns()
-    data = get_data(filters) * 103
+    data = get_data(filters)
    
     return columns, data
 

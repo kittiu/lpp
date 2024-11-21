@@ -93,7 +93,7 @@ def get_data(filters):
             try:
                 query_data = frappe.db.sql(
                     """
-                    SELECT tsi.company, tsi.company_tax_id, ta.address_line2, tsi.name, ta.custom_branch
+                    SELECT tsi.company, ta.address_line2, tsi.name, ta.custom_branch
                     FROM `tabSales Invoice` tsi
                     INNER JOIN `tabAddress` ta ON tsi.customer_address = ta.name 
                     WHERE tsi.name = %s
@@ -103,16 +103,18 @@ def get_data(filters):
                 )
 
                 for dr in query_data:
+                    company_tax_id = get_company_tax_id(dr['company'])
                     net_total_zero = None
                     net_total = None
                     if dt["net_total"] == dt["grand_total"]:
                         net_total_zero = dt["net_total"]
                     else: 
                         net_total = dt["net_total"]
+					
                                    
                     report_data.append({
                         "company": dr['company'],
-                        "company_tax_id": dr["company_tax_id"],
+                        "company_tax_id": company_tax_id,
                         "posting_date": dt["posting_date"],
                         "voucher_no": dt['voucher_no'],
                         "customer_name": dt["customer_name"],
@@ -128,3 +130,8 @@ def get_data(filters):
                 frappe.log_error(frappe.get_traceback(), _("Error in fetching data for Sales Invoice"))
 
     return report_data
+
+def get_company_tax_id(company_name):
+    # Fetch the tax ID of the company
+    tax_id = frappe.get_value('Company', company_name, 'tax_id')
+    return tax_id
