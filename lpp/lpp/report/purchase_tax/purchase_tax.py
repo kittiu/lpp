@@ -186,18 +186,18 @@ def get_data(filters):
         #         "company_tax_id" : company_tax_id
         #     })
             
-        report_data.append({
-			"no": None,
-			"posting_date": None,
-			"voucher_no": None,
-			"supplier_name": "รวมยอดทั้งสิ้น",
-			"tax_id": None,
-			"address_line2": None,
-			"net_total": grand_total_net,
-			"total_tax": grand_total_tax,
-			"grand_total": grand_total_balance,
-            "company_tax_id" : company_tax_id
-		})
+        # report_data.append({
+		# 	"no": None,
+		# 	"posting_date": None,
+		# 	"voucher_no": None,
+		# 	"supplier_name": "รวมยอดทั้งสิ้น",
+		# 	"tax_id": None,
+		# 	"address_line2": None,
+		# 	"net_total": grand_total_net,
+		# 	"total_tax": grand_total_tax,
+		# 	"grand_total": grand_total_balance,
+        #     "company_tax_id" : company_tax_id
+		# })
 
     return report_data
 
