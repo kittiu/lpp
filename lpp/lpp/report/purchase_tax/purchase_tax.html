@@ -1,133 +1,387 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body {
-            font-family: "Arial", sans-serif;
-            margin: 10px;
-            background-color: #f0f0f0; /* Light background color to enhance visibility */
-        }
-        label {
-            color: black;
-        }
-        .header {
-            text-align: center;
-        }
-        .row-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 5px;
-        }
-        table {
-            width: 80%; /* Set a reasonable width for the table */
-            max-width: 1200px; /* Set a max width to avoid stretching */
-            border-collapse: collapse;
-            margin: 0 auto; /* This centers the table horizontally */
-            margin-top: 20px;
-            background-color: white; /* Background for the table */
-        }
-        th, td {
-            border: 1px solid black; /* Add border to cells */
-            padding: 8px; /* Adds some padding inside cells for readability */
-        }
-        th {
-            background-color: #f2f2f2; /* Light background for headers */
-            text-align: center;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .text-left {
-            text-align: left;
-        }
-        .text-right {
-            text-align: right;
-        }
-        @media screen {
-            .print-format {
-                padding: 35px !important;
-            }
-        }
-    </style>
-</head>
-
-{% let pay_date = data[1]['posting_date']; %}
-{% let dateConvert = String(pay_date) %}
-{% let date_parts = dateConvert.split('-') %}
-{% let year = Number(date_parts[0]) %}
-{% let month = date_parts[1] %}
-{% let day = date_parts[2] %}
-{% let month_th = {
+{%
+let pay_date = data.length ? data[0]['posting_date'] : '';
+let company_tax_id = data.length ? data[0].company_tax_id : '';
+let [year, month, day] = pay_date.split('-');
+let month_th = {
 '01': 'มกราคม', '02': 'กุมภาพันธ์', '03': 'มีนาคม', '04': 'เมษายน',
 '05': 'พฤษภาคม', '06': 'มิถุนายน', '07': 'กรกฎาคม', '08': 'สิงหาคม',
 '09': 'กันยายน', '10': 'ตุลาคม', '11': 'พฤศจิกายน', '12': 'ธันวาคม'
-}[month] %}
+}[month];
 
+let items_per_page = 21;
+let pages = [];
+let items_default = Array(items_per_page).fill('default');
+for (let i = 0; i < data.length; i +=items_per_page) {
+    let combined_items = [...(data.slice(i, i + items_per_page)), ...items_default];
+    pages.push(combined_items.slice(0, items_per_page));
+} 
+function formatDate(dateStr) {
+    let [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+}
+let currentDate = new Date().toLocaleString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+}).replace(',', '').replace(' ', '-');
+%} 
+<head>
+    <link href="/assets/lpp/css/fonts.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>รายงานภาษีซื้อ</title>
+    <style>
+        @media scrseen {
+            .print-format {
+                padding: 0.2cm !important;
+            }
+        }
+        .print-format {
+            padding: 0.5cm !important;
+        }
 
-<body>
-    <div class="header">
-        <label style="font-size: 18px; font-weight: bold;">รายงานภาษีซื้อ</label>
-        <label style="font-size: 18px; font-weight: bold;">{{ __("ประจำเดือน") }} {{month_th}} {{year}}</label>
-    </div>
+        @page {
+            /* size: A4; */
+            margin: 0.2cm;
+        }
+        .content{
+            font-family: NotoSansThai, sans-serif  !important;
+        }
+        body {
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: black !important;
+        }
 
-    <div class="row">
-        <div class="row-flex">
-            <label style="text-align: left; font-size: 14px;">{{ __("ชื่อผู้ประกอบการ") }} : {%= filters['company'] %}</label>
-            <label style="text-align: right; font-size: 14px;">{{ __("เลขประจำตัวผู้เสียภาษี") }}: {%= data[1]['company_tax_id'] %}</label>
+        /* The clickable checkbox */
+        .checkbox {
+            width: 15px;
+            height: 15px;
+            border: 1px solid #666;
+            border-radius: 4px;
+            /* Rounded corners */
+            background-color: #fff;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .checkbox-container {
+            display: flex;
+            /* Use flexbox for horizontal layout */
+            gap: 5px;
+            /* Space between checkboxes */
+            align-items: center;
+            /* Align checkboxes and labels vertically */
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .item-keep-right {
+            text-align: right;
+            /* Align content to the right */
+            display: flex;
+            /* Use flexbox for flexible alignment */
+            justify-content: flex-end;
+            /* Push content to the right */
+            align-items: center;
+            /* Vertically center content */
+        }
+
+        /* Row */
+        .b-row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* Columns */
+        [class*="b-col-"] {
+            flex-basis: 0;
+            flex-grow: 1;
+            max-width: 100%;
+        }
+
+        /* Column sizes */
+        .b-col-1 {
+            flex: 0 0 8.33%;
+            max-width: 8.33%;
+        }
+
+        .b-col-2 {
+            flex: 0 0 16.66%;
+            max-width: 16.66%;
+        }
+
+        .b-col-3 {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+
+        .b-col-4 {
+            flex: 0 0 33.33%;
+            max-width: 33.33%;
+        }
+
+        .b-col-5 {
+            flex: 0 0 41.66%;
+            max-width: 41.66%;
+        }
+
+        .b-col-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .b-col-7 {
+            flex: 0 0 58.33%;
+            max-width: 58.33%;
+        }
+
+        .b-col-8 {
+            flex: 0 0 66.66%;
+            max-width: 66.66%;
+        }
+
+        .b-col-9 {
+            flex: 0 0 75%;
+            max-width: 75%;
+        }
+
+        .b-col-10 {
+            flex: 0 0 83.33%;
+            max-width: 83.33%;
+        }
+
+        .b-col-11 {
+            flex: 0 0 91.66%;
+            max-width: 91.66%;
+        }
+
+        .b-col-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .row {
+            margin: 10px 0;
+        }
+
+        .px-3 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .print-format table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .text-box {
+            width: 240px;            /* Set the width to 300px */
+            white-space: nowrap;     /* Prevent text from wrapping to a new line */
+            overflow: hidden;        /* Hide any text that overflows the width */
+        }
+        .print-format th {
+            padding: 5px !important;
+            background-color: #f4f4f4;
+            text-align: center !important;
+            border: 1px solid #000000 !important;
+            /* Horizontal center */
+            vertical-align: middle !important;
+            /* Vertical center */
+            background-color: white;
+            color: black;
+            font-size: 12px;
+        }
+
+        .print-format td {
+            padding: 3px !important;
+            font-size: 11px;
+            border-left: 1px solid #000000 !important;
+            border-right: 1px solid #000000 !important;
+        }
+        .print-format .row-last-data td {
+            padding: 4px !important;
+            font-size: 11px;
+            border-left: 1px solid #000000 !important;
+            border-right: 1px solid #000000 !important;
+            border-bottom: 1px solid #000000 !important;
+        }
+        .print-format .row-total td {
+            font-size: 12px;
+            padding: 4px !important;
+            border: 1px solid #000000 !important;
+        }
+        .print-format .row-default td {
+            height: 23.59px;
+        }
+        .print-format .border-none td {
+            padding: 4px !important;
+            font-size: 11px;
+            color: #ffffff !important;
+            border-left: 0px solid #ffffff !important;
+            border-right: 0px solid #ffffff !important;
+            border-bottom: 0px solid #ffffff !important;
+        }
+        .print-format .last-row td {
+            padding: 4px !important;
+            font-size: 12px;
+            border-left: 0px solid #ffffff !important;
+            border-right: 0px solid #ffffff !important;
+            border-bottom: 0px solid #ffffff !important;
+        }
+        .text-blue-underline {
+            color: blue;         /* Sets the text color to blue */
+            text-decoration: underline; /* Adds an underline */
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        .text-left {
+            text-align: left !important;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+    </style>
+    </head>
+
+    <body>
+        <div class="content">
+        {%  
+            let sumTotal1 = 0;
+            let sumTotal2 = 0;
+            let sumTotal3 = 0;
+            pages.forEach((page_data, page_idx) => { 
+        %}
+        <div class="text-right">
+           หน้าที่ {%= page_idx + 1 %}
         </div>
-    </div>
 
-    <!-- Add table here -->
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 5%;">{{ __("ลำดับ")}}</th>
-                <th style="width: 10%;">{{ __("วัน/เดือน/ปี ใบกำกับภาษี")}}</th>
-                <th style="width: 15%;">{{ __("เลขที่ใบกำกับภาษี")}}</th>
-                <th style="width: 20%;">{{ __("ชื่อในรายงานภาษี")}}</th>
-                <th style="width: 15%;">{{ __("เลขประจำตัวผู้เสียภาษี")}}</th>
-                <th style="width: 10%;">{{ __("สาขาสถานประกอบการ")}}</th>
-                <th style="width: 10%;">{{ __("จำนวนเงิน")}}</th>
-                <th style="width: 10%;">{{ __("ภาษี")}}</th>
-                <th style="width: 10%;">{{ __("ยอดรวม")}}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for(var v=0 ; v < data.length; v++ ) { %}
-            <tr>
-                <td class="text-center" style="font-size: 10px;">
-                    {%= data[v]['no'] %}
-                </td>
-                <td class="text-left" style="font-size: 10px;">
-                    {%= data[v]['posting_date'] %}
-                </td>
-                <td class="text-left" style="font-size: 10px;">
-                    {%= data[v]['voucher_no'] %}
-                </td>
-                <td class="text-left" style="font-size: 10px;">
-                    {%= data[v]['supplier_name'] %}
-                </td>
-                <td class="text-left" style="font-size: 10px;">
-                    {%= data[v]['tax_id'] %}
-                </td>
-                <td class="text-left" style="font-size: 10px;">
-                    {%= data[v]['address_line2'] %}
-                </td>
-                <td class="text-right" style="font-size: 10px;">
-                    {%= !data[v]['no'] ? "" : format_number(data[v]['net_total'], null, 2) %}
-                </td>
-                <td class="text-right" style="font-size: 10px;">
-                    {%= !data[v]['no'] ? "" : format_number(data[v]['total_tax'], null, 2) %}
-                </td>
-                <td class="text-right" style="font-size: 10px;">
-                    {%= !data[v]['no'] ? "" : format_number(data[v]['grand_total'], null, 2) %}
-                </td>
-            </tr>
+        <div class="header">
+            <h4 class="my-0">รายงานภาษีซื้อ</h4>
+            <p>ประจำเดือน {%= month_th %} {%= year %}</p>
+        </div>
+
+        <div class="b-row">
+            <div class="b-col-9">
+                ชื่อผู้ประกอบการ: บริษัท ลำพูนพลาสแพค จำกัด
+            </div>
+            <div class="b-col-3">
+                <div class="checkbox-container">
+                    <div class="checkbox my-0"></div><span class="mr-5">สำนักงานใหญ่</span>
+                    <div class="checkbox my-0"></div><span>สาขา</span>
+                </div>
+                <div>เลขประจำตัวผู้เสียภาษี: {%= company_tax_id%}</div>
+            </div>
+        </div>
+
+        <table class="my-0 mt-2">
+            <thead>
+                <tr>
+                    <th rowspan="2">ลำดับ</th>
+                    <th colspan="2">ใบกำกับภาษี</th>
+                    <th rowspan="2" style="width: 240px;">ชื่อในรายงานภาษี</th>
+                    <th rowspan="2">เลขประจำตัว<br>ผู้เสียภาษี</th>
+                    <th>สถานประกอบการ</th>
+                    <th rowspan="2">จำนวนเงิน</th>
+                    <th rowspan="2">ภาษี</th>
+                    <th rowspan="2">ยอดรวม</th>
+                </tr>
+                <tr>
+                    <th>วัน เดือน ปี</th>
+                    <th>เลขที่</th>
+                    <th>สาขา</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%
+                    let sum1 = 0;
+                    let sum2 = 0;
+                    let sum3 = 0;
+                %}
+                {% 
+                    page_data.forEach((row, idx) => { 
+                    if(row !== 'default'){
+                        sum1 += row.net_total;
+                        sum2 += row.total_tax;
+                        sum3 += row.grand_total;
+                    }
+                %}
+
+                {%if(row === 'default'){ %}
+                <tr class="row-default">
+                    <td class="text-center"></td>
+                    <td class="text-left"></td>
+                    <td class="text-left"></td>
+                    <td class="text-left"></td>
+                    <td class="text-left"></td>
+                    <td class="text-left"></td>
+                    <td class="text-right"></td>
+                    <td class="text-right"></td>
+                    <td class="text-right"></td>
+                </tr>
+                {%}else{ %}
+                <tr class="{{ ((idx + 1) == items_per_page)? 'row-last-data': '' }}">
+                    <td class="text-center">{%= idx + 1 + page_idx * items_per_page %}</td>
+                    <td class="text-left">{%= formatDate(row.posting_date) %}</td>
+                    <td class="text-left">{%= row.voucher_no %}</td>
+                    <td class="text-left">
+                        <div class="text-box">
+                            {%= row.supplier_name %}
+                        </div>
+                    </td>
+                    <td class="text-center">{%= row.tax_id %}</td>
+                    <td class="text-center">{%= row.address_line2 %}</td>
+                    <td class="text-right">
+                        {%= row.net_total == null ? '-' : format_number(row.net_total, null, 2) %}
+                    </td>
+                    <td class="text-right">
+                        {%= row.total_tax == null ? '-' : format_number(row.total_tax, null, 2) %}
+                    </td>
+                    <td class="text-right">
+                        {%= row.grand_total == null ? '-' : format_number(row.grand_total, null, 2) %}
+                    </td>
+                </tr>
+
+                {%
+                }
+                 })
+                  %}
+                {%
+                    sumTotal1 += sum1;
+                    sumTotal2 += sum2;
+                    sumTotal3 += sum3;
+                %}
+                <tr class="{{ ((page_idx+1) == pages.length)? 'row-total': 'border-none' }}">
+                    <td colspan="6" class="text-left">รวมยอดทั้งหมด</td>
+                    <td class="text-right">{%= format_number(sumTotal1, null, 2) %}</td>
+                    <td class="text-right">{%= format_number(sumTotal2, null, 2) %}</td>
+                    <td class="text-right">{%= format_number(sumTotal3, null, 2) %}</td>
+                </tr>
+                <tr class="last-row">
+                    <td colspan="3" class="text-left">{%= currentDate %}</td>
+                    <td  colspan="3" class="text-center">รวมยอดหน้าที่ {%= page_idx + 1 %}</td>
+                    <td class="text-right text-blue-underline">{%= format_number(sum1, null, 2) %}</td>
+                    <td class="text-right text-blue-underline">{%= format_number(sum2, null, 2) %}</td>
+                    <td class="text-right text-blue-underline">{%= format_number(sum3, null, 2) %}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% if (page_idx < pages.length - 1) { %} <div style="page-break-after: always;">
+            </div>
             {% } %}
-        </tbody>
-    </table>
-
-</body>
+            {% }) %}
+        </div>
+    </body>
 </html>

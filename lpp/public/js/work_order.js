@@ -38,6 +38,9 @@ frappe.ui.form.on("Work Order", {
                 }).addClass("btn-primary");
             }
         }, 10);
+
+        set_item_code_query(frm);
+        frm.refresh_field("items"); // รีเฟรช child table เมื่อ customer_name เปลี่ยน
     },
     
     custom_customer(frm) {
@@ -47,6 +50,8 @@ frappe.ui.form.on("Work Order", {
                 .then(({ message }) => {
                     if (message) {
                         frm.set_value("custom_customer_on_label", message.customer_name);
+                        set_item_code_query(frm);
+                        frm.refresh_field("items"); // รีเฟรช child table เมื่อ customer_name เปลี่ยน
                     }
                 })
                 .catch(err => {
@@ -400,4 +405,16 @@ function aggregateJobCards(jobCards) {
     }, {});
 
     return Object.values(aggregated);
+}
+
+function set_item_code_query(frm) {    
+    frm.set_query("production_item", function () {
+        const party_name = frm.doc.custom_customer_on_label;
+        return {
+            query: "lpp.custom.custom_item.get_items_based_on_party_and_groups",
+            filters: {
+                party_name : party_name
+            }
+        };
+    })
 }

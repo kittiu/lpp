@@ -16,12 +16,12 @@ def execute(filters=None):
 
 def get_columns():
     columns = [
-        {
-			"label": _("ลำดับ"),
-			"fieldname": "no",
-			"fieldtype": "Int",
-			"width": 60,
-		},
+        # {
+		# 	"label": _("ลำดับ"),
+		# 	"fieldname": "no",
+		# 	"fieldtype": "Int",
+		# 	"width": 60,
+		# },
         {
 			"label": _("วัน/เดือน/ปี ใบกำกับภาษี"),
 			"fieldname": "posting_date",
@@ -85,20 +85,28 @@ def get_data(filters):
 
     company_tax_id = get_company_tax_id(filters['company'])
 
-    # Initialize row number
-    row_number = 1
 
     if purchase_register_data and len(purchase_register_data) > 1:
         filtered_data = [
             dt for dt in purchase_register_data[1] if dt.get('total_tax', 0.0)
         ]
+        grand_total_net = 0
+        grand_total_tax = 0
+        grand_total_balance = 0
+
         for dt in filtered_data:
             # Get supplier's address_line2 from linked address
             address_line2 = get_customer_address_line2(dt.get('supplier_id', ''))
+            tax_invoice_number = get_tax_invoice_number_by_name(dt.get('voucher_no', ''))
+
+            voucher_no = None
+            if tax_invoice_number and len(tax_invoice_number) >= 1:
+                voucher_no = tax_invoice_number[0].tax_invoice_number
+
             # Append to report_data
             report_data.append({
                 "posting_date": dt.get('posting_date', ''),
-                "voucher_no": dt.get('voucher_no', ''),
+                "voucher_no": voucher_no, #dt.get('voucher_no', ''),
                 "supplier_name": dt.get('supplier_name', ''),
                 "tax_id": dt.get('tax_id', ''),
                 "address_line2": address_line2,
@@ -107,101 +115,105 @@ def get_data(filters):
                 "grand_total": dt.get('grand_total', 0.0),
                 "company_tax_id": company_tax_id
             })
+
+            grand_total_net += dt.get('net_total', 0.0)
+            grand_total_tax += dt.get('total_tax', 0.0)
+            grand_total_balance += dt.get('grand_total', 0.0)
         
-        # Group data by 'address_line2'
-        grouped_data = defaultdict(list)
-        for item in report_data:
-            grouped_data[item['address_line2']].append(item)
+        # # Group data by 'address_line2'
+        # grouped_data = defaultdict(list)
+        # for item in report_data:
+        #     grouped_data[item['address_line2']].append(item)
 		
 		
-        # Iterate through the grouped data and calculate group totals
-        grand_total_net = 0
-        grand_total_tax = 0
-        grand_total_balance = 0
-        for group, items in sorted(grouped_data.items()):
-            group_total_net = 0
-            group_total_tax = 0
-            group_total_balance = 0
+        # # Iterate through the grouped data and calculate group totals
+        # grand_total_net = 0
+        # grand_total_tax = 0
+        # grand_total_balance = 0
+        # for group, items in sorted(grouped_data.items()):
+        #     group_total_net = 0
+        #     group_total_tax = 0
+        #     group_total_balance = 0
 
             
             
-            # Add the summary row for the group
-            target_data.append({
-                "no": None,
-                "posting_date": group,
-                "voucher_no": None,
-                "supplier_name": None,
-                "tax_id": None,
-                "address_line2": None,
-                "net_total": None,
-                "total_tax": None,
-                "grand_total": None,
-                "company_tax_id" : company_tax_id
-            })
+        #     # Add the summary row for the group
+        #     target_data.append({
+        #         "no": None,
+        #         "posting_date": group,
+        #         "voucher_no": None,
+        #         "supplier_name": None,
+        #         "tax_id": None,
+        #         "address_line2": None,
+        #         "net_total": None,
+        #         "total_tax": None,
+        #         "grand_total": None,
+        #         "company_tax_id" : company_tax_id
+        #     })
             
-            # Add numbered items for each group
-            for idx, item in enumerate(items, start=1):
-                group_total_net += item['net_total']
-                group_total_tax += item['total_tax']
-                group_total_balance += item['grand_total']
-                grand_total_net += item['net_total']
-                grand_total_tax += item['total_tax']
-                grand_total_balance += item['grand_total']
-                target_data.append({
-                    "no": idx,
-                    "posting_date": item['posting_date'],
-                    "voucher_no": item['voucher_no'],
-                    "supplier_name": item['supplier_name'],
-                    "tax_id": item['tax_id'],
-                    "address_line2": item['address_line2'],
-                    "net_total": item['net_total'],
-                    "total_tax": item['total_tax'],
-                    "grand_total": item['grand_total'],
-                    "company_tax_id" : company_tax_id
-                })
+        #     # Add numbered items for each group
+        #     for idx, item in enumerate(items, start=1):
+        #         group_total_net += item['net_total']
+        #         group_total_tax += item['total_tax']
+        #         group_total_balance += item['grand_total']
+        #         grand_total_net += item['net_total']
+        #         grand_total_tax += item['total_tax']
+        #         grand_total_balance += item['grand_total']
+        #         target_data.append({
+        #             "no": idx,
+        #             "posting_date": item['posting_date'],
+        #             "voucher_no": item['voucher_no'],
+        #             "supplier_name": item['supplier_name'],
+        #             "tax_id": item['tax_id'],
+        #             "address_line2": item['address_line2'],
+        #             "net_total": item['net_total'],
+        #             "total_tax": item['total_tax'],
+        #             "grand_total": item['grand_total'],
+        #             "company_tax_id" : company_tax_id
+        #         })
 
-            # Add the group total row
-            target_data.append({
-                "no": None,
-                "posting_date": None,
-                "voucher_no": None,
-                "supplier_name": "รวมยอดสาขา " + group,
-                "tax_id": None,
-                "address_line2": None,
-                "net_total": group_total_net,
-                "total_tax": group_total_tax,
-                "grand_total": group_total_balance,
-                "company_tax_id" : company_tax_id
-            })
+        #     # Add the group total row
+        #     target_data.append({
+        #         "no": None,
+        #         "posting_date": None,
+        #         "voucher_no": None,
+        #         "supplier_name": "รวมยอดสาขา " + group,
+        #         "tax_id": None,
+        #         "address_line2": None,
+        #         "net_total": group_total_net,
+        #         "total_tax": group_total_tax,
+        #         "grand_total": group_total_balance,
+        #         "company_tax_id" : company_tax_id
+        #     })
             
-        target_data.append({
-			"no": None,
-			"posting_date": None,
-			"voucher_no": None,
-			"supplier_name": "รวมยอดทั้งสิ้น",
-			"tax_id": None,
-			"address_line2": None,
-			"net_total": grand_total_net,
-			"total_tax": grand_total_tax,
-			"grand_total": grand_total_balance,
-            "company_tax_id" : company_tax_id
-		})
+        # report_data.append({
+		# 	"no": None,
+		# 	"posting_date": None,
+		# 	"voucher_no": None,
+		# 	"supplier_name": "รวมยอดทั้งสิ้น",
+		# 	"tax_id": None,
+		# 	"address_line2": None,
+		# 	"net_total": grand_total_net,
+		# 	"total_tax": grand_total_tax,
+		# 	"grand_total": grand_total_balance,
+        #     "company_tax_id" : company_tax_id
+		# })
 
-    return target_data
+    return report_data
 
 def get_customer_address_line2(customer_name):
-    # Query for address_line2 in the Address linked to Customer
+    # Query for custom_branch in the Address linked to Customer
     address = frappe.get_all('Address', 
                             filters={
                                 'link_doctype': 'Supplier',
                                 'link_name': customer_name
                             }, 
-                            fields=['address_line2'], 
+                            fields=['custom_branch'], 
                             limit=1)	
 
     # Check if the customer was found and has an address_line2
     if address:
-        return address[0].get('address_line2', "-")
+        return address[0].get('custom_branch', "-")
     else:
         return "-"
     
@@ -209,3 +221,13 @@ def get_company_tax_id(company_name):
     # Fetch the tax ID of the company
     tax_id = frappe.get_value('Company', company_name, 'tax_id')
     return tax_id
+
+def get_tax_invoice_number_by_name(voucher_no):
+    query_purchase = frappe.db.sql("""
+        SELECT IFNULL(tax_invoice_number, '-') AS tax_invoice_number
+        FROM `tabPurchase Invoice` tpi 
+        WHERE tpi.name = %s """,
+        (voucher_no), as_dict=True
+    )
+
+    return query_purchase

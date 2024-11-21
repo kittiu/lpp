@@ -53,9 +53,15 @@ def get_columns():
 		},
         {
 			"label": _("สาขา"),
-			"fieldname": "address_line2",
+			"fieldname": "custom_branch",
 			"fieldtype": "Data",
 			"width": 160,
+		},
+        {
+			"label": _("จำนวนเงินก่อนภาษีอัตราศูนย์"),
+			"fieldname": "net_total_zero",
+			"fieldtype": "Currency",
+			"width": 210,
 		},
         {
 			"label": _("จำนวนเงินก่อนภาษี"),
@@ -87,7 +93,7 @@ def get_data(filters):
             try:
                 query_data = frappe.db.sql(
                     """
-                    SELECT tsi.company, tsi.company_tax_id, ta.address_line2, tsi.name 
+                    SELECT tsi.company, ta.address_line2, tsi.name, ta.custom_branch
                     FROM `tabSales Invoice` tsi
                     INNER JOIN `tabAddress` ta ON tsi.customer_address = ta.name 
                     WHERE tsi.name = %s
@@ -97,16 +103,26 @@ def get_data(filters):
                 )
 
                 for dr in query_data:
+                    company_tax_id = get_company_tax_id(dr['company'])
+                    net_total_zero = None
+                    net_total = None
+                    if dt["net_total"] == dt["grand_total"]:
+                        net_total_zero = dt["net_total"]
+                    else: 
+                        net_total = dt["net_total"]
+					
+                                   
                     report_data.append({
                         "company": dr['company'],
-                        "company_tax_id": dr["company_tax_id"],
+                        "company_tax_id": company_tax_id,
                         "posting_date": dt["posting_date"],
                         "voucher_no": dt['voucher_no'],
                         "customer_name": dt["customer_name"],
                         "tax_id": dt['tax_id'],
-                        "address_line2": dr["address_line2"],
-                        "net_total": dt["net_total"],
-                        "tax_total": dt['tax_total'],
+                        "custom_branch": dr["custom_branch"],
+                        "net_total_zero": None if net_total_zero == 0 else net_total_zero,
+                        "net_total": None if net_total == 0 else net_total,
+                        "tax_total": None if dt['tax_total'] == 0 else dt['tax_total'],
                         "grand_total": dt["grand_total"],
                     })
 
@@ -114,3 +130,8 @@ def get_data(filters):
                 frappe.log_error(frappe.get_traceback(), _("Error in fetching data for Sales Invoice"))
 
     return report_data
+
+def get_company_tax_id(company_name):
+    # Fetch the tax ID of the company
+    tax_id = frappe.get_value('Company', company_name, 'tax_id')
+    return tax_id
