@@ -8,6 +8,10 @@ frappe.ui.form.on("Payment Entry", {
             frm.script_manager.trigger("party");
         }
 
+        if (frm.is_new() && frm.doc.custom_bill_no && frm.doc.payment_type === "Pay") {
+            frm.set_value('naming_series', 'BP.YY.MM.-.####.');
+        }
+
         frm.set_query("reference_doctype", "references", function () {
             let doctypes = ["Journal Entry"];
             if (frm.doc.party_type == "Customer") {
