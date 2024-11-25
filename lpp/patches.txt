@@ -21,4 +21,4 @@ lpp.lpp.patches.remove_field_from_work_order_20241106_1300
 lpp.lpp.patches.remove_field_from_quality_inspection_order_20241106_1740
 lpp.lpp.patches.clear_unused_print_format_data_20241114_1640
 lpp.lpp.patches.remove_field_from_item_20241115_1640
-
+lpp.lpp.patches.remove_field_from_quality_inspection_20241122_1130
