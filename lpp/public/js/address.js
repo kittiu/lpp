@@ -12,7 +12,13 @@ frappe.ui.form.on('Address', {
             console.error('Error updating link title:', error);
             frappe.msgprint(__('There was an error updating the link title. Please try again.'));
         }
+    },
+
+    refresh(frm, cdt, cdn) {
+        get_address_title(frm, cdt, cdn)
     }
+
+    
 });
 
 
@@ -24,17 +30,17 @@ frappe.ui.form.on('Dynamic Link', {
         if (row.idx !== 1) return;
     
         // Map of doctype to the corresponding field to fetch
-        const doctypeFieldMap = {
+        const doctype_to_map = {
             Customer: 'customer_name',
             Supplier: 'supplier_name',
         };
     
         // Check if the row's link_doctype has a corresponding field
-        const fieldToFetch = doctypeFieldMap[row.link_doctype];
+        const doctype_field = doctype_to_map[row.link_doctype];
     
-        if (fieldToFetch) {
-            const { message } = await frappe.db.get_value(row.link_doctype, row.link_name, [fieldToFetch]);
-            frm.set_value('address_title', message[fieldToFetch]);
+        if (doctype_field) {
+            const { message } = await frappe.db.get_value(row.link_doctype, row.link_name, [doctype_field]);
+            frm.set_value('address_title', message[doctype_field]);
         } else {
             frm.set_value('address_title', row.link_name);
         }
@@ -42,3 +48,28 @@ frappe.ui.form.on('Dynamic Link', {
         frm.refresh_field('address_title');
     }
 });
+
+
+async function get_address_title (frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    
+    if (row.links.length === 0) return;
+
+    let link = row.links[0];
+    const doctype_to_map = {
+        Customer: 'customer_name',
+        Supplier: 'supplier_name',
+    };
+
+    // Check if the row's link_doctype has a corresponding field
+    const doctype_field = doctype_to_map[link.link_doctype];
+
+    if (doctype_field) {
+        const { message } = await frappe.db.get_value(link.link_doctype, link.link_name, [doctype_field]);
+        frm.set_value('address_title', message[doctype_field]);
+    } else {
+        frm.set_value('address_title', link.link_name);
+    }
+
+    frm.refresh_field('address_title');
+}
