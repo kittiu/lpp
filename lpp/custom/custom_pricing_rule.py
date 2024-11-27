@@ -20,7 +20,7 @@ class CustomPricingRule(PricingRule):
                     self.custom_item_code_naming_series = first_row.item_code
 
                     # Generate a name using make_autoname with the item_code
-                    self.name = make_autoname(f"PRLE-{first_row.item_code}-.##")
+                    self.name = make_autoname(f"PRLE-{first_row.item_code}-.##.")
                 else:
                     # Throw an error if item_code is missing in the first row
                     frappe.throw("Item Code is missing in the first row of items.")
