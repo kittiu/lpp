@@ -270,7 +270,7 @@ let currentDate = new Date().toLocaleString('en-US', {
 
         <div class="header">
             <h4 class="my-0">รายงานภาษีซื้อ</h4>
-            <p>ประจำเดือน {%= month_th %} {%= year %}</p>
+            <p style="font-weight: 500;">ประจำเดือน {%= month_th %} {%= year %}</p>
         </div>
 
         <div class="b-row">
@@ -299,7 +299,7 @@ let currentDate = new Date().toLocaleString('en-US', {
                     <th rowspan="2">ยอดรวม</th>
                 </tr>
                 <tr>
-                    <th>วัน เดือน ปี</th>
+                    <th style="width: 70px;">วัน เดือน ปี</th>
                     <th>เลขที่</th>
                     <th>สาขา</th>
                 </tr>
@@ -322,7 +322,7 @@ let currentDate = new Date().toLocaleString('en-US', {
                 {%if(row === 'default'){ %}
                 <tr class="row-default">
                     <td class="text-center"></td>
-                    <td class="text-left"></td>
+                    <td class="text-center"></td>
                     <td class="text-left"></td>
                     <td class="text-left"></td>
                     <td class="text-left"></td>
@@ -364,10 +364,10 @@ let currentDate = new Date().toLocaleString('en-US', {
                     sumTotal3 += sum3;
                 %}
                 <tr class="{{ ((page_idx+1) == pages.length)? 'row-total': 'border-none' }}">
-                    <td colspan="6" class="text-left">รวมยอดทั้งหมด</td>
-                    <td class="text-right">{%= format_number(sumTotal1, null, 2) %}</td>
-                    <td class="text-right">{%= format_number(sumTotal2, null, 2) %}</td>
-                    <td class="text-right">{%= format_number(sumTotal3, null, 2) %}</td>
+                    <td colspan="6" class="text-left" style="font-weight: 500;">รวมยอดทั้งหมด</td>
+                    <td class="text-right" style="font-weight: 500;">{%= format_number(sumTotal1, null, 2) %}</td>
+                    <td class="text-right" style="font-weight: 500;">{%= format_number(sumTotal2, null, 2) %}</td>
+                    <td class="text-right" style="font-weight: 500;">{%= format_number(sumTotal3, null, 2) %}</td>
                 </tr>
                 <tr class="last-row">
                     <td colspan="3" class="text-left">{%= currentDate %}</td>

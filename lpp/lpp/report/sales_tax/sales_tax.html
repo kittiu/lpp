@@ -271,7 +271,7 @@ let currentDate = new Date().toLocaleString('en-US', {
 
         <div class="header">
             <h4 class="my-0">รายงานภาษีขาย</h4>
-            <p>ประจำเดือน {%= month_th %} {%= year %}</p>
+            <p style="font-weight: 500;">ประจำเดือน {%= month_th %} {%= year %}</p>
         </div>
 
         <div class="b-row">
@@ -373,11 +373,11 @@ let currentDate = new Date().toLocaleString('en-US', {
                     sumTotal4 += sum4;
                 %}
                 <tr class="{{ ((page_idx+1) == pages.length)? 'row-total': 'border-none' }}">
-                    <td colspan="6" class="text-left">รวมยอดทั้งหมด</td>
-                    <td class="text-right">{%= format_number(sumTotal1, null, 2) %}</td>
-                    <td class="text-right">{%= format_number(sumTotal2, null, 2) %}</td>
-                    <td class="text-right">{%= format_number(sumTotal3, null, 2) %}</td>
-                    <td class="text-right">{%= format_number(sumTotal4, null, 2) %}</td>
+                    <td colspan="6" class="text-left" style="font-weight: 500;">รวมยอดทั้งหมด</td>
+                    <td class="text-right" style="font-weight: 500;">{%= format_number(sumTotal1, null, 2) %}</td>
+                    <td class="text-right" style="font-weight: 500;">{%= format_number(sumTotal2, null, 2) %}</td>
+                    <td class="text-right" style="font-weight: 500;">{%= format_number(sumTotal3, null, 2) %}</td>
+                    <td class="text-right" style="font-weight: 500;">{%= format_number(sumTotal4, null, 2) %}</td>
                 </tr>
                 <tr class="last-row">
                     <td colspan="3" class="text-left">{%= currentDate %}</td>
