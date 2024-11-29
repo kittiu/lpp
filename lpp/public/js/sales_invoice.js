@@ -5,6 +5,7 @@ frappe.ui.form.on("Sales Invoice", {
         if(frm.doc.select_print_heading && frm.doc.select_print_heading === 'Credit Note'){
             frm.set_value('naming_series', 'CN.YY.MM.-.####');
         }
+        frm.set_value('disable_rounded_total', 1);
     },
     refresh_field: function(frm){
         set_item_code_query(frm);
