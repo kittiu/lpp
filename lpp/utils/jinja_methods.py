@@ -81,3 +81,24 @@ def group_and_sum_by_po(docname):
     except Exception as e:
         frappe.log_error(message=f"Error in group_and_sum_by_po: {str(e)}", title="Jinja Method Error")
         return []
+    
+def get_remark_form_items(account, id, item_table):
+    item = frappe.db.get_all(
+        item_table,
+        filters={
+            'expense_account': account,
+            'parent': id,
+        },
+        fields=['custom_remark'],
+        order_by='item_name asc'
+    )
+
+    # If no items are found, return '-'
+    if not item:
+        return '-'
+    
+    # Concatenate 'custom_remark' values
+    remarks = ', '.join([i['custom_remark'] for i in item])
+
+    return remarks
+
