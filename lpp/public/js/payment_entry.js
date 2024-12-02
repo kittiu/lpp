@@ -1,13 +1,14 @@
 frappe.ui.form.on("Payment Entry", {
     onload(frm){
-        frm.script_manager.trigger("payment_type");
+        if(frm.doc.custom_bill_no){
+            frm.script_manager.trigger("payment_type");
+            if(frm.doc.party && frm.is_new()){
+                frm.script_manager.trigger("party");
+            }
+        }
     },
     refresh(frm) {
-        frm.set_value('custom_no_chequereference_transaction', 1)
         frm.set_df_property('purchase_billing', 'read_only', 1);
-        if(frm.doc.party && frm.is_new()){
-            frm.script_manager.trigger("party");
-        }
 
         if (frm.is_new() && frm.doc.custom_bill_no && frm.doc.payment_type === "Pay") {
             frm.set_value('naming_series', 'BP.YY.MM.-.####.');
@@ -67,19 +68,6 @@ frappe.ui.form.on("Payment Entry", {
             frm.set_value('naming_series','RC.YY.MM.-.####');
         }else{
             frm.set_value('naming_series','')
-        }
-    },
-    custom_no_chequereference_transaction: function(frm){
-        if (frm.doc.custom_no_chequereference_transaction) {
-            setTimeout(() => {
-                frm.set_df_property('reference_no', 'reqd', 0);
-                frm.set_df_property('reference_date', 'reqd', 0);
-            }, 2000);
-        }else{
-            setTimeout(() => {
-                frm.set_df_property('reference_no', 'reqd', 1);
-                frm.set_df_property('reference_date', 'reqd', 1);
-            }, 2000);
         }
     }
 });
