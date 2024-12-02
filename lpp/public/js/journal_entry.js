@@ -8,6 +8,21 @@ frappe.ui.form.on('Journal Entry', {
 
     },
 
+    validate(frm) {
+        console.log('frm', frm.doc.tax_invoice_details);
+
+        if(frm.doc.tax_invoice_details){
+            const total_tax_amount = frm.doc.tax_invoice_details.reduce((sum, row) => {
+                return sum + (row.custom_tax_amount_custom || 0);
+            }, 0);
+
+
+            // Set the total value to a field in the parent document
+            frm.set_value('custom_total', total_tax_amount);
+        }else{
+            frm.set_value('custom_total', 0);
+        }
+    },
     // Event triggered when the custom_journal_type field is updated
     custom_journal_type: function(frm) {
         if (frm.doc.custom_journal_type) {
