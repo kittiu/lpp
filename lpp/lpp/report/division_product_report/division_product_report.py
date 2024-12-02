@@ -121,9 +121,9 @@ def get_data(filters=None):
 
 		for dt in sales_analytics_data[1]:
 			value_sum = get_value_summary_by_month(dt)
-			address_line2 = get_customer_address_line2(dt["entity"])
+			custom_branch = get_customer_custom_branch(dt["entity"])
 			json_data = {
-				"address_line2": address_line2,
+				"custom_branch": custom_branch,
 				"entity" : dt["entity"],
 				"entity_name" : dt["entity_name"],
 				"jan" : value_sum['total_jan'],
@@ -144,7 +144,7 @@ def get_data(filters=None):
 
 		grouped_data = defaultdict(list)
 		for item in report_data:
-			grouped_data[item['address_line2']].append(item)
+			grouped_data[item['custom_branch']].append(item)
 
 		grand_total_balance = 0
 		grand_total_jan = 0
@@ -176,8 +176,8 @@ def get_data(filters=None):
 
             # Add the summary row for the group
 			target_data.append({
-				"address_line2": group,
-				"entity" : address_line2,
+				"custom_branch": group,
+				"entity" : custom_branch,
 				"entity_name" : "",
 				"jan" : None,
 				"feb" : None,
@@ -211,7 +211,7 @@ def get_data(filters=None):
 				group_total_dec += item['dec']
 
 				target_data.append({
-                    "address_line2": group,
+                    "custom_branch": group,
 					"entity" : item["entity"],
 					"entity_name" : item["entity_name"],
 					"jan" : item["jan"],
@@ -232,7 +232,7 @@ def get_data(filters=None):
 	
 			# Add total row for the group
 			target_data.append({
-				"address_line2": group,
+				"custom_branch": group,
 				"entity" : "Summary : " + group,
 				"entity_name" : "",
 				"jan" : group_total_jan,
@@ -265,7 +265,7 @@ def get_data(filters=None):
 			grand_total_dec += group_total_dec
 
 		target_data.append({
-			"address_line2": group,
+			"custom_branch": group,
 			"entity" : "Grand Total",
 			"entity_name" : "",
 			"jan" : grand_total_jan,
@@ -285,18 +285,18 @@ def get_data(filters=None):
 
 	return target_data
 
-def get_customer_address_line2(customer_name):
+def get_customer_custom_branch(customer_name):
     address = frappe.get_all('Address', 
 							filters={
 								'link_doctype': 'Customer',
 								'link_name': customer_name
 							}, 
-							fields=['address_line2'], 
+							fields=['custom_branch'], 
 							limit=1)	
 
-    # Check if the customer was found and has an address_line2
+    # Check if the customer was found and has an custom_branch
     if address:
-        return address[0].get('address_line2', "No address_line2 found")
+        return address[0].get('custom_branch', "No custom_branch found")
     else:
         return None
 
