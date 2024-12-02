@@ -102,3 +102,18 @@ def get_remark_form_items(account, id, item_table):
 
     return remarks
 
+
+def sort_journal_entries(entries):
+    def sort_key(entry):
+        # Determine group based on debit and credit values
+        if entry.debit_in_account_currency > 0 and entry.credit_in_account_currency == 0:
+            group = 0  # Debit group
+        elif entry.debit_in_account_currency == 0 and entry.credit_in_account_currency > 0:
+            group = 1  # Credit group
+        else:
+            group = 2  # Invalid or mixed group
+        # Return a tuple for sorting: (group, account)
+        return (group, entry.account)
+
+    # Sort the entries using the custom key
+    return sorted(entries, key=sort_key)
