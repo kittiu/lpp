@@ -11,7 +11,7 @@ frappe.ui.form.on("Sales Invoice", {
         set_item_code_query(frm);
         frm.refresh_field("items"); // รีเฟรช child table เมื่อ customer_name เปลี่ยน
     },
-    customer: function(frm) {
+    customer: async function(frm) {
         // เคลียร์ตาราง items เมื่อเปลี่ยน Customer
         // clearSalesInvoiceItems(frm);
 
@@ -23,6 +23,10 @@ frappe.ui.form.on("Sales Invoice", {
         set_item_code_query(frm);
         frm.refresh_field("items"); // รีเฟรช child table เมื่อ customer_name เปลี่ยน
 
+        const { message } = await frappe.db.get_value("Customer", frm.doc.customer, "custom_sales_tax_and_charge");
+        if (message && message.custom_sales_tax_and_charge) {
+            frm.set_value("taxes_and_charges", message.custom_sales_tax_and_charge);
+        }
     }
 });
 
