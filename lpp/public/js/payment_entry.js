@@ -1,8 +1,10 @@
 frappe.ui.form.on("Payment Entry", {
     onload(frm){
-        frm.script_manager.trigger("payment_type");
-        if(frm.doc.party && frm.is_new()){
-            frm.script_manager.trigger("party");
+        if(frm.doc.custom_bill_no){
+            frm.script_manager.trigger("payment_type");
+            if(frm.doc.party && frm.is_new()){
+                frm.script_manager.trigger("party");
+            }
         }
     },
     refresh(frm) {
