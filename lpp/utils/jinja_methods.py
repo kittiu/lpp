@@ -1,5 +1,7 @@
 import frappe
 import math
+import re
+import json
 
 def get_company_info():
     try:
@@ -117,3 +119,98 @@ def sort_journal_entries(entries):
 
     # Sort the entries using the custom key
     return sorted(entries, key=sort_key)
+
+def html_to_text_with_newlines_extended(html):
+    """
+    Convert HTML to plain text with newlines for specific tags.
+
+    Parameters:
+        html (str): HTML content.
+
+    Returns:
+        str: Plain text with newlines.
+    """
+
+    # Define tags that will be replaced with a newline
+    newline_tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'br']
+    
+    # Replace opening and closing tags of newline_tags with a newline
+    for tag in newline_tags:
+        html = re.sub(fr'</?{tag}.*?>', '\n', html, flags=re.IGNORECASE)
+
+    # Remove any remaining HTML tags
+    plain_text = re.sub(r'<[^>]+>', '', html)
+
+    # Normalize newlines (remove extra blank lines)
+    plain_text = re.sub(r'\n+', '\n', plain_text).strip()
+
+    return plain_text
+
+
+def calculate_table_rows(text, table_width_px=200, font_size_px=11):
+    """
+    Calculate the number of rows required to display text in a table.
+
+    Parameters:
+        text (str): The text to display.
+        table_width_px (int): Width of the table in pixels. Default is 200.
+        font_size_px (int): Font size in pixels. Default is 11.
+
+    Returns:
+        int: Number of rows required.
+    """
+    avg_char_width_px = font_size_px/2
+    chars_per_row = table_width_px // avg_char_width_px
+
+    # Split the text into lines based on newlines
+    lines = text.splitlines()
+
+    # Calculate the total rows required
+    total_rows = sum(-(-len(line) // chars_per_row) for line in lines)  # Ceiling division
+
+    return total_rows
+
+def paginate_items(items, max_rows_per_page=12, table_width_px=200, font_size_px=11):
+    """
+    Paginate items based on the maximum number of rows per page.
+
+    Parameters:
+        items (list of dict): List of items, each containing 'item_name' and 'description'.
+        max_rows_per_page (int): Maximum number of rows allowed per page. Default is 12.
+        table_width_px (int): Table width in pixels. Default is 200.
+        font_size_px (int): Font size in pixels. Default is 11.
+
+    Returns:
+        list of list of dict: Paginated items, each sublist represents a page.
+    """
+    pages = []
+    current_page = []
+    current_rows = 0
+
+    for item in items:
+        # Ensure item_name and custom_descriptions are strings
+        item_name = item.item_name or ""
+        custom_descriptions = item.custom_descriptions or ""
+        custom_descriptions = html_to_text_with_newlines_extended(custom_descriptions)
+
+        # Combine item_name and custom_descriptions using dot notation
+        combined_text = item_name + "\n" + custom_descriptions
+        # Calculate rows required for this item
+        rows_required = calculate_table_rows(combined_text, table_width_px, font_size_px)
+        
+        # Check if adding this item exceeds max rows per page
+        if current_rows + rows_required > max_rows_per_page:
+            # Start a new page
+            pages.append(current_page)
+            current_page = []
+            current_rows = 0
+
+        # Add item to the current page
+        current_page.append(item)
+        current_rows += rows_required
+
+    # Add the last page if it has items
+    if current_page:
+        pages.append(current_page)
+
+    return pages
