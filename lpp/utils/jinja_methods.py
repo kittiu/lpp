@@ -170,7 +170,7 @@ def calculate_table_rows(text, table_width_px=200, font_size_px=11):
 
     return total_rows
 
-def paginate_items(items, max_rows_per_page=12, table_width_px=200, font_size_px=11):
+def paginate_items(items, max_rows_per_page=12, is_final=False, table_width_px=200, font_size_px=11):
     """
     Paginate items based on the maximum number of rows per page.
 
@@ -190,8 +190,14 @@ def paginate_items(items, max_rows_per_page=12, table_width_px=200, font_size_px
     for item in items:
         # Ensure item_name and custom_descriptions are strings
         item_name = item.item_name or ""
-        custom_descriptions = item.custom_descriptions or ""
-        custom_descriptions = html_to_text_with_newlines_extended(custom_descriptions)
+
+        # Handle custom_descriptions based on 'final' flag
+        if is_final and item != items[-1]:
+            custom_descriptions = ""  # Ignore custom_descriptions for non-final items
+        else:
+            custom_descriptions = item.custom_descriptions or ""
+            custom_descriptions = html_to_text_with_newlines_extended(custom_descriptions)
+
 
         # Combine item_name and custom_descriptions using dot notation
         combined_text = item_name + "\n" + custom_descriptions
