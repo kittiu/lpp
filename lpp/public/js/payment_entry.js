@@ -7,6 +7,10 @@ frappe.ui.form.on("Payment Entry", {
             }
         }
     },
+    after_save: function (frm) {
+        // Fix the issue Advance Taxes and Charges not refreshed after saving
+        frm.reload_doc();
+    },
     refresh(frm) {
         frm.set_df_property('purchase_billing', 'read_only', 1);
 
