@@ -61,6 +61,20 @@ frappe.ui.form.on('Quotation Item', {
     items_add: function (frm, cdt, cdn) {
         // เมื่อเพิ่มรายการใหม่ในตาราง items ให้เซ็ต customer_item_code เป็น party_name
         frappe.model.set_value(cdt, cdn, 'customer_item_code', frm.doc.party_name);
+    },
+    item_code: function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];  // Get the child table row
+        if (row.item_code) {
+            frappe.db.get_doc('Item', row.item_code)
+            .then(doc => {
+                if (doc.description) {
+                    frappe.model.set_value(cdt, cdn, 'custom_descriptions', doc.description);
+                } 
+            })
+            .catch(error => {
+                console.error('Error fetching item document:', error);
+            });
+        }
     }
 });
 
