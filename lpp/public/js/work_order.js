@@ -1,5 +1,5 @@
 frappe.ui.form.on("Work Order", {
-    refresh(frm) {        
+    refresh(frm) {                
         frm.set_df_property('status', 'hidden', 0);
         frm.set_df_property('company', 'hidden', 0);
 
@@ -331,21 +331,21 @@ function calculate_total_run_cards(frm) {
     }
 }
 
-function update_custom_jobcard_remaining(frm) {    
-    if(frm.doc.custom_total_run_cards && frm.doc.name && frm.doc.operations.length) {
+function update_custom_jobcard_remaining(frm) {        
+    if(frm.doc.custom_total_run_cards && frm.doc.name && frm.doc.operations?.length) {
         frm.call({
             method: 'lpp.custom.work_order.get_jobcard_remaining',
             args: {
                 data: frm.doc
             },
             callback: function (response) {
-                if (frm.doc.custom_jobcard_remaining != response.message) {
-                    frm.set_value("custom_jobcard_remaining", response.message);
+                if (frm.doc.custom_jobcard_remaining != response.message) {                    
+                    frm.set_value("custom_jobcard_remaining", response.message?.toString());
                 }
             }
         });
     } else {
-        frm.set_value("custom_jobcard_remaining", 0);
+        frm.set_value("custom_jobcard_remaining", null);
     }
 }
 
