@@ -42,7 +42,15 @@ def get_columns():
 			"fieldtype": "Data",
 			"width": 160,
             "align": "left"
-		},{
+		},
+        {
+			"label": _("Currency"),
+			"fieldname": "currency",
+			"fieldtype": "Data",
+			"width": 160,
+            "align": "left"
+		},
+        {
 			"label": _("Balance"),
 			"fieldname": "balance",
 			"fieldtype": "Currency",
@@ -77,7 +85,8 @@ def get_data(filters):
                     "group" : qr['customer_group'],
                     "entity" : dt["entity"],
                     "entity_name" : dt["entity_name"],
-                    "remark" : qr['result_currency'],
+                    "remark" : "",
+                    "currency" : qr['result_currency'],
                     "balance" : dt["total"],
                 }
                 report_data.append(json_data)
@@ -96,6 +105,7 @@ def get_data(filters):
                 "entity": "",
                 "entity_name": "",
                 "remark": "",
+                "currency" : "",
                 "balance": None
             })
 
@@ -107,6 +117,7 @@ def get_data(filters):
                     "entity": item['entity'],
                     "entity_name": item['entity_name'],
                     "remark": item['remark'],
+                    "currency": item['currency'],
                     "balance": item['balance']
                 })
 
@@ -130,6 +141,5 @@ def get_data(filters):
         })
 	# except KeyError as e:
         # print(f"KeyError encountered: {e}")
-
     return target_data
     
